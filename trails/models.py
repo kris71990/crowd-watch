@@ -143,8 +143,3 @@ class Report(models.Model):
   )
   horses_seen = models.BooleanField()
   dogs_seen = models.BooleanField()
-
-
-
-
-
