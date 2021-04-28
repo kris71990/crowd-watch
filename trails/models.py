@@ -37,7 +37,7 @@ class Trail(models.Model):
 
 class Trailhead(models.Model):
   def __str__(self):
-    return self.name + ' - ' + self.trail.name
+    return self.name + ' (' + self.trail.name + ')'
 
   PARKING_TYPES = [
     ('UL', 'Unpaved Lot'),
@@ -67,13 +67,15 @@ class Trailhead(models.Model):
     choices=PARKING_TYPES,
     help_text='Type of Parking at Trailhead'
   )
-  pkg_capacity = models.IntegerField(
-    'Parking Capacity', blank=True, null=True,
+  pkg_capacity = models.IntegerField('Parking Capacity', 
+    blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
   )
   bathroom = models.CharField(
-    help_text='Is there a bathroom at the trailhead?', blank=True, null=True,
-    max_length=1, choices=BATHROOM_STATUS
+    blank=True, null=True,
+    max_length=1, 
+    choices=BATHROOM_STATUS,
+    help_text='Is there a bathroom at the trailhead?'
   )
 
 class Report(models.Model):

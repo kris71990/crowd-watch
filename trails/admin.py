@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Trail
+from .models import Trail, Trailhead
 
 class TrailAdmin(admin.ModelAdmin):
   readonly_fields = ('id', 'modified')
@@ -12,4 +12,19 @@ class TrailAdmin(admin.ModelAdmin):
     })
   )
 
+class TrailheadAdmin(admin.ModelAdmin):
+  readonly_fields = ('id', 'trail', 'modified')
+  fieldsets = (
+    ('For Trail: ', {
+      'fields': ('trail',)
+    }),
+    (None, {
+      'fields': ('name', 'coordinates', 'pkg_type', 'pkg_capacity', 'bathroom')
+    }),
+    ('Metadata', {
+      'fields': ('id', 'modified')
+    })
+  )
+
 admin.site.register(Trail, TrailAdmin)
+admin.site.register(Trailhead, TrailheadAdmin)
