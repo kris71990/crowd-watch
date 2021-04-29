@@ -6,9 +6,10 @@
   </head>
   <body>
     {% if trails_list %}
+      <h1>{{ region }} Trails</h1>
       <ul>
         {% for trail in trails_list %}
-          <li>{{ trail }}</li>
+          <li><a href="{% url 'trailheads' region=region trail=trail.id %}">{{ trail.name }}</a></li>
         {% endfor%}
       </ul>
     {% else %}
