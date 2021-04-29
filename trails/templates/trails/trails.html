@@ -15,5 +15,15 @@
     {% else %}
       <p>No trails found</p>
     {% endif %}
+
+    {% if error_message %}
+      <p>{{ error_message }}</p>
+    {% endif %}
+
+    <form action="{% url 'trails' region %}" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Add">
+    </form>
   </body>
 </html>
