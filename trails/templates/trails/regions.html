@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Regions</title>
+  </head>
+  <body>
+    {% if regions_list %}
+      <ul>
+        {% for abbr, region in regions_list %}
+          <li><a href="{% url 'trails' abbr %}">{{ region }}</a></li>
+        {% endfor%}
+      </ul>
+    {% else %}
+      <p>Regions not found</p>
+    {% endif %}
+  </body>
+</html>
