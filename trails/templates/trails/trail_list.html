@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Trail Feed</title>
+  </head>
+  <body>
+    {% if trails_list %}
+      {% include "./header.html" %}
+      <h2>Trail Feed</h2>
+      <ul>
+        {% for trail in trails_list %}
+          <li>
+            <div>
+              <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a><span> | {{ trail.get_region_display }} | {{ trail.modified }}</span>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Regions not found</p>
+    {% endif %}
+  </body>
+</html>

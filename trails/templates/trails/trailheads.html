@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Trailheads</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
+    {% if trailheads_list %}
+      <h3>Trailheads ({{ trailheads_list.count }})</h3>
+      <ul>
+        {% for trailhead in trailheads_list %}
+          <li>
+            <div>
+              <p>{{ trailhead.name }} | <span>{{ trailhead.coordinates }}</span></p>
+              <p>{{ trailhead.modified }}</p>
+            </div>
+          </li>
+        {% endfor%}
+      </ul>
+    {% else %}
+      <p>No trailheads found</p>
+    {% endif %}
+  </body>
+</html>
