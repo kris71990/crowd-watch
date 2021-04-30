@@ -1,6 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
 
 from .models import Trail, Trailhead
 from .forms import TrailForm
@@ -10,8 +9,14 @@ def regions(request):
   context = { 'regions_list': regions_list }
   return render(request, 'trails/regions.html', context)
 
+def trail_list(request):
+  trails_list = Trail.objects.all().order_by('-modified')
+  context = { 'trails_list': trails_list }
+  return render(request, 'trails/trail_list.html', context)
+
 def trails(request, region):
-  trails_list = Trail.objects.filter(region=region)
+  trails_list = Trail.objects.filter(region=region).order_by('-modified')
+  
   if request.method == 'POST':
     form = TrailForm(request.POST)
     if form.is_valid():
@@ -27,27 +32,13 @@ def trails(request, region):
   }
   return render(request, 'trails/trails.html', context)
 
-def add_trail(request, region):
-  print(request.POST)
-  # try:
-  #   trail_to_add = request.POST['name']
-  # except (KeyError, Trail.DoesNotExist):
-  #   trails_list = Trail.objects.filter(region=region)
-  #   return render(request, 'trails/trails.html', { 
-  #     'trails_list': trails_list,
-  #     'region': region,
-  #   })
-  # else:
-  #   trail_instance = get_object_or_404(Trail, region=region, name=request.POST['name'])
-  #   Trail()
-
-
 def trailheads(request, region, trail):
-  trailheads_list = Trailhead.objects.filter(trail=trail)
+  trailheads_list = Trailhead.objects.filter(trail=trail).order_by('-modified')
+  trail_obj = Trail.objects.get(pk=trail)
   context = {
     'trailheads_list': trailheads_list,
     'region': region,
-    'trail': trail
+    'trail': trail_obj
   }
   return render(request, 'trails/trailheads.html', context)
 

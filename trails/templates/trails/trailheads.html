@@ -5,12 +5,18 @@
     <title>Trailheads</title>
   </head>
   <body>
+    {% include "./header.html" %}
+    <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
     {% if trailheads_list %}
-      <h1>{{ region }}<h1> 
-      <h2>{{ trail }} Trailheads</h2>
+      <h3>Trailheads ({{ trailheads_list.count }})</h3>
       <ul>
         {% for trailhead in trailheads_list %}
-          <li>{{ trailhead }}</li>
+          <li>
+            <div>
+              <p>{{ trailhead.name }} | <span>{{ trailhead.coordinates }}</span></p>
+              <p>{{ trailhead.modified }}</p>
+            </div>
+          </li>
         {% endfor%}
       </ul>
     {% else %}

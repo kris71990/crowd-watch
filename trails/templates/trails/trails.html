@@ -5,11 +5,13 @@
     <title>Trails</title>
   </head>
   <body>
+    {% include "./header.html" %}
     {% if trails_list %}
-      <h1>{{ region }} Trails</h1>
+      <h2>{{ trails_list.0.get_region_display }} Trails</h2>
       <ul>
         {% for trail in trails_list %}
-          <li><a href="{% url 'trailheads' region=region trail=trail.id %}">{{ trail.name }}</a></li>
+          <li><a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a><span> | {{ trail.modified }}</span>
+          </li>
         {% endfor%}
       </ul>
     {% else %}

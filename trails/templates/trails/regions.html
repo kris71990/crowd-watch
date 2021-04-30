@@ -6,7 +6,7 @@
   </head>
   <body>
     {% if regions_list %}
-      <h1>Crowd Watch - Washington State Trails</h1>
+      {% include "./header.html" %}
       <ul>
         {% for abbr, region in regions_list %}
           <li><a href="{% url 'trails' abbr %}">{{ region }}</a></li>
