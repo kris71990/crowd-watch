@@ -22,6 +22,7 @@
       <p>{{ error_message }}</p>
     {% endif %}
 
+    <h4>Add Trail</h4>
     <form action="{% url 'trails' region %}" method="post">
       {% csrf_token %}
       {{ form }}
