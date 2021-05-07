@@ -5,6 +5,9 @@ class Trail(models.Model):
   def __str__(self):
     return self.name
 
+  def get_id(self):
+    return self.id
+
   REGION_CHOICES = [
     ('OP', 'Olympic Peninsula'),
     ('NC', 'North Cascades'),

@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
 from .models import Trail, Trailhead
-from .forms import TrailForm
+from .forms import TrailForm, TrailheadForm
 
 def regions(request):
   regions_list = Trail.REGION_CHOICES
@@ -35,10 +35,20 @@ def trails(request, region):
 def trailheads(request, region, trail):
   trailheads_list = Trailhead.objects.filter(trail=trail).order_by('-modified')
   trail_obj = Trail.objects.get(pk=trail)
+
+  if request.method == 'POST':
+    form = TrailheadForm(request.POST)
+    if form.is_valid():
+      form.save()
+      return HttpResponseRedirect(request.path_info)
+  else:
+    form = TrailheadForm()
+
   context = {
     'trailheads_list': trailheads_list,
     'region': region,
-    'trail': trail_obj
+    'trail': trail_obj,
+    'form': form
   }
   return render(request, 'trails/trailheads.html', context)
 
