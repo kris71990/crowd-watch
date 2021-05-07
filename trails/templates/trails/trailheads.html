@@ -22,5 +22,12 @@
     {% else %}
       <p>No trailheads found</p>
     {% endif %}
+
+    <h4>Add Trailhead</h4>
+    <form action="{% url 'trailheads' region trail.id %}" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Add">
+    </form>
   </body>
 </html>

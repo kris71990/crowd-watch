@@ -2,20 +2,10 @@ from django.test import TestCase
 from django.urls import reverse
 from faker import Faker
 
-from ..models import Trail, Trailhead, Report
-from .mocks import *
+from ...models import Trail
+from ..mocks import create_trail
 
 fake = Faker()
-
-# /regions
-class RegionViewTests(TestCase):
-  # returns a list of regions
-  def test_region_list(self):
-    response = self.client.get(reverse('regions'))
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('regions.html')
-    self.assertEqual(len(response.context['regions_list']), 9)
-    self.assertIsInstance(response.context['regions_list'][0], tuple)
 
 # /list
 class TrailListViewTests(TestCase):
@@ -48,7 +38,7 @@ class TrailListViewTests(TestCase):
 # /<region>
 class TrailListByRegionViewTests(TestCase):
   # returns empty list when no trails exist in region
-  def test_trail_list_empty_by_region(self):
+  def test_trail_list_by_region_empty(self):
     region = 'CC'
     response = self.client.get(reverse('trails', args=(region,)))
     self.assertEqual(response.status_code, 200)
@@ -86,7 +76,7 @@ class TrailListByRegionViewTests(TestCase):
 
     path = reverse('trails', args=(region,))
     post_response = self.client.post(path, { 'name': 'dssf', 'region': region, 'coordinates': 'sffsd' })
-    self.assertRedirects(post_response, path, fetch_redirect_response=True)
+    self.assertRedirects(post_response, path)
 
     get_response = self.client.get(path, args=(region,))
     trails = get_response.context['trails_list']
@@ -97,13 +87,3 @@ class TrailListByRegionViewTests(TestCase):
     self.assertEqual(len(trails), 4)
     self.assertGreater(trails[0].modified, trails[1].modified)
     self.assertEqual(trails[0].name, 'dssf')
-
-    
-
-
-# class TrailheadViewTests(TestCase)
-  # /<region>/<trail> - returns all trailheads for trail 
-
-# class ReportViewTests(TestCase):
-  # /<region>/<trail>/<reports> - returns all reports for trail
-  # /<region>/<trail>/<trailhead> - returns all reports for trailhead
