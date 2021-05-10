@@ -1,4 +1,7 @@
 from ..models import Trail, Trailhead, Report
+from faker import Faker
+
+fake = Faker()
 
 def create_trail(name, region, coordinates):
   return Trail.objects.create(name=name, region=region, coordinates=coordinates)

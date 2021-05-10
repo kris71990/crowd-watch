@@ -1,15 +1,21 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput
 from .models import Trail, Trailhead, Report
 
 class TrailForm(ModelForm):
   class Meta:
     model = Trail
     fields = ['name', 'region', 'coordinates', 'length', 'elevation_gain']
+    # widgets = {
+    #   'region': TextInput(attrs={ 'readonly': 'readonly' })
+    # }
 
 class TrailheadForm(ModelForm):
   class Meta:
     model = Trailhead
     fields = ('trail', 'name', 'coordinates', 'pkg_type', 'pkg_capacity', 'bathroom')
+    # widgets = {
+    #   'trail': TextInput(attrs={ 'readonly': 'readonly' })
+    # }
 
 class ReportForm(ModelForm):
   class Meta:

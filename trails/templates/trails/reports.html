@@ -32,7 +32,7 @@
       <h4>Add Report</h4>
       <form action="{% url 'reports_trailhead' region trailhead.trail.id trailhead.id %}" method="post">
         {% csrf_token %}
-        {{ form }}
+        <table>{{ form.as_table }}</table>
         <input type="submit" value="Add">
       </form>
     {% endif %}

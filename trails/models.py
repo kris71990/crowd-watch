@@ -36,7 +36,10 @@ class Trail(models.Model):
   length = models.DecimalField(
     max_digits=4, decimal_places=1, help_text='From 0.0 to 999.9 miles', blank=True, null=True
   )
-  elevation_gain = models.IntegerField('Elevation Gain', blank=True, null=True)
+  elevation_gain = models.IntegerField('Elevation Gain', 
+    blank=True, null=True,
+    help_text='From trailhead to highest point of trail'
+  )
 
 class Trailhead(models.Model):
   def __str__(self):
@@ -59,7 +62,7 @@ class Trailhead(models.Model):
   trail = models.ForeignKey('Trail', on_delete=models.CASCADE)
   modified = models.DateTimeField('time modified', auto_now=True)
 
-  name = models.CharField(max_length=50, unique=True)
+  name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
   coordinates = models.CharField(
     max_length=25,
     help_text='Geographic coordinates searchable via Google Maps'

@@ -26,7 +26,7 @@
     <h4>Add Trailhead</h4>
     <form action="{% url 'trailheads' region trail.id %}" method="post">
       {% csrf_token %}
-      {{ form }}
+      <table>{{ form.as_table }}</table>
       <input type="submit" value="Add">
     </form>
   </body>
