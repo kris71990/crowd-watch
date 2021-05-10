@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Reports</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    {% if trail %}
+      <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
+    {% elif trailhead %}
+      <h2>{{ trailhead.trail.get_region_display }} | {{ trailhead.trail.name }} | {{ trailhead.name }}</h2>
+    {% endif %}
+
+    {% if reports_list %}
+      <h3>Reports ({{ reports_list.count }})</h3>
+      <ul>
+        {% for report in reports_list %}
+          <li>
+            <div>
+              <p>{{ report.date_hikes }} | <span>{{ report.day_hiked }}</span></p>
+              <p>{{ report.modified }}</p>
+            </div>
+          </li>
+        {% endfor%}
+      </ul>
+    {% else %}
+      <p>No reports found</p>
+    {% endif %}
+
+    {% if trailhead %}
+      <h4>Add Report</h4>
+      <form action="{% url 'reports_trailhead' region trailhead.trail.id trailhead.id %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Add">
+      </form>
+    {% endif %}
+  </body>
+</html>

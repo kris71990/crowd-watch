@@ -1,8 +1,8 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
-from .models import Trail, Trailhead
-from .forms import TrailForm, TrailheadForm
+from .models import Trail, Trailhead, Report
+from .forms import TrailForm, TrailheadForm, ReportForm
 
 def regions(request):
   regions_list = Trail.REGION_CHOICES
@@ -23,7 +23,7 @@ def trails(request, region):
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    form = TrailForm()
+    form = TrailForm(initial={ 'region': region })
 
   context = { 
     'trails_list': trails_list,
@@ -42,7 +42,7 @@ def trailheads(request, region, trail):
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    form = TrailheadForm()
+    form = TrailheadForm(initial={ 'trail': trail })
 
   context = {
     'trailheads_list': trailheads_list,
@@ -53,10 +53,28 @@ def trailheads(request, region, trail):
   return render(request, 'trails/trailheads.html', context)
 
 def reports_trailhead(request, region, trail, trailhead):
-  return HttpResponse('Reports for %s trailhead - %s (%s)' % (trailhead, trail, region))
+  reports = Report.objects.filter(trailhead=trailhead).order_by('-modified')
+  trailhead_obj = Trailhead.objects.get(pk=trailhead)
+  form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead })
+
+  context = {
+    'reports_list': reports,
+    'region': region, 
+    'trailhead': trailhead_obj,
+    'form': form
+  }
+  return render(request, 'trails/reports.html', context)
 
 def reports_trail(request, region, trail):
-  return HttpResponse('Reports for %s (%s)' % (trail, region))
+  reports = Report.objects.filter(trail=trail).order_by('-modified')
+  trail_obj = Trail.objects.get(pk=trail)
+
+  context = {
+    'reports_list': reports,
+    'region': region,
+    'trail': trail_obj,
+  }
+  return render(request, 'trails/reports.html', context)
 
 def index(request):
-  return HttpResponse('Hello World: Trails index.')
+  return render(request, 'trails/index.html')

@@ -9,5 +9,5 @@ urlpatterns = [
   path('<str:region>/<str:trail>/', views.trailheads, name='trailheads'),
   
   path('<str:region>/<str:trail>/reports/', views.reports_trail, name='reports_trail'),
-  path('<str:region>/<str:trail>/<str:trailhead>/', views.reports_trailhead, name='reports_trailhead')
+  path('<str:region>/<str:trail>/<str:trailhead>/reports/', views.reports_trailhead, name='reports_trailhead')
 ]

@@ -13,7 +13,7 @@
         {% for trailhead in trailheads_list %}
           <li>
             <div>
-              <p>{{ trailhead.name }} | <span>{{ trailhead.coordinates }}</span></p>
+              <p><a href="{% url 'reports_trailhead' region=trail.region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a> | <span>{{ trailhead.coordinates }}</span></p>
               <p>{{ trailhead.modified }}</p>
             </div>
           </li>
