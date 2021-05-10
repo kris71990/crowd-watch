@@ -55,7 +55,14 @@ def trailheads(request, region, trail):
 def reports_trailhead(request, region, trail, trailhead):
   reports = Report.objects.filter(trailhead=trailhead).order_by('-modified')
   trailhead_obj = Trailhead.objects.get(pk=trailhead)
-  form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead })
+
+  if request.method == 'POST':
+    form = ReportForm(request.POST)
+    if form.is_valid():
+      form.save()
+      return HttpResponseRedirect(request.path_info)
+  else:
+    form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead })
 
   context = {
     'reports_list': reports,
