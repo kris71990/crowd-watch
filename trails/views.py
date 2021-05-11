@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from .tests.mocks import create_bulk_reports
 
 from .models import Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm
@@ -11,6 +12,7 @@ def regions(request):
 
 def trail_list(request):
   trails_list = Trail.objects.all().order_by('-modified')
+  create_bulk_reports(region='NC', total=5)
   context = { 'trails_list': trails_list }
   return render(request, 'trails/trail_list.html', context)
 
@@ -82,6 +84,13 @@ def reports_trail(request, region, trail):
     'trail': trail_obj,
   }
   return render(request, 'trails/reports.html', context)
+
+def report(request, region, trail, trailhead, report):
+  report = Report.objects.get(pk=report)
+  context = {
+    'report': report,
+  }
+  return render(request, 'trails/report.html', context)
 
 def index(request):
   return render(request, 'trails/index.html')

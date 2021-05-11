@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Report</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    {% if report %}
+      <h2>{{ report.trail.get_region_display }} | {{ report.trail.name }} | {{ report.trailhead.name }}</h2>
+    {% endif %}
+    <div>
+      <p>Date: {{ report.date_hiked }}</p>
+      <p>Day: {{ report.day_hiked }}</p>
+      <p>Started hike: {{ report.trail_begin }}</p>
+      <p>Ended hike: {{ report.trail_end }}</p>
+
+      <h3>Trailhead Amenities</h3>
+      <p>Bathroom: {{ report.bathroom }}</p>
+      <p>Parking: {{ report.pkg_location }}</p>
+
+      <h3>Trail Conditions</h3>
+      <p>% Parking Full on Arrival: {{ report.pkg_estimate_begin }}</p>
+      <p>% Parking Full on Departure: {{ report.pkg_estimate_end }}</p>
+      <p>Most cars seen at trailhead: {{ report.cars_seen }}</p>
+      <p>Estimated people seen on trail: {{ report.people_seen }}</p>
+      <p>Dogs Seen: {{ report.dogs_seen }}</p>
+      <p>Horses Seen: {{ report.horses_seen }}</p>
+    </div>
+  </body>
+</html>

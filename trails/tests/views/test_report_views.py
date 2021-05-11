@@ -96,7 +96,7 @@ class ReportViewTests(TestCase):
         'dogs_seen': fake.boolean()
       })
 
-    response = self.client.get(reverse('reports_trail', args=(region, trailhead.trail.id,)))
+    response = self.client.get(reverse('reports_trail', args=(region, trail.id,)))
     reports = response.context['reports_list']
 
     self.assertEqual(response.status_code, 200)
@@ -141,3 +141,28 @@ class ReportViewTests(TestCase):
     self.assertEqual(len(reports), 1)
     self.assertEqual(reports[0].trail.name, 'test_trail')
     
+  def test_single_report(self):
+    region = 'CC'
+    trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word())
+    time = datetime.now()
+    report = create_report(report={
+      'trail': trailhead.trail, 
+      'trailhead': trailhead,
+      'date_hiked': fake.date(),
+      'day_hiked': 'Th',
+      'trail_begin': time.time(),
+      'trail_end': fake.time(),
+      'bathroom': 'N',
+      'pkg_location': 'P',
+      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
+      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
+      'cars_seen': fake.pyint(),
+      'people_seen': fake.pyint(),
+      'horses_seen': fake.boolean(),
+      'dogs_seen': fake.boolean()
+    })
+
+    response = self.client.get(reverse('report', args=(region, trailhead.trail.id, trailhead.id, report.id,)))
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('report.html')
+    self.assertEqual(response.context['report'].trail_begin, time.time())
