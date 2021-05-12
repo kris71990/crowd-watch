@@ -43,7 +43,7 @@ class Trail(models.Model):
 
 class Trailhead(models.Model):
   def __str__(self):
-    return self.name + ' (' + self.trail.name + ')'
+    return self.name
 
   PARKING_TYPES = [
     ('UL', 'Unpaved Lot'),
@@ -59,7 +59,7 @@ class Trailhead(models.Model):
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  trail = models.ForeignKey('Trail', on_delete=models.CASCADE)
+  trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
   modified = models.DateTimeField('time modified', auto_now=True)
 
   name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
@@ -112,8 +112,8 @@ class Report(models.Model):
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  trail = models.ForeignKey('Trail', on_delete=models.CASCADE)
-  trailhead = models.ForeignKey('Trailhead', on_delete=models.CASCADE)
+  trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
+  trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE)
 
   created = models.DateTimeField('time created', auto_now_add=True)
   modified = models.DateTimeField('time modified', auto_now=True)

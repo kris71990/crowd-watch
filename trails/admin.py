@@ -1,22 +1,18 @@
 from django.contrib import admin
 from .models import Trail, Trailhead, Report
 
-class TrailAdmin(admin.ModelAdmin):
-  readonly_fields = ('id', 'modified')
-  fieldsets = (
-    (None, {
-      'fields': ('name', 'region', 'coordinates', 'length', 'elevation_gain')
-    }),
-    ('Metadata', {
-      'fields': readonly_fields
-    })
-  )
+class TrailheadInline(admin.StackedInline):
+  model = Trailhead
+  readonly_fields = ('id', 'get_trail', 'modified')
 
-class TrailheadAdmin(admin.ModelAdmin):
-  readonly_fields = ('id', 'trail', 'modified')
+  def get_trail(self, obj):
+    return obj.trail.name
+
+  get_trail.short_description = 'Trail'
+
   fieldsets = (
-    ('For Trail: ', {
-      'fields': ('trail',)
+    ('For Trail', {
+      'fields': ('get_trail',)
     }),
     (None, {
       'fields': ('name', 'coordinates', 'pkg_type', 'pkg_capacity', 'bathroom')
@@ -25,22 +21,38 @@ class TrailheadAdmin(admin.ModelAdmin):
       'fields': ('id', 'modified')
     })
   )
+  extra = 1
+
+class TrailAdmin(admin.ModelAdmin):
+  readonly_fields = ['id', 'modified']
+  fieldsets = (
+    (None, {
+      'fields': ('name', 'region', 'coordinates', 'length', 'elevation_gain')
+    }),
+    ('Metadata', {
+      'fields': readonly_fields
+    })
+  )
+  inlines = [TrailheadInline]
+  list_display = ('name', 'region')
+  list_filter = ['region', 'modified']
 
 class ReportAdmin(admin.ModelAdmin):
-  readonly_fields = ('id', 'trail', 'trailhead', 'modified')
+  readonly_fields = ('id', 'modified')
   fieldsets = (
     ('For Trail', {
       'fields': ('trail', 'trailhead')
     }),
     (None, {
-      'fields': ('date_hiked', 'day_hiked', 'trail_begin', 'trail_end', 'bathroom', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'dogs_seen', 'horses_seen'),
+      'fields': ('date_hiked', 'day_hiked', 'trail_begin', 'trail_end', 'bathroom', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'dogs_seen', 'horses_seen')
     }),
     ('Metadata', {
-      'fields': ('id', 'modified')
+      'fields': readonly_fields
     })
   )
+  list_display = ('day_hiked', 'date_hiked')
+  list_filter = ['trail']
   
 
 admin.site.register(Trail, TrailAdmin)
-admin.site.register(Trailhead, TrailheadAdmin)
 admin.site.register(Report, ReportAdmin)

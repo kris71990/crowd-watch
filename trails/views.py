@@ -12,7 +12,7 @@ def regions(request):
 
 def trail_list(request):
   trails_list = Trail.objects.all().order_by('-modified')
-  create_bulk_reports(region='NC', total=5)
+  # create_bulk_reports(region='NC', total=5)
   context = { 'trails_list': trails_list }
   return render(request, 'trails/trail_list.html', context)
 
