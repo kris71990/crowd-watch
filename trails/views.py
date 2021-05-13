@@ -1,5 +1,7 @@
+from django.db.models.base import Model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.forms import ModelChoiceField
 from .tests.mocks import create_bulk_reports
 
 from .models import Trail, Trailhead, Report
@@ -36,7 +38,7 @@ def trails(request, region):
 
 def trailheads(request, region, trail):
   trailheads_list = Trailhead.objects.filter(trail=trail).order_by('-modified')
-  trail_obj = Trail.objects.get(pk=trail)
+  trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':
     form = TrailheadForm(request.POST)
@@ -44,12 +46,13 @@ def trailheads(request, region, trail):
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
+    TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
     form = TrailheadForm(initial={ 'trail': trail })
 
   context = {
     'trailheads_list': trailheads_list,
     'region': region,
-    'trail': trail_obj,
+    'trail': trail_obj[0],
     'form': form
   }
   return render(request, 'trails/trailheads.html', context)
@@ -57,6 +60,7 @@ def trailheads(request, region, trail):
 def reports_trailhead(request, region, trail, trailhead):
   reports = Report.objects.filter(trailhead=trailhead).order_by('-modified')
   trailhead_obj = Trailhead.objects.get(pk=trailhead)
+  trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':
     form = ReportForm(request.POST)
@@ -64,6 +68,9 @@ def reports_trailhead(request, region, trail, trailhead):
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
+    trailhead_choices = Trailhead.objects.filter(trail=trail)
+    ReportForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
+    ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead_choices)
     form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead })
 
   context = {

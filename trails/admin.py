@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from .models import Trail, Trailhead, Report
 
 class TrailheadInline(admin.StackedInline):
@@ -39,6 +40,16 @@ class TrailAdmin(admin.ModelAdmin):
 
 class ReportAdmin(admin.ModelAdmin):
   readonly_fields = ('id', 'modified')
+
+  def get_trail(self, obj):
+    return obj.trail.name
+
+  def get_trailhead(self, obj):
+    return obj.trailhead.name
+
+  get_trail.short_description = 'Trail'
+  get_trailhead.short_description = 'Trailhead'
+
   fieldsets = (
     ('For Trail', {
       'fields': ('trail', 'trailhead')
@@ -50,7 +61,7 @@ class ReportAdmin(admin.ModelAdmin):
       'fields': readonly_fields
     })
   )
-  list_display = ('day_hiked', 'date_hiked')
+  list_display = ('get_trail', 'get_trailhead', 'day_hiked', 'date_hiked')
   list_filter = ['trail']
   
 

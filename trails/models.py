@@ -88,6 +88,12 @@ class Report(models.Model):
   def __str__(self):
     return str(self.modified)
 
+  def get_trailhead(self):
+    return self.trailhead.name
+  
+  def get_trail(self):
+    return self.trail.name
+
   PARKING_TYPES = [
     ('UL', 'Unpaved Lot'),
     ('PL', 'Paved Lot'),
