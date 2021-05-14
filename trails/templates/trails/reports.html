@@ -18,7 +18,7 @@
         {% for report in reports_list %}
           <li>
             <div>
-              <p>{{ report.date_hiked }} | <span>{{ report.day_hiked }} || {{ report.modified }}</span> || 
+              <p><span>{{ report.get_day_hiked_display }}, {{ report.date_hiked }}</span> || 
               {% if trail %}
                 <a href="{% url 'report' region=region trail=trail.id trailhead=report.trailhead.id report=report.id %}">Details</a></p>
               {% else %}

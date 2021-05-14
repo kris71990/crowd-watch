@@ -52,10 +52,20 @@ class Trailhead(models.Model):
     ('P', 'Designated Pullout/Shoulder')
   ]
 
+  ACCESS_TYPES = [
+    ('FS', 'Forest Service Road'),
+    ('P', 'Paved Road'),
+  ]
+
   BATHROOM_STATUS = [
     ('O', 'Open'),
     ('C', 'Closed'),
-    ('N', 'None')
+  ]
+
+  BATHROOM_TYPE = [
+    ('P', 'Portable/Outhouse'),
+    ('FP', 'Fixed Building, Pit'),
+    ('FR', 'Fixed Building with plumbing')
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -68,6 +78,11 @@ class Trailhead(models.Model):
     help_text='Geographic coordinates searchable via Google Maps'
   )
 
+  access = models.CharField(
+    max_length=2, blank=True, null=True,
+    choices=ACCESS_TYPES,
+    help_text='How is the trailhead accessed?'
+  )
   pkg_type = models.CharField(
     max_length=2, blank=True, null=True,
     choices=PARKING_TYPES,
@@ -77,11 +92,17 @@ class Trailhead(models.Model):
     blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
   )
-  bathroom = models.CharField(
+  bathroom_type = models.CharField(
+    blank=True, null=True,
+    max_length=2, 
+    choices=BATHROOM_TYPE,
+    help_text='Is there a bathroom at the trailhead?'
+  )
+  bathroom_status = models.CharField(
     blank=True, null=True,
     max_length=1, 
     choices=BATHROOM_STATUS,
-    help_text='Is there a bathroom at the trailhead?'
+    help_text='Is the bathroom open?'
   )
 
 class Report(models.Model):
@@ -111,10 +132,20 @@ class Report(models.Model):
     ('Su', 'Sunday')
   ]
 
+  ACCESS_TYPES = [
+    ('FS', 'Forest Service Road'),
+    ('P', 'Paved Road'),
+  ]
+
   BATHROOM_STATUS = [
     ('O', 'Open'),
     ('C', 'Closed'),
-    ('N', 'None')
+  ]
+
+  BATHROOM_TYPE = [
+    ('P', 'Portable/Outhouse'),
+    ('FP', 'Fixed Building, Pit'),
+    ('FR', 'Fixed Building with plumbing')
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -130,11 +161,24 @@ class Report(models.Model):
     choices=DAYS,
     help_text='What day of the week was the hike?'
   )
+  access = models.CharField(
+    max_length=2, blank=True, null=True,
+    choices=ACCESS_TYPES,
+    help_text='How is the trailhead accessed?'
+  )
   trail_begin = models.TimeField(help_text='What time did the hike begin?')
   trail_end = models.TimeField(help_text='What time did the hike end?')
-  bathroom = models.CharField(
-    help_text='Is there a bathroom at the trailhead?', blank=True, null=True,
-    max_length=1, choices=BATHROOM_STATUS
+  bathroom_type = models.CharField(
+    blank=True, null=True,
+    max_length=2, 
+    choices=BATHROOM_TYPE,
+    help_text='Is there a bathroom at the trailhead?'
+  )
+  bathroom_status = models.CharField(
+    blank=True, null=True,
+    max_length=1, 
+    choices=BATHROOM_STATUS,
+    help_text='Is the bathroom open?'
   )
   pkg_location = models.CharField(
     max_length=2,

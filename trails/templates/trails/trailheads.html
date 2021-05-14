@@ -14,7 +14,6 @@
           <li>
             <div>
               <p><a href="{% url 'reports_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a> | <span>{{ trailhead.coordinates }}</span></p>
-              <p>{{ trailhead.modified }}</p>
             </div>
           </li>
         {% endfor%}
