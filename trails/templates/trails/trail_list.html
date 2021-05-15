@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,7 +15,10 @@
         {% for trail in trails_list %}
           <li>
             <div>
-              <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a><span> | {{ trail.get_region_display }} | {{ trail.modified }}</span>
+              <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a>
+              <span> | {{ trail.get_region_display }} | {{ trail.modified }} || 
+                <a href="{% url 'reports_trail' region=trail.region trail=trail.id %}">{{ trail.report__count }}</a>
+              </span>
             </div>
           </li>
         {% endfor %}

@@ -1,0 +1,12 @@
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.subheader {
+  border-bottom: 1px dashed black;
+}
+
+.report-footer {
+  border-top: 1px dashed black;
+}

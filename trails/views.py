@@ -1,8 +1,7 @@
-from django.db.models.base import Model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.db.models import Count
 from django.forms import ModelChoiceField
-from .tests.mocks import create_bulk_reports
 
 from .models import Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm
@@ -13,13 +12,12 @@ def regions(request):
   return render(request, 'trails/regions.html', context)
 
 def trail_list(request):
-  trails_list = Trail.objects.all().order_by('-modified')
-  # create_bulk_reports(region='NC', total=5)
+  trails_list = Trail.objects.annotate(Count('report')).order_by('-modified')
   context = { 'trails_list': trails_list }
   return render(request, 'trails/trail_list.html', context)
 
 def trails(request, region):
-  trails_list = Trail.objects.filter(region=region).order_by('-modified')
+  trails_list = Trail.objects.filter(region=region).annotate(Count('report')).order_by('-modified')
   
   if request.method == 'POST':
     form = TrailForm(request.POST)
@@ -37,7 +35,7 @@ def trails(request, region):
   return render(request, 'trails/trails.html', context)
 
 def trailheads(request, region, trail):
-  trailheads_list = Trailhead.objects.filter(trail=trail).order_by('-modified')
+  trailheads_list = Trailhead.objects.filter(trail=trail).annotate(Count('report')).order_by('-modified')
   trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':

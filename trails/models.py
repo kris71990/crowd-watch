@@ -1,5 +1,7 @@
-import uuid
+from django.core import validators
 from django.db import models
+import uuid
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Trail(models.Model):
   def __str__(self):
@@ -14,9 +16,9 @@ class Trail(models.Model):
     ('CC', 'Central Cascades'),
     ('SQ', 'Snoqualmie'),
     ('SC', 'South Cascades'),
+    ('WW', 'Western Washington Lowlands'),
     ('EW', 'Eastern Washington'),
     ('CW', 'Central Washington'),
-    ('WW', 'Western Washington Lowlands'),
     ('SW', 'Southwest Washington'),
   ]
 
@@ -34,11 +36,13 @@ class Trail(models.Model):
     help_text='Geographic coordinates searchable via Google Maps'
   )
   length = models.DecimalField(
-    max_digits=4, decimal_places=1, help_text='From 0.0 to 999.9 miles', blank=True, null=True
+    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
+    validators=[MinValueValidator(0.1)]
   )
   elevation_gain = models.IntegerField('Elevation Gain', 
     blank=True, null=True,
-    help_text='From trailhead to highest point of trail'
+    help_text='From trailhead to highest point of trail',
+    validators=[MinValueValidator(1)]
   )
 
 class Trailhead(models.Model):
@@ -91,6 +95,7 @@ class Trailhead(models.Model):
   pkg_capacity = models.IntegerField('Parking Capacity', 
     blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
+    validators=[MinValueValidator(0)]
   )
   bathroom_type = models.CharField(
     blank=True, null=True,
@@ -188,16 +193,20 @@ class Report(models.Model):
   pkg_estimate_begin = models.IntegerField(
     'Percentage Capacity Start',
     help_text='Approximate parking capacity full at trailhead arrival',
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   pkg_estimate_end = models.IntegerField(
     'Percentage Capacity End',
     help_text='Approximate parking capacity full at trailhead departure',
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   cars_seen = models.IntegerField(
-    'Cars seen', help_text='Most cars seen at arrival/departure'
+    'Cars seen', help_text='Most cars seen at arrival/departure',
+    validators=[MinValueValidator(0)]
   )
   people_seen = models.IntegerField(
-    'People seen', help_text='Approximate number of people encountered on trail'
+    'People seen', help_text='Approximate number of people encountered on trail',
+    validators=[MinValueValidator(0)]
   )
   horses_seen = models.BooleanField()
   dogs_seen = models.BooleanField()

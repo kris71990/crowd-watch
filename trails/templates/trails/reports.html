@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,19 +9,24 @@
   </head>
   <body>
     {% include "./header.html" %}
+    <div class="subheader">
     {% if trail %}
       <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
     {% elif trailhead %}
       <h2>{{ trailhead.trail.get_region_display }} | {{ trailhead.trail.name }} | {{ trailhead.name }}</h2>
     {% endif %}
+    </div>
 
+    <div class="report">
     {% if reports_list %}
       <h3>Reports ({{ reports_list.count }})</h3>
       <ul>
         {% for report in reports_list %}
           <li>
             <div>
-              <p><span>{{ report.get_day_hiked_display }}, {{ report.date_hiked }}</span> || 
+              <p>
+              {% if trail %}<span>{{ report.trailhead.name }} - </span>{% endif %}
+                <span>{{ report.get_day_hiked_display }}, {{ report.date_hiked }}</span> || 
               {% if trail %}
                 <a href="{% url 'report' region=region trail=trail.id trailhead=report.trailhead.id report=report.id %}">Details</a></p>
               {% else %}
@@ -31,6 +39,12 @@
     {% else %}
       <p>No reports found</p>
     {% endif %}
+    {% if trail %}
+    <div class="report-footer">
+      <p>To add a report, select a <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">trailhead</a></p>
+    </div>
+    {% endif %}
+    </div>
 
     {% if trailhead %}
       <h4>Add Report</h4>
