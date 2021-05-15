@@ -1,5 +1,7 @@
-import uuid
+from django.core import validators
 from django.db import models
+import uuid
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Trail(models.Model):
   def __str__(self):
@@ -14,9 +16,9 @@ class Trail(models.Model):
     ('CC', 'Central Cascades'),
     ('SQ', 'Snoqualmie'),
     ('SC', 'South Cascades'),
+    ('WW', 'Western Washington Lowlands'),
     ('EW', 'Eastern Washington'),
     ('CW', 'Central Washington'),
-    ('WW', 'Western Washington Lowlands'),
     ('SW', 'Southwest Washington'),
   ]
 
@@ -34,13 +36,18 @@ class Trail(models.Model):
     help_text='Geographic coordinates searchable via Google Maps'
   )
   length = models.DecimalField(
-    max_digits=4, decimal_places=1, help_text='From 0.0 to 999.9 miles', blank=True, null=True
+    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
+    validators=[MinValueValidator(0.1)]
   )
-  elevation_gain = models.IntegerField('Elevation Gain', blank=True, null=True)
+  elevation_gain = models.IntegerField('Elevation Gain', 
+    blank=True, null=True,
+    help_text='From trailhead to highest point of trail',
+    validators=[MinValueValidator(1)]
+  )
 
 class Trailhead(models.Model):
   def __str__(self):
-    return self.name + ' (' + self.trail.name + ')'
+    return self.name
 
   PARKING_TYPES = [
     ('UL', 'Unpaved Lot'),
@@ -49,22 +56,37 @@ class Trailhead(models.Model):
     ('P', 'Designated Pullout/Shoulder')
   ]
 
+  ACCESS_TYPES = [
+    ('FS', 'Forest Service Road'),
+    ('P', 'Paved Road'),
+  ]
+
   BATHROOM_STATUS = [
     ('O', 'Open'),
     ('C', 'Closed'),
-    ('N', 'None')
+  ]
+
+  BATHROOM_TYPE = [
+    ('P', 'Portable/Outhouse'),
+    ('FP', 'Fixed Building, Pit'),
+    ('FR', 'Fixed Building with plumbing')
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  trail = models.ForeignKey('Trail', on_delete=models.CASCADE)
+  trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
   modified = models.DateTimeField('time modified', auto_now=True)
 
-  name = models.CharField(max_length=50, unique=True)
+  name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
   coordinates = models.CharField(
     max_length=25,
     help_text='Geographic coordinates searchable via Google Maps'
   )
 
+  access = models.CharField(
+    max_length=2, blank=True, null=True,
+    choices=ACCESS_TYPES,
+    help_text='How is the trailhead accessed?'
+  )
   pkg_type = models.CharField(
     max_length=2, blank=True, null=True,
     choices=PARKING_TYPES,
@@ -73,17 +95,30 @@ class Trailhead(models.Model):
   pkg_capacity = models.IntegerField('Parking Capacity', 
     blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
+    validators=[MinValueValidator(0)]
   )
-  bathroom = models.CharField(
+  bathroom_type = models.CharField(
+    blank=True, null=True,
+    max_length=2, 
+    choices=BATHROOM_TYPE,
+    help_text='Is there a bathroom at the trailhead?'
+  )
+  bathroom_status = models.CharField(
     blank=True, null=True,
     max_length=1, 
     choices=BATHROOM_STATUS,
-    help_text='Is there a bathroom at the trailhead?'
+    help_text='Is the bathroom open?'
   )
 
 class Report(models.Model):
   def __str__(self):
     return str(self.modified)
+
+  def get_trailhead(self):
+    return self.trailhead.name
+  
+  def get_trail(self):
+    return self.trail.name
 
   PARKING_TYPES = [
     ('UL', 'Unpaved Lot'),
@@ -102,15 +137,25 @@ class Report(models.Model):
     ('Su', 'Sunday')
   ]
 
+  ACCESS_TYPES = [
+    ('FS', 'Forest Service Road'),
+    ('P', 'Paved Road'),
+  ]
+
   BATHROOM_STATUS = [
     ('O', 'Open'),
     ('C', 'Closed'),
-    ('N', 'None')
+  ]
+
+  BATHROOM_TYPE = [
+    ('P', 'Portable/Outhouse'),
+    ('FP', 'Fixed Building, Pit'),
+    ('FR', 'Fixed Building with plumbing')
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  trail = models.ForeignKey('Trail', on_delete=models.CASCADE)
-  trailhead = models.ForeignKey('Trailhead', on_delete=models.CASCADE)
+  trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
+  trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE)
 
   created = models.DateTimeField('time created', auto_now_add=True)
   modified = models.DateTimeField('time modified', auto_now=True)
@@ -121,11 +166,24 @@ class Report(models.Model):
     choices=DAYS,
     help_text='What day of the week was the hike?'
   )
+  access = models.CharField(
+    max_length=2, blank=True, null=True,
+    choices=ACCESS_TYPES,
+    help_text='How is the trailhead accessed?'
+  )
   trail_begin = models.TimeField(help_text='What time did the hike begin?')
   trail_end = models.TimeField(help_text='What time did the hike end?')
-  bathroom = models.CharField(
-    help_text='Is there a bathroom at the trailhead?', blank=True, null=True,
-    max_length=1, choices=BATHROOM_STATUS
+  bathroom_type = models.CharField(
+    blank=True, null=True,
+    max_length=2, 
+    choices=BATHROOM_TYPE,
+    help_text='Is there a bathroom at the trailhead?'
+  )
+  bathroom_status = models.CharField(
+    blank=True, null=True,
+    max_length=1, 
+    choices=BATHROOM_STATUS,
+    help_text='Is the bathroom open?'
   )
   pkg_location = models.CharField(
     max_length=2,
@@ -135,16 +193,20 @@ class Report(models.Model):
   pkg_estimate_begin = models.IntegerField(
     'Percentage Capacity Start',
     help_text='Approximate parking capacity full at trailhead arrival',
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   pkg_estimate_end = models.IntegerField(
     'Percentage Capacity End',
     help_text='Approximate parking capacity full at trailhead departure',
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   cars_seen = models.IntegerField(
-    'Cars seen', help_text='Most cars seen at arrival/departure'
+    'Cars seen', help_text='Most cars seen at arrival/departure',
+    validators=[MinValueValidator(0)]
   )
   people_seen = models.IntegerField(
-    'People seen', help_text='Approximate number of people encountered on trail'
+    'People seen', help_text='Approximate number of people encountered on trail',
+    validators=[MinValueValidator(0)]
   )
   horses_seen = models.BooleanField()
   dogs_seen = models.BooleanField()

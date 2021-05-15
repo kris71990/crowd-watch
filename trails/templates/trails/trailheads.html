@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,15 +9,16 @@
   </head>
   <body>
     {% include "./header.html" %}
-    <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
+    <div class="subheader">
+      <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
+    </div>
     {% if trailheads_list %}
       <h3>Trailheads ({{ trailheads_list.count }})</h3>
       <ul>
         {% for trailhead in trailheads_list %}
           <li>
             <div>
-              <p>{{ trailhead.name }} | <span>{{ trailhead.coordinates }}</span></p>
-              <p>{{ trailhead.modified }}</p>
+              <p><a href="{% url 'reports_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a> | <span>{{ trailhead.coordinates }} | {{ trailhead.report__count }}</span></p>
             </div>
           </li>
         {% endfor%}
@@ -26,7 +30,7 @@
     <h4>Add Trailhead</h4>
     <form action="{% url 'trailheads' region trail.id %}" method="post">
       {% csrf_token %}
-      {{ form }}
+      <table>{{ form.as_table }}</table>
       <input type="submit" value="Add">
     </form>
   </body>

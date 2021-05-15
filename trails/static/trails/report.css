@@ -1,0 +1,24 @@
+#report-table {
+  margin-top: 20px;
+}
+
+table {
+  border-collapse: collapse;
+}  
+
+th {
+  padding: 1em;
+  background-color: #2C520F;
+  border: 1px solid black;
+  color: white;
+}
+
+td {
+  padding: 0.5em;
+  border: 1px solid black;
+  color: black;
+}
+
+td:first-child {
+  font-weight: bold;
+}

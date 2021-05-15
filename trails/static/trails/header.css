@@ -1,0 +1,18 @@
+#header {
+  border-bottom: 3px double black;
+}
+
+#header a {
+  color: black;
+  text-decoration: none;
+}
+
+#header * {
+  display: inline-block;
+}
+
+#header h2 {
+  float: right;
+  font-style: italic;
+  color: #2C520F;
+}

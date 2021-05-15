@@ -1,0 +1,74 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/report.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Report</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    {% if report %}
+    <div class="subheader">
+      <h2>{{ report.trail.get_region_display }} | {{ report.trail.name }} | {{ report.trailhead.name }}</h2>
+    </div>
+    {% endif %}
+    <div id="report-table">
+      <table>
+        <tbody>
+          <tr><th colspan="3">Report</th></tr>
+          <tr>
+            <td>Time</td>
+            <td>Date: {{ report.date_hiked }}</td>
+            <td>Day: {{ report.get_day_hiked_display }}</td>
+          </tr>
+          <tr>
+            <td>Duration</td>
+            <td>Started hike: {{ report.trail_begin }}</td>
+            <td>Ended hike: {{ report.trail_end }}</td>
+          </tr>
+          <tr><th colspan="3">Trailhead Features</th></tr>
+          <tr>
+            <td>Access</td>
+            <td colspan="2">
+              {% if report.access %}{{ report.get_access_display }}
+              {% else %}No Data{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Parking</td>
+            <td colspan="2">
+              {% if report.pkg_location %}{{ report.get_pkg_location_display }}
+              {% else %}No Data{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Bathroom</td>
+            <td colspan="2">
+              {% if report.bathroom_type %}{{ report.get_bathroom_type_display }} - {{ report.get_bathroom_status_display }}
+              {% else %}No Data{% endif %}
+            </td>
+          </tr>
+          <tr><th colspan="3">Trail Conditions</th></tr>
+          <tr>
+            <td>Parking</td>
+            <td>Parking full on arrival: {{ report.pkg_estimate_begin }}%</td>
+            <td>Parking full on departure: {{ report.pkg_estimate_end }}%</td>
+          </tr>
+          <tr>
+            <td>People</td>
+            <td>Most cars seen at trailhead: {{ report.cars_seen }}</td>
+            <td>Estimated people seen on trail: {{ report.people_seen }}</td>
+          </tr>
+          <tr>
+            <td>Animals</td>
+            <td>Dogs Seen: {% if dogs_seen %} Yes {% else %} No {% endif %}</td>
+            <td>Horses Seen: {% if horses_seen %} Yes {% else %} No {% endif %}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
