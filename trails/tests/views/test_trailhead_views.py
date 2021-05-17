@@ -39,7 +39,7 @@ class TrailheadViewTests(TestCase):
 
 
   # create trailhead, return new list of trailheads for trail, in order
-  def test_create_trailhead(self):
+  def test_create_trailhead_view(self):
     region = 'CC'
     trail_name = 'test_trail'
     trail = create_trail(name=trail_name, region=region, coordinates=fake.word())

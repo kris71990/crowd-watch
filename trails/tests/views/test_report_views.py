@@ -49,7 +49,9 @@ class ReportViewTests(TestCase):
         'day_hiked': days[i],
         'trail_begin': fake.time(),
         'trail_end': fake.time(),
-        'bathroom': 'N',
+        'bathroom_status': 'C',
+        'bathroom_type': 'FP',
+        'access': 'FS',
         'pkg_location': 'P',
         'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
         'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
@@ -86,7 +88,9 @@ class ReportViewTests(TestCase):
         'day_hiked': days[i],
         'trail_begin': fake.time(),
         'trail_end': fake.time(),
-        'bathroom': 'N',
+        'bathroom_status': 'O',
+        'bathroom_type': 'FP', 
+        'access': 'FS',
         'pkg_location': 'P',
         'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
         'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
@@ -107,7 +111,7 @@ class ReportViewTests(TestCase):
     self.assertGreater(reports[0].modified, reports[1].modified)
 
   # creates a report and returns updated list of reports
-  def test_create_report(self):
+  def test_create_report_view(self):
     region = 'CC'
     trail_name = 'test_trail'
     trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
@@ -121,7 +125,9 @@ class ReportViewTests(TestCase):
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': time.time(),
-      'bathroom': 'N',
+      'bathroom_status': 'O',
+      'bathroom_type': 'FP',
+      'access': 'P',
       'pkg_location': 'P',
       'pkg_estimate_begin': 29,
       'pkg_estimate_end': 34,
@@ -152,7 +158,9 @@ class ReportViewTests(TestCase):
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': fake.time(),
-      'bathroom': 'N',
+      'bathroom_status': 'O',
+      'bathroom_type': 'FP',
+      'access': 'P',
       'pkg_location': 'P',
       'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
       'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),

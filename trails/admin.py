@@ -55,7 +55,7 @@ class ReportAdmin(admin.ModelAdmin):
       'fields': ('trail', 'trailhead')
     }),
     (None, {
-      'fields': ('date_hiked', 'day_hiked', 'trail_begin', 'trail_end', 'bathroom', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'dogs_seen', 'horses_seen')
+      'fields': ('date_hiked', 'day_hiked', 'access', 'trail_begin', 'trail_end', 'bathroom_type', 'bathroom_status', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'dogs_seen', 'horses_seen')
     }),
     ('Metadata', {
       'fields': readonly_fields
