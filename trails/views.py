@@ -8,7 +8,17 @@ from .forms import TrailForm, TrailheadForm, ReportForm
 
 def regions(request):
   regions_list = Trail.REGION_CHOICES
-  context = { 'regions_list': regions_list }
+  region_trail_count = []
+  for i in Trail.REGION_CHOICES:
+    trail_count = len(Trail.objects.filter(region=i[0]).values('name'))
+    region_trail_count.append(trail_count)
+
+  print(region_trail_count)
+
+  context = { 
+    'regions_list': regions_list,
+    'region_trail_count': region_trail_count
+  }
   return render(request, 'trails/regions.html', context)
 
 def trail_list(request):
