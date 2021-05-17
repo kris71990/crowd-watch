@@ -1,0 +1,27 @@
+.trail-table {
+  margin-top: 20px;
+}
+
+thead td {
+  font-weight: bold;
+}
+
+td {
+  padding: 0.5em 3em;
+  border-bottom: 1px solid black;
+  border-right: 1px dashed black;
+  color: black;
+}
+
+td:last-child {
+  border-right: none;
+}
+
+form {
+  display: inline-block;
+  border: 2px solid black;
+}
+
+form td {
+  border: none;
+}

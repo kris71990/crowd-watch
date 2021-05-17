@@ -15,7 +15,9 @@
       {% include "./header.html" %}
       <ul>
         {% for abbr, region in regions_list %}
-          <li><a href="{% url 'trails' abbr %}">{{ region }} || {{ region_trail_count|lookup:forloop.counter0 }}</li>
+          <li><a href="{% url 'trails' abbr %}">{{ region }}</a> 
+            <span>{{ region_trail_count|lookup:forloop.counter0 }}</span>
+          </li>
         {% endfor %}
       </ul>
     {% else %}
