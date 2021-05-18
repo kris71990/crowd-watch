@@ -32,7 +32,7 @@ class TrailheadViewTests(TestCase):
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads.html')
-    self.assertContains(response, 'Trailheads (2)')
+    self.assertContains(response, 'Trailhead')
     self.assertEqual(response.context['trail'], trail)
     self.assertEqual(len(trailheads), 2)
     self.assertGreater(trailheads[0].modified, trailheads[1].modified)
@@ -55,7 +55,7 @@ class TrailheadViewTests(TestCase):
 
     self.assertEqual(get_response.status_code, 200)
     self.assertTemplateUsed('trailheads.html')
-    self.assertContains(get_response, 'Trailheads (3)')
+    self.assertContains(get_response, 'Trailhead')
     self.assertEqual(len(trailheads), 3)
     self.assertGreater(trailheads[0].modified, trailheads[1].modified)
     self.assertEqual(trailheads[0].name, 'abcd')

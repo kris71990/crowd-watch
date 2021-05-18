@@ -13,7 +13,7 @@ class TrailForm(ModelForm):
 class TrailheadForm(ModelForm):
   class Meta:
     model = Trailhead
-    fields = ('trail', 'name', 'coordinates', 'access', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
+    fields = ('trail', 'name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
     # widgets = {
     #   'trail': TextInput(attrs={ 'readonly': 'readonly' })
     # }
@@ -26,7 +26,7 @@ class ReportForm(ModelForm):
       year_choices.append(current_year - i)
 
     model = Report
-    fields = ('trail', 'trailhead', 'date_hiked', 'day_hiked', 'access', 'trail_begin', 'trail_end', 'bathroom_type', 'bathroom_status', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'horses_seen', 'dogs_seen')
+    fields = ('trail', 'trailhead', 'date_hiked', 'day_hiked', 'weather_type', 'temperature', 'car_type', 'access', 'access_distance', 'access_condition','trail_begin', 'trail_end', 'bathroom_type', 'bathroom_status', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'horses_seen', 'dogs_seen')
     widgets = {
       'date_hiked': SelectDateWidget(
         years=year_choices,
