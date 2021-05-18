@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.db.models import Count
 from django.forms import ModelChoiceField
-from datetime import datetime
+from django.utils import timezone
 
 from .models import Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm
@@ -28,7 +28,6 @@ def trail_list(request):
 def reports_list(request):
   reports_list = Report.objects.all().order_by('-modified')
   context = { 'reports_list': reports_list }
-  print(reports_list)
   return render(request, 'trails/report_list.html', context)
 
 def trails(request, region):
@@ -56,7 +55,7 @@ def trailheads(request, region, trail):
   if request.method == 'POST':
     form = TrailheadForm(request.POST)
     if form.is_valid():
-      trail_obj.update(modified=datetime.now())
+      trail_obj.update(modified=timezone.now())
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
@@ -79,8 +78,9 @@ def reports_trailhead(request, region, trail, trailhead):
   if request.method == 'POST':
     form = ReportForm(request.POST)
     if form.is_valid():
-      trail_obj.update(modified=datetime.now())
-      trailhead_obj.update(modified=datetime.now())
+      trail_obj.update(modified=timezone.now())
+      trailhead_obj.modified = timezone.now()
+      trailhead_obj.save(update_fields=['modified'])
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:

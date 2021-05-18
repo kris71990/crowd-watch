@@ -11,6 +11,46 @@ fake = Faker()
 # /<region>/<trail>/reports
 # /<region>/<trail>/<trailhead>/reports
 class ReportViewTests(TestCase):
+  def test_report_feed(self):
+    regions = ['CC', 'WW', 'NC']
+    days = ['M', 'T', 'W', 'TH', 'F']
+    for i in range(3):
+      trailhead = create_trail_and_trailhead(name=fake.name(), region=regions[i], coordinates=fake.word())
+      create_report(report={
+        'trail': trailhead.trail, 
+        'trailhead': trailhead,
+        'date_hiked': fake.date(),
+        'day_hiked': days[i],
+        'trail_begin': fake.time(),
+        'trail_end': fake.time(),
+        'car_type': 'Suv',
+        'weather_type': 'S',
+        'temperature': 'C',
+        'bathroom_status': 'C',
+        'bathroom_type': 'FP',
+        'access': 'FS',
+        'access_distance': 5.0,
+        'access_condition': 'P+',
+        'pkg_location': 'P',
+        'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
+        'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
+        'cars_seen': fake.pyint(),
+        'people_seen': fake.pyint(),
+        'horses_seen': fake.boolean(),
+        'dogs_seen': fake.boolean()
+      })
+      
+    response = self.client.get(reverse('reports_list'))
+    reports = response.context['reports_list']
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('report_list.html')
+    self.assertContains(response, 'Report Feed')
+
+    self.assertEqual(len(reports), 3)
+    self.assertGreater(reports[0].modified, reports[1].modified)
+    self.assertGreater(reports[1].modified, reports[2].modified)
+
   # returns empty list of reports for a trail
   def test_report_list_trail_empty(self):
     region = 'CC'
