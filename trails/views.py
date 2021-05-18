@@ -13,8 +13,6 @@ def regions(request):
     trail_count = len(Trail.objects.filter(region=i[0]).values('name'))
     region_trail_count.append(trail_count)
 
-  print(region_trail_count)
-
   context = { 
     'regions_list': regions_list,
     'region_trail_count': region_trail_count
@@ -27,7 +25,7 @@ def trail_list(request):
   return render(request, 'trails/trail_list.html', context)
 
 def trails(request, region):
-  trails_list = Trail.objects.filter(region=region).annotate(Count('report')).order_by('-modified')
+  trails_list = Trail.objects.annotate(Count('report')).filter(region=region).order_by('-modified')
   
   if request.method == 'POST':
     form = TrailForm(request.POST)

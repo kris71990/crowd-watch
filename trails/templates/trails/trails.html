@@ -37,6 +37,7 @@
           {% endfor%}
         </tbody>
       </table>
+    </div>
     {% else %}
       <p>No trails found</p>
     {% endif %}
@@ -45,11 +46,13 @@
       <p>{{ error_message }}</p>
     {% endif %}
 
-    <h4>Add Trail</h4>
-    <form action="{% url 'trails' region %}" method="post">
-      {% csrf_token %}
-      <table>{{ form.as_table }}</table>
-      <input type="submit" value="Add">
-    </form>
+    <div class="form-box">
+      <h4>Add Trail</h4>
+      <form action="{% url 'trails' region %}" method="post">
+        {% csrf_token %}
+        <table>{{ form.as_table }}</table>
+        <input class="button" type="submit" value="Add">
+      </form>
+    </div>
   </body>
 </html>

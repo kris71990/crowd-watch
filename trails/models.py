@@ -1,7 +1,7 @@
 from django.core import validators
 from django.db import models
 import uuid
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 
 class Trail(models.Model):
   def __str__(self):
@@ -185,7 +185,7 @@ class Report(models.Model):
     choices=BATHROOM_STATUS,
     help_text='Is the bathroom open?'
   )
-  pkg_location = models.CharField(
+  pkg_location = models.CharField('Type of Parking',
     max_length=2,
     choices=PARKING_TYPES,
     help_text='Where did you park at the trailhead?'
@@ -193,12 +193,12 @@ class Report(models.Model):
   pkg_estimate_begin = models.IntegerField(
     'Percentage Capacity Start',
     help_text='Approximate parking capacity full at trailhead arrival',
-    validators=[MinValueValidator(0), MaxValueValidator(100)]
+    validators=[MinValueValidator(0)]
   )
   pkg_estimate_end = models.IntegerField(
     'Percentage Capacity End',
     help_text='Approximate parking capacity full at trailhead departure',
-    validators=[MinValueValidator(0), MaxValueValidator(100)]
+    validators=[MinValueValidator(0)]
   )
   cars_seen = models.IntegerField(
     'Cars seen', help_text='Most cars seen at arrival/departure',

@@ -12,7 +12,11 @@
     {% include "./header.html" %}
     {% if report %}
     <div class="subheader">
-      <h2>{{ report.trail.get_region_display }} | {{ report.trail.name }} | {{ report.trailhead.name }}</h2>
+      <h2>
+        <a href="{% url 'trails' report.trail.region %}">{{ report.trail.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=report.trail.region trail=report.trail.id %}">{{ report.trail.name }}</a> |
+        <a href="{% url 'reports_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
+      </h2>
     </div>
     {% endif %}
     <div id="report-table">

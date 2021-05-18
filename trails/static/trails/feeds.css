@@ -1,5 +1,6 @@
 .trail-table {
   margin-top: 20px;
+  margin-bottom: 40px;
 }
 
 thead td {
@@ -17,11 +18,32 @@ td:last-child {
   border-right: none;
 }
 
+td:last-child a {
+  color: #2C520F;
+}
+
+td:last-child a:hover {
+  font-weight: bold;
+}
+
 form {
+  border-top: 1px dashed black;
   display: inline-block;
-  border: 2px solid black;
 }
 
 form td {
   border: none;
+}
+
+form tr:last-child td {
+  border-bottom: 1px dashed black;
+}
+
+form .button {
+  padding: 5px 40px;
+  float: right;
+}
+
+form .button:hover {
+  cursor: pointer;
 }

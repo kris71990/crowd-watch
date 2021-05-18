@@ -1,5 +1,6 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
 
 <!DOCTYPE html>
 <html>
@@ -10,28 +11,47 @@
   <body>
     {% include "./header.html" %}
     <div class="subheader">
-      <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
+      <h2>
+        <a href="{% url 'trails' trail.region %}">{{ trail.get_region_display }}</a> | 
+        {{ trail.name }}
+      </h2>
     </div>
     {% if trailheads_list %}
-      <h3>Trailheads ({{ trailheads_list.count }})</h3>
-      <ul>
-        {% for trailhead in trailheads_list %}
-          <li>
-            <div>
-              <p><a href="{% url 'reports_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a> | <span>{{ trailhead.coordinates }} | {{ trailhead.report__count }}</span></p>
-            </div>
-          </li>
-        {% endfor%}
-      </ul>
+    <div class="trail-table">
+      <table>
+        <thead>
+          <tr>
+            <td>Trailhead</td>
+            <td>Location</td>
+            <td>Updated</td>
+            <td>Reports</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trailhead in trailheads_list %}
+            <tr>
+              <td>
+                <a href="{% url 'reports_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a>
+              </td>
+              <td>{{ trailhead.coordinates }}</td>
+              <td>{{ trailhead.modified|date:"m/d/y" }}</td>
+              <td>{{ trailhead.report__count }}</td>
+            </li>
+          {% endfor%}
+        </tbody>
+      </table>
+    </div>
     {% else %}
       <p>No trailheads found</p>
     {% endif %}
 
-    <h4>Add Trailhead</h4>
-    <form action="{% url 'trailheads' region trail.id %}" method="post">
-      {% csrf_token %}
-      <table>{{ form.as_table }}</table>
-      <input type="submit" value="Add">
-    </form>
+    <div class="form-box">
+      <h4>Add Trailhead</h4>
+      <form action="{% url 'trailheads' region trail.id %}" method="post">
+        {% csrf_token %}
+        <table>{{ form.as_table }}</table>
+        <input class="button" type="submit" value="Add">
+      </form>
+    </div>
   </body>
 </html>
