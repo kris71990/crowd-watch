@@ -50,11 +50,17 @@
         {{ form.non_field_errors }}
         {% for field in form %}
           <div class="field">
-            {{ field.errors }}
-            {{ field.label_tag }} {{ field }}
-            {% if field.help_text %}
-              <p>{{ field.help_text|safe }}</p>
+            {% if field.field.required %}
+              <p class="label"><span>*</span> {{ field.label_tag }}</p>
+            {% else %}
+              {{ field.label_tag }}
             {% endif %}
+
+            {{ field }}
+            {% if field.help_text %}
+              <p class="help">{{ field.help_text|safe }}</p>
+            {% endif %}
+            {{ field.errors }}
           </div>
         {% endfor %}
         <input class="button" type="submit" value="Add">

@@ -1,6 +1,7 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/forms.css' %}">
 
 <!DOCTYPE html>
 <html>
@@ -49,7 +50,22 @@
       <h4>Add Trailhead</h4>
       <form action="{% url 'trailheads' region trail.id %}" method="post">
         {% csrf_token %}
-        <table>{{ form.as_table }}</table>
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          <div class="field">
+            {% if field.field.required %}
+              <p class="label"><span>*</span> {{ field.label_tag }}</p>
+            {% else %}
+              {{ field.label_tag }}
+            {% endif %}
+            
+            {{ field }}
+            {% if field.help_text %}
+              <p>{{ field.help_text|safe }}</p>
+            {% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
         <input class="button" type="submit" value="Add">
       </form>
     </div>

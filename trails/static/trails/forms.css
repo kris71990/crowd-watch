@@ -1,16 +1,21 @@
 form {
   border-top: 1px dashed black;
   display: inline-block;
-  width: 400px;
+  width: 500px;
 }
 
 .field {
   display: grid;
-  grid-template-columns: 2fr 2fr;
+  grid-template-columns: 3fr 2fr;
+  margin: 10px 0;
 }
 
 .field input, .field select {
   width: 200px;
+}
+
+.field select {
+  display: block;
 }
 
 .field:first-of-type {
@@ -19,6 +24,7 @@ form {
 
 .field:last-of-type {
   border-bottom: 1px dashed black;
+  padding-bottom: 10px;
 }
 
 .field label {
@@ -31,6 +37,13 @@ form {
   font-style: italic;
 }
 
+.field .label {
+  font-size: initial;
+  font-style: initial;
+  padding: 0;
+  margin: 0;
+}
+
 form .button {
   margin-top: 10px;
   padding: 5px 40px;
@@ -39,4 +52,13 @@ form .button {
 
 form .button:hover {
   cursor: pointer;
+}
+
+.errorlist {
+  color: red;
+  font-size: 0.8em;
+}
+
+.field span {
+  color: red;
 }

@@ -92,12 +92,12 @@ class Trailhead(models.Model):
     help_text='If accessed via service road, length of service road from paved road to trailhead',
     validators=[MinValueValidator(0)]
   )
-  pkg_type = models.CharField(
+  pkg_type = models.CharField('Parking type',
     max_length=2, blank=True, null=True,
     choices=PARKING_TYPES,
     help_text='Type of Parking at Trailhead'
   )
-  pkg_capacity = models.IntegerField('Parking Capacity', 
+  pkg_capacity = models.IntegerField('Parking capacity', 
     blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
     validators=[MinValueValidator(0)]
@@ -234,7 +234,7 @@ class Report(models.Model):
     blank=True, null=True,
     max_length=2,
     choices=ACCESS_CONDITIONS,
-    help_text='If accessed via service road, What condition was the service road in?'
+    help_text='If accessed via service road, the condition of the service road?'
   )
   trail_begin = models.TimeField(help_text='What time did the hike begin?')
   trail_end = models.TimeField(help_text='What time did the hike end?')

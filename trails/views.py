@@ -39,7 +39,7 @@ def trails(request, region):
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    form = TrailForm(initial={ 'region': region })
+    form = TrailForm(initial={ 'region': region }, label_suffix='')
 
   context = { 
     'trails_list': trails_list,
@@ -60,7 +60,7 @@ def trailheads(request, region, trail):
       return HttpResponseRedirect(request.path_info)
   else:
     TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    form = TrailheadForm(initial={ 'trail': trail })
+    form = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
 
   context = {
     'trailheads_list': trailheads_list,
@@ -87,7 +87,7 @@ def reports_trailhead(request, region, trail, trailhead):
     trailhead_choices = Trailhead.objects.filter(trail=trail)
     ReportForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
     ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead_choices)
-    form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead })
+    form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead }, label_suffix='')
 
   context = {
     'reports_list': reports,
