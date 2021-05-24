@@ -87,3 +87,16 @@ class TrailListByRegionViewTests(TestCase):
     self.assertEqual(len(trails), 4)
     self.assertGreater(trails[0].modified, trails[1].modified)
     self.assertEqual(trails[0].name, 'dssf')
+
+  def test_create_trail_error_name(self):
+    region = 'CC'
+    path = reverse('trails', args=(region,))
+    response = self.client.post(path, {
+      'region': region,
+      'coordinates': '21313'
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('trails.html')
+    self.assertContains(response, 'name')
+
