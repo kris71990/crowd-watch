@@ -7,6 +7,9 @@ urlpatterns = [
 
   path('list/', views.trail_list, name='trail_list'),
   path('reports/', views.reports_list, name='reports_list'),
+  # TODO 
+  path('reports/<str:day>', views.reports_day, name='reports_day'),
+  #
 
   path('<str:region>/', views.trails, name='trails'),
   path('<str:region>/<str:trail>/', views.trailheads, name='trailheads'),
@@ -14,5 +17,9 @@ urlpatterns = [
   path('<str:region>/<str:trail>/reports/', views.reports_trail, name='reports_trail'),
   path('<str:region>/<str:trail>/<str:trailhead>/reports/', views.reports_trailhead, name='reports_trailhead'),
 
-  path('<str:region>/<str:trail>/<str:trailhead>/<str:report>/', views.report, name='report')
+  path('<str:region>/<str:trail>/<str:trailhead>/<str:report>/', views.report, name='report'),
+
+  # TODO
+  path('<str:region>/<str:trail>/reports/<str:day>')
+  #
 ]

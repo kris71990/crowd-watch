@@ -14,8 +14,7 @@ def create_trail_and_trailhead(name, region, coordinates):
   trail = Trail.objects.create(name=name, region=region, coordinates=coordinates)
   return Trailhead.objects.create(trail=trail, name=fake.name(), coordinates=coordinates)
 
-def create_report(report):
-  access = Report.ACCESS_CONDITIONS[randint(0, len(Report.ACCESS_CONDITIONS) - 1)][0]
+def generate_random_choices():
   day_hiked = Report.DAYS[randint(0, len(Report.DAYS) - 1)][0]
   car_type = Report.CAR_TYPES[randint(0, len(Report.CAR_TYPES) - 1)][0]
   weather_type = Report.WEATHER_TYPE[randint(0, len(Report.WEATHER_TYPE) - 1)][0]
@@ -25,6 +24,12 @@ def create_report(report):
   access = Report.ACCESS_TYPES[randint(0, len(Report.ACCESS_TYPES) - 1)][0]
   access_condition = Report.ACCESS_CONDITIONS[randint(0, len(Report.ACCESS_CONDITIONS) - 1)][0]
   pkg_location = Report.PARKING_TYPES[randint(0, len(Report.PARKING_TYPES) - 1)][0]
+  return {
+    'access': access, 'day_hiked': day_hiked, 'car_type': car_type, 'weather_type': weather_type, 'temperature': temperature, 'bathroom_status': bathroom_status, 'bathroom_type': bathroom_type, 'access_condition': access_condition, 'pkg_location': pkg_location
+  }
+
+def create_report(report):
+  random_choices = generate_random_choices()
   if 'access_distance' in report:
     access_distance = report['access_distance']
   else:
@@ -43,40 +48,42 @@ def create_report(report):
     people_seen=report['people_seen'], 
     horses_seen=report['horses_seen'], 
     dogs_seen=report['dogs_seen'],
-    day_hiked=day_hiked, 
-    bathroom_status=bathroom_status, 
-    bathroom_type=bathroom_type, 
-    access=access, 
-    access_condition=access_condition, 
-    car_type=car_type, 
-    temperature=temperature, 
-    weather_type=weather_type, 
-    pkg_location=pkg_location, 
+    day_hiked=random_choices['day_hiked'], 
+    bathroom_status=random_choices['bathroom_status'], 
+    bathroom_type=random_choices['bathroom_type'], 
+    access=random_choices['access'], 
+    access_condition=random_choices['access_condition'], 
+    car_type=random_choices['car_type'], 
+    temperature=random_choices['temperature'], 
+    weather_type=random_choices['weather_type'], 
+    pkg_location=random_choices['pkg_location'], 
   )
 
 def create_bulk_reports(region, total):
   trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word())
-  days = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
-  br_status = ['C', 'N']
-  br_type = ['P', 'FP', 'FR']
-  pk = ['UL', 'PL', 'S', 'P']
 
   for i in range(total):
+    random_choices = generate_random_choices()
     create_report(report={
       'trail': trailhead.trail, 
       'trailhead': trailhead,
-      'access': 'P',
       'date_hiked': fake.date(),
-      'day_hiked': days[randint(0, len(days) - 1)],
       'trail_begin': fake.time(),
       'trail_end': fake.time(),
-      'bathroom_status': br_status[randint(0, len(br_status) - 1)],
-      'bathroom_type': br_type[randint(0, len(br_type) - 1)],
-      'pkg_location': pk[randint(0, len(pk) - 1)],
       'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
       'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
       'cars_seen': fake.pyint(),
       'people_seen': fake.pyint(),
       'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean()
+      'dogs_seen': fake.boolean(),
+      'access_distance': randint(0, 20),
+      'access': random_choices['access'],
+      'access_condition': random_choices['access_condition'],
+      'day_hiked': random_choices['day_hiked'],
+      'bathroom_status': random_choices['bathroom_status'],
+      'bathroom_type': random_choices['bathroom_type'],
+      'pkg_location': random_choices['pkg_location'],
+      'car_type': random_choices['car_type'],
+      'temperature': random_choices['temperature'],
+      'weather_type': random_choices['weather_type']
     })

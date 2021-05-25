@@ -3,7 +3,6 @@ from django.urls import reverse
 from faker import Faker
 from datetime import datetime
 
-from ...models import Trail, Trailhead, Report
 from ..mocks import *
 
 fake = Faker()
@@ -384,3 +383,33 @@ class SingleReportViewTests(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('report.html')
     self.assertEqual(response.context['report'].trail_begin, time.time())
+
+# reports/<str:day>
+class ReportFilterViews(TestCase):
+  # returns reports from all trails/regions for a specific day
+  def test_filter_by_day(self):
+    create_bulk_reports('CC', 3)
+    create_bulk_reports('NC', 3)
+
+    response = self.client.get(reverse('reports_day', args=('S',)))
+
+    reports_day = response.context['reports_day']
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports_day.html')
+    for i in range(len(reports_day)):
+      self.assertEqual(reports_day[i]['day_hiked'], 'S')
+
+  def test_filter_by_time(self):
+    create_bulk_reports('CC', 3)
+    create_bulk_reports('NC', 3)
+    time = datetime.time(12, 00)
+
+    response = self.client.get(reverse('reports_time', args=('morning',)))
+
+    reports_time = response.context['reports_time']
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports_time.html')
+    for i in range(len(reports_time)):
+      self.assertLessEqual(reports_time[i]['trail_begin'], time)
+
+  
