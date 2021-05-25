@@ -15,8 +15,43 @@ def create_trail_and_trailhead(name, region, coordinates):
   return Trailhead.objects.create(trail=trail, name=fake.name(), coordinates=coordinates)
 
 def create_report(report):
+  access = Report.ACCESS_CONDITIONS[randint(0, len(Report.ACCESS_CONDITIONS) - 1)][0]
+  day_hiked = Report.DAYS[randint(0, len(Report.DAYS) - 1)][0]
+  car_type = Report.CAR_TYPES[randint(0, len(Report.CAR_TYPES) - 1)][0]
+  weather_type = Report.WEATHER_TYPE[randint(0, len(Report.WEATHER_TYPE) - 1)][0]
+  temperature = Report.TEMPERATURES[randint(0, len(Report.TEMPERATURES) - 1)][0]
+  bathroom_status = Report.BATHROOM_STATUS[randint(0, len(Report.BATHROOM_STATUS) - 1)][0]
+  bathroom_type = Report.BATHROOM_TYPE[randint(0, len(Report.BATHROOM_TYPE) - 1)][0]
+  access = Report.ACCESS_TYPES[randint(0, len(Report.ACCESS_TYPES) - 1)][0]
+  access_condition = Report.ACCESS_CONDITIONS[randint(0, len(Report.ACCESS_CONDITIONS) - 1)][0]
+  pkg_location = Report.PARKING_TYPES[randint(0, len(Report.PARKING_TYPES) - 1)][0]
+  if 'access_distance' in report:
+    access_distance = report['access_distance']
+  else:
+    access_distance = 0.1
+
   return Report.objects.create(
-    trail=report['trail'], trailhead=report['trailhead'], date_hiked=report['date_hiked'], day_hiked=report['day_hiked'], trail_begin=report['trail_begin'], trail_end=report['trail_end'], bathroom_status=report['bathroom_status'], bathroom_type=report['bathroom_type'], access=report['access'], access_condition=report['access_condition'], access_distance=report['access_distance'], car_type=report['car_type'], temperature=report['temperature'], weather_type=report['weather_type'], pkg_location=report['pkg_location'], pkg_estimate_begin=report['pkg_estimate_begin'], pkg_estimate_end=report['pkg_estimate_end'], cars_seen=report['cars_seen'], people_seen=report['people_seen'], horses_seen=report['horses_seen'], dogs_seen=report['dogs_seen']
+    trail=report['trail'], 
+    trailhead=report['trailhead'], 
+    date_hiked=report['date_hiked'], 
+    trail_begin=report['trail_begin'], 
+    trail_end=report['trail_end'], 
+    access_distance=access_distance, 
+    pkg_estimate_begin=report['pkg_estimate_begin'], 
+    pkg_estimate_end=report['pkg_estimate_end'], 
+    cars_seen=report['cars_seen'], 
+    people_seen=report['people_seen'], 
+    horses_seen=report['horses_seen'], 
+    dogs_seen=report['dogs_seen'],
+    day_hiked=day_hiked, 
+    bathroom_status=bathroom_status, 
+    bathroom_type=bathroom_type, 
+    access=access, 
+    access_condition=access_condition, 
+    car_type=car_type, 
+    temperature=temperature, 
+    weather_type=weather_type, 
+    pkg_location=pkg_location, 
   )
 
 def create_bulk_reports(region, total):

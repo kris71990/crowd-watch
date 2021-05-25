@@ -88,15 +88,33 @@ class TrailListByRegionViewTests(TestCase):
     self.assertGreater(trails[0].modified, trails[1].modified)
     self.assertEqual(trails[0].name, 'dssf')
 
-  def test_create_trail_error_name(self):
+  # test negative trail length error
+  def test_create_trail_error_length(self):
     region = 'CC'
     path = reverse('trails', args=(region,))
     response = self.client.post(path, {
+      'name': 'test',
       'region': region,
-      'coordinates': '21313'
+      'coordinates': '21313',
+      'length': -0.1,
     })
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trails.html')
-    self.assertContains(response, 'name')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')
+
+  # test negative elevation gain error
+  def test_create_trail_error_elevation(self):
+    region = 'CC'
+    path = reverse('trails', args=(region,))
+    response = self.client.post(path, {
+      'name': 'test',
+      'region': region,
+      'coordinates': '21313',
+      'elevation_gain': -3,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('trails.html')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 1.')
 

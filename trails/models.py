@@ -90,7 +90,7 @@ class Trailhead(models.Model):
   access_distance = models.IntegerField(
     blank=True, null=True,
     help_text='If accessed via service road, length of service road from paved road to trailhead',
-    validators=[MinValueValidator(0)]
+    validators=[MinValueValidator(0.1)]
   )
   pkg_type = models.CharField('Parking type',
     max_length=2, blank=True, null=True,

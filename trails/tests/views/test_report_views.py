@@ -23,15 +23,6 @@ class ReportViewTests(TestCase):
         'day_hiked': days[i],
         'trail_begin': fake.time(),
         'trail_end': fake.time(),
-        'car_type': 'Suv',
-        'weather_type': 'S',
-        'temperature': 'C',
-        'bathroom_status': 'C',
-        'bathroom_type': 'FP',
-        'access': 'FS',
-        'access_distance': 5.0,
-        'access_condition': 'P+',
-        'pkg_location': 'P',
         'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
         'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
         'cars_seen': fake.pyint(),
@@ -89,15 +80,6 @@ class ReportViewTests(TestCase):
         'day_hiked': days[i],
         'trail_begin': fake.time(),
         'trail_end': fake.time(),
-        'car_type': 'Suv',
-        'weather_type': 'S',
-        'temperature': 'C',
-        'bathroom_status': 'C',
-        'bathroom_type': 'FP',
-        'access': 'FS',
-        'access_distance': 5.0,
-        'access_condition': 'P+',
-        'pkg_location': 'P',
         'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
         'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
         'cars_seen': fake.pyint(),
@@ -133,15 +115,6 @@ class ReportViewTests(TestCase):
         'day_hiked': days[i],
         'trail_begin': fake.time(),
         'trail_end': fake.time(),
-        'car_type': 'Suv',
-        'weather_type': 'S',
-        'temperature': 'C',
-        'bathroom_status': 'O',
-        'bathroom_type': 'FP', 
-        'access': 'FS',
-        'access_distance': 5.0,
-        'access_condition': 'P+',
-        'pkg_location': 'P',
         'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
         'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
         'cars_seen': fake.pyint(),
@@ -178,9 +151,9 @@ class ReportViewTests(TestCase):
       'car_type': 'Suv',
       'weather_type': 'S',
       'temperature': 'C',
-      'bathroom_status': 'O',
+      'bathroom_status': 'C',
       'bathroom_type': 'FP',
-      'access': 'P',
+      'access': 'FS',
       'access_distance': 5.0,
       'access_condition': 'P+',
       'pkg_location': 'P',
@@ -201,7 +174,194 @@ class ReportViewTests(TestCase):
     self.assertContains(get_response, 'Reports (1)')
     self.assertEqual(len(reports), 1)
     self.assertEqual(reports[0].trail.name, 'test_trail')
-    
+
+  # test access distance error when value is below 0.1
+  def test_create_report_error_access_distance(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    time = datetime.now()
+
+    path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'access_distance': -0.1,
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')
+  
+  # test error when begin time is invalid
+  def test_create_report_error_time_begin(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    time = datetime.now()
+
+    path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
+      'trail_begin': '2345',
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertContains(response, 'Enter a valid time.')
+  
+  # test error when end time is invalid
+  def test_create_report_error_time_end(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    time = datetime.now()
+
+    path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
+      'trail_begin': time.time(),
+      'trail_end': '1235',
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertContains(response, 'Enter a valid time.')
+
+  # test parking capacity start error when value is below 0
+  def test_create_report_error_parking_capacity_start(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    time = datetime.now()
+
+    path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': -22,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+      'pkg_estimate_begin': -22,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 0')
+
+  # test parking capacity end error when value is below 0
+  def test_create_report_error_parking_capacity_end(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    time = datetime.now()
+
+    path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': -34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 0')
+
+  # test cars seen error when value is below 0
+  def test_create_report_error_cars_seen(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    time = datetime.now()
+
+    path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': -34,
+      'people_seen': 344,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 0')
+
+  # test people seen error when value is below 0
+  def test_create_report_error_people_seen(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    time = datetime.now()
+
+    path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': -344,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 0')
+
+# <str:region>/<str:trail>/<str:trailhead>/<str:report>/
+class SingleReportViewTests(TestCase):
+  # renders single report 
   def test_single_report(self):
     region = 'CC'
     trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word())
@@ -210,18 +370,8 @@ class ReportViewTests(TestCase):
       'trail': trailhead.trail, 
       'trailhead': trailhead,
       'date_hiked': fake.date(),
-      'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': fake.time(),
-      'car_type': 'Suv',
-      'weather_type': 'S',
-      'temperature': 'C',
-      'bathroom_status': 'O',
-      'bathroom_type': 'FP',
-      'access': 'P',
-      'access_distance': 5.0,
-      'access_condition': 'P+',
-      'pkg_location': 'P',
       'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
       'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
       'cars_seen': fake.pyint(),
