@@ -47,15 +47,21 @@
                 <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ report.trailhead.name }}</a>
               </td>
               {% endif %}
+
               <td>{{ report.date_hiked }}</td> 
               <td>{{ report.get_day_hiked_display }}</td>
+
               {% if trail %}
               <td>
                 <a href="{% url 'report' region=region trail=trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
               </td>
-              {% else %}
+              {% elif trailhead %}
               <td>
                 <a href="{% url 'report' region=region trail=trailhead.trail.id trailhead=trailhead.id report=report.id %}">More</a>
+              </td>
+              {% else %}
+              <td>
+                <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
               </td>
               {% endif %}
             </div>

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from faker import Faker
-from datetime import datetime
+from datetime import datetime, time
 
 from ..mocks import *
 
@@ -385,31 +385,46 @@ class SingleReportViewTests(TestCase):
     self.assertEqual(response.context['report'].trail_begin, time.time())
 
 # reports/<str:day>
+# reports/<str:time>
 class ReportFilterViews(TestCase):
   # returns reports from all trails/regions for a specific day
   def test_filter_by_day(self):
     create_bulk_reports('CC', 3)
     create_bulk_reports('NC', 3)
+    day = 'S'
 
-    response = self.client.get(reverse('reports_day', args=('S',)))
+    response = self.client.get(reverse('reports_day', args=(day,)))
 
-    reports_day = response.context['reports_day']
+    reports_day = response.context['reports_list']
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('reports_day.html')
-    for i in range(len(reports_day)):
-      self.assertEqual(reports_day[i]['day_hiked'], 'S')
 
+    if reports_day:
+      for i in range(len(reports_day)):
+        self.assertEqual(reports_day[i].day_hiked, 'S')
+    else:
+      self.assertContains(response, 'No reports found')
+
+
+  # returns reports from all trails/regions for a time range
   def test_filter_by_time(self):
     create_bulk_reports('CC', 3)
     create_bulk_reports('NC', 3)
-    time = datetime.time(12, 00)
+    period = 'morning'
+    time_end = time(12, 00)
+    time_begin = time(0, 00)
 
-    response = self.client.get(reverse('reports_time', args=('morning',)))
+    response = self.client.get(reverse('reports_time', args=(period,)))
 
-    reports_time = response.context['reports_time']
+    reports_time = response.context['reports_list']
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('reports_time.html')
-    for i in range(len(reports_time)):
-      self.assertLessEqual(reports_time[i]['trail_begin'], time)
+
+    if reports_time:
+      for i in range(len(reports_time)):
+        self.assertLess(reports_time[i].trail_begin, time_end)
+        self.assertGreater(reports_time[i].trail_begin, time_begin)
+    else:
+      self.assertContains(response, 'No reports found')
 
   

@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.db.models import Count
 from django.forms import ModelChoiceField
 from django.utils import timezone
+from datetime import datetime, time
 
 from .models import Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm
@@ -114,6 +115,35 @@ def report(request, region, trail, trailhead, report):
     'report': report,
   }
   return render(request, 'trails/report.html', context)
+
+def reports_day(request, day):
+  reports = Report.objects.filter(day_hiked=day).order_by('-day_hiked')
+  if len(reports) > 0:
+    day_full = reports[0].get_day_hiked_display()
+  context = { 'reports_list': reports }
+  return render(request, 'trails/reports_day.html', context)
+
+def reports_time(request, period):
+  if period == 'morning':
+    min = time(0, 00)
+    max = time(11, 59)
+  elif period == 'afternoon':
+    min = time(12, 00)
+    max = time(17, 59)
+  elif period == 'evening':
+    min = time(18, 00)
+    max = time(21, 59)
+  else:
+    min = time(22, 00)
+    max = time(23, 59)
+
+  reports = Report.objects.filter(trail_begin__gte=min).filter(trail_begin__lte=max)
+  period_print = '%s (%s-%s)' % (period.capitalize(), min, max)
+  context = { 
+    'reports_list': reports,
+    'period': period_print,
+  }
+  return render(request, 'trails/reports_time.html', context)
 
 def index(request):
   return render(request, 'trails/index.html')
