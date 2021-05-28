@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.db.models import Count
 from django.forms import ModelChoiceField
 from django.utils import timezone
+from django.urls import reverse
 from datetime import datetime, time
 
 from .models import Trail, Trailhead, Report
@@ -118,12 +119,22 @@ def report(request, region, trail, trailhead, report):
 
 def reports_day(request, day):
   reports = Report.objects.filter(day_hiked=day).order_by('-day_hiked')
-  if len(reports) > 0:
-    day_full = reports[0].get_day_hiked_display()
   context = { 'reports_list': reports }
   return render(request, 'trails/reports_day.html', context)
 
-def reports_time(request, period):
+def reports_filter(request, region, trail):
+  print(region, trail)
+  if request.method == 'POST':
+    day = request.POST.get('day')
+    print(day)
+    return HttpResponseRedirect(reverse('reports_trail_day'), args=(request, region, trail, day,))
+
+def reports_trail_day(request, region, trail, day):
+  reports = Report.objects.filter(trail=trail).filter(day_hiked=day).order_by('-day_hiked')
+  context = { 'reports_list_trail': reports }
+  return render(request, 'trails/reports.html', context)
+
+def parse_time(period):
   if period == 'morning':
     min = time(0, 00)
     max = time(11, 59)
@@ -136,11 +147,24 @@ def reports_time(request, period):
   else:
     min = time(22, 00)
     max = time(23, 59)
+  return { 'min': min, 'max': max }
 
-  reports = Report.objects.filter(trail_begin__gte=min).filter(trail_begin__lte=max)
-  period_print = '%s (%s-%s)' % (period.capitalize(), min, max)
+def reports_time(request, period):
+  range = parse_time(period)
+  reports = Report.objects.filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
+  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
   context = { 
     'reports_list': reports,
+    'period': period_print,
+  }
+  return render(request, 'trails/reports_time.html', context)
+
+def reports_trail_time(request, region, trail, period):
+  range = parse_time(period)
+  reports = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
+  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
+  context = { 
+    'reports_list_trail': reports,
     'period': period_print,
   }
   return render(request, 'trails/reports_time.html', context)

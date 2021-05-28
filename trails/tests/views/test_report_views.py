@@ -386,6 +386,8 @@ class SingleReportViewTests(TestCase):
 
 # reports/<str:day>
 # reports/<str:time>
+# <trail>/reports/<day>
+# <trail>/reports/<time>
 class ReportFilterViews(TestCase):
   # returns reports from all trails/regions for a specific day
   def test_filter_by_day(self):
@@ -405,6 +407,56 @@ class ReportFilterViews(TestCase):
     else:
       self.assertContains(response, 'No reports found')
 
+  # returns reports from a trail for a specific day
+  def test_filter_by_day_trail(self):
+    create_bulk_reports('CC', 2)
+    trailhead = create_trail_and_trailhead('sfdsf', 'NC', '342323')
+    create_report(report={
+      'trail': trailhead.trail, 
+      'trailhead': trailhead,
+      'date_hiked': fake.date(),
+      'trail_begin': fake.time(),
+      'trail_end': fake.time(),
+      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
+      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
+      'cars_seen': fake.pyint(),
+      'people_seen': fake.pyint(),
+      'horses_seen': fake.boolean(),
+      'dogs_seen': fake.boolean(),
+      'day_hiked': 'S'
+    })
+
+    response = self.client.get(reverse('reports_trail_day', args=('NC', trailhead.trail.id, 'S',)))
+
+    reports_day = response.context['reports_list_trail']
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertEqual(len(reports_day), 1)
+    self.assertEqual(reports_day[0].day_hiked, 'S')
+
+  def test_filter_by_day_trail_empty(self):
+    trailhead = create_trail_and_trailhead('test', 'NC', '34223')
+    create_report(report={
+      'trail': trailhead.trail, 
+      'trailhead': trailhead,
+      'date_hiked': fake.date(),
+      'trail_begin': fake.time(),
+      'trail_end': fake.time(),
+      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
+      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
+      'cars_seen': fake.pyint(),
+      'people_seen': fake.pyint(),
+      'horses_seen': fake.boolean(),
+      'dogs_seen': fake.boolean(),
+      'day_hiked': 'Th'
+    })
+
+    response = self.client.get(reverse('reports_trail_day', args=('NC', trailhead.trail.id, 'S',)))
+
+    reports_day = response.context['reports_list_trail']
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports.html')
+    self.assertQuerysetEqual(reports_day, [])
 
   # returns reports from all trails/regions for a time range
   def test_filter_by_time(self):
@@ -427,4 +479,56 @@ class ReportFilterViews(TestCase):
     else:
       self.assertContains(response, 'No reports found')
 
+  # returns reports from a trail for a specific time
+  def test_filter_by_time_trail(self):
+    trailhead = create_trail_and_trailhead('test', 'NC', '342323')
+    create_report(report={
+      'trail': trailhead.trail, 
+      'trailhead': trailhead,
+      'date_hiked': fake.date(),
+      'trail_begin': fake.time(),
+      'trail_end': fake.time(),
+      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
+      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
+      'cars_seen': fake.pyint(),
+      'people_seen': fake.pyint(),
+      'horses_seen': fake.boolean(),
+      'dogs_seen': fake.boolean(),
+      'trail_begin': time(6, 00),
+      'trail_end': time(10, 00)
+    })
+
+    response = self.client.get(reverse('reports_trail_time', args=('NC', trailhead.trail.id, 'morning',)))
+
+    reports_time = response.context['reports_list_trail']
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports_time.html')
+    self.assertEqual(len(reports_time), 1)
+    self.assertGreater(reports_time[0].trail_begin, time(0, 00))
+    self.assertLess(reports_time[0].trail_begin, time(12, 00))
+
+  def test_filter_by_time_trail_empty(self):
+    trailhead = create_trail_and_trailhead('test', 'NC', '34223')
+    create_report(report={
+      'trail': trailhead.trail, 
+      'trailhead': trailhead,
+      'date_hiked': fake.date(),
+      'trail_begin': fake.time(),
+      'trail_end': fake.time(),
+      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
+      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
+      'cars_seen': fake.pyint(),
+      'people_seen': fake.pyint(),
+      'horses_seen': fake.boolean(),
+      'dogs_seen': fake.boolean(),
+      'trail_begin': time(13, 00),
+      'trail_end': time(16, 00)
+    })
+
+    response = self.client.get(reverse('reports_trail_time', args=('NC', trailhead.trail.id, 'morning',)))
+
+    reports_day = response.context['reports_list_trail']
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('reports_time.html')
+    self.assertQuerysetEqual(reports_day, [])
   

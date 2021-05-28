@@ -18,6 +18,22 @@
       </h2>
     </div>
     {% if trailheads_list %}
+    <div class="filter_day">
+      <form action="{% url 'reports_filter' region=trailheads_list.0.trail.region trail=trailheads_list.0.trail.id %}" method="post">
+        {% csrf_token %}
+        <select name='day'>
+          <option value=''>Filter by day</option>
+          <option value='Monday'>Monday</option>
+          <option value='Tuesday'>Tuesday</option>
+          <option value='Wednesday'>Wednesday</option>
+          <option value='Thursday'>Thursday</option>
+          <option value='Friday'>Friday</option>
+          <option value='Saturday'>Saturday</option>
+          <option value='Sunday'>Sunday</option>
+        </select>
+        <input class="button" type="submit" value="Filter">
+      </form>
+    </div>
     <div class="trail-table">
       <table>
         <thead>

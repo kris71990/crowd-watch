@@ -11,8 +11,8 @@ def create_trailhead(trail, name, coordinates):
   return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates)
 
 def create_trail_and_trailhead(name, region, coordinates):
-  trail = Trail.objects.create(name=name, region=region, coordinates=coordinates)
-  return Trailhead.objects.create(trail=trail, name=fake.name(), coordinates=coordinates)
+  trail = create_trail(name, region, coordinates)
+  return create_trailhead(trail, fake.name(), coordinates)
 
 def generate_random_choices():
   day_hiked = Report.DAYS[randint(0, len(Report.DAYS) - 1)][0]
@@ -35,6 +35,8 @@ def create_report(report):
   else:
     access_distance = 0.1
 
+  day_hiked = report['day_hiked'] if 'day_hiked' in report else random_choices['day_hiked']
+
   return Report.objects.create(
     trail=report['trail'], 
     trailhead=report['trailhead'], 
@@ -48,7 +50,7 @@ def create_report(report):
     people_seen=report['people_seen'], 
     horses_seen=report['horses_seen'], 
     dogs_seen=report['dogs_seen'],
-    day_hiked=random_choices['day_hiked'], 
+    day_hiked=day_hiked, 
     bathroom_status=random_choices['bathroom_status'], 
     bathroom_type=random_choices['bathroom_type'], 
     access=random_choices['access'], 

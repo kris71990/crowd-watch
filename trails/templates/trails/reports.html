@@ -20,8 +20,14 @@
     {% elif trailhead %}
       <h2>
         <a href="{% url 'trails' trailhead.trail.region %}">{{ trailhead.trail.get_region_display }}</a> | 
-        <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}<a/> | 
+        <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a> | 
         {{ trailhead.name }}
+      </h2>
+    {% elif reports_list_trail %}
+      <h2>
+        <a href="{% url 'trails' reports_list_trail.0.trail.region %}">{{ reports_list_trail.0.trail.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=reports_list_trail.0.trail.region trail=reports_list_trail.0.trail.id %}">{{ reports_list_trail.0.trail.name }}</a> | 
+        {{ reports_list_trail.0.get_day_hiked_display }}
       </h2>
     {% endif %}
     </div>
