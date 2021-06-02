@@ -134,18 +134,40 @@ def reports_filter(request, region, trail):
       return redirect('reports_trail_day', region=region, trail=trail, day=day)
 
 def reports_trail_day(request, region, trail, day):
-  reports = Report.objects.filter(trail=trail).filter(day_hiked=day).order_by('-day_hiked')
+  reports_total = Report.objects.filter(trail=trail)
+  reports = reports_total.filter(day_hiked=day).order_by('-day_hiked')
   
   if not reports:
     trail_obj = Trail.objects.get(pk=trail)
+    total = len(reports_total)
     context = {
       'region': region,
       'trail_day_empty': trail_obj,
       'day': day,
+      'reports_total': total,
     }
   else:
+    total = len(reports_total)
+    reports_list_total = len(reports)
+    ratio = (reports_list_total / total) * 100
+
+    if (ratio > 80):
+      advice = 'Crowded: at least 4 of 5 people hike on this day - choose a different day to avoid crowds.'
+    elif (ratio > 50):
+      advice = 'Popular: a majority of hikers hike on this day - consider choosing a different day to avoid crowds.'
+    elif (ratio > 40):
+      advice = 'Expect people: roughly half of hikers choose this day - consider choosing a different day to avoid people.'
+    elif (ratio > 25):
+      advice = 'Expect people: roughly 3 of every 10 hikers hike on this day - this is a good day to avoid crowds.'
+    elif(ratio > 10):
+      advice = 'Minimal traffic: about 2 in 10 people hike on this day - this is a good day to avoid crowds'
+    else:
+      advice = 'Solitude: few people hike on this day - this is the ideal day to avoid people'
     context = { 
       'reports_list': reports,
+      'reports_total': total,
+      'reports_list_total': reports_list_total,
+      'advice': advice
     }
   return render(request, 'trails/reports.html', context)
 

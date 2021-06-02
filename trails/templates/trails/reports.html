@@ -42,6 +42,10 @@
 
     <div class="report">
     {% if reports_list %}
+      {% if reports_total %}
+        <p>{{ reports_list_total }} submitted out of {{ reports_total }}</p>
+        <p>{{ advice }}</p>
+      {% endif %}
       <div class="trail-table">
         <h3>Reports ({{ reports_list.count }})</h3>
         <table>
@@ -85,6 +89,9 @@
       </div>
     {% else %}
       <p>No reports found</p>
+      {% if reports_total %}
+        <p><span>Note</span> - There have been <span>{{ reports_total }}</span> submitted for this trail. If there have not been many reports, there may not be enough data to determine popularity.</p>
+      {% endif %}
     {% endif %}
     {% if trail %}
     <div class="report-footer">
