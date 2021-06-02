@@ -15,18 +15,42 @@ def parse_time(period):
     max = time(23, 59)
   return { 'min': min, 'max': max }
 
-def create_advice(total, filter):
-  ratio = (filter / total) * 100
+def create_advice(type, filtered, total):
+  ratio = (filtered / total) * 100
   if (ratio > 80):
-    advice = 'Crowded: at least 4 of 5 people hike on this day - choose a different day to avoid crowds.'
+    caution = 'red'
+    if type == 'time':
+      advice = 'Crowded: at least 4 of 5 people hike around this time - try going earlier or later to avoid crowds.'
+    else:
+      advice = 'Crowded: at least 4 of 5 people hike on this day - choose a different day to avoid crowds.'
   elif (ratio > 50):
-    advice = 'Popular: a majority of hikers hike on this day - consider choosing a different day to avoid crowds.'
+    caution = 'orange'
+    if type == 'time':
+      advice = 'Popular: a majority of hikers hike around this time - consider going earlier or later to avoid crowds.'
+    else:
+      advice = 'Popular: a majority of hikers hike on this day - consider choosing a different day to avoid crowds.'
   elif (ratio > 40):
-    advice = 'Expect people: roughly half of hikers choose this day - consider choosing a different day to avoid people.'
+    caution = 'orange'
+    if type == 'time':
+      advice = 'Expect people: roughly half of hikers hike at this time - consider going earlier or later to avoid people.'
+    else:
+      advice = 'Expect people: roughly half of hikers choose this day - consider choosing a different day to avoid people.'
   elif (ratio > 25):
-    advice = 'Expect people: roughly 3 of every 10 hikers hike on this day - this is a good day to avoid crowds.'
+    caution = 'yellow'
+    if type == 'time':
+      advice = 'A few people: roughly 3 in 10 hikers hike at this time - this is a good time to avoid people'
+    else:
+      advice = 'A few people: roughly 3 of every 10 hikers hike on this day - this is a good day to avoid people.'
   elif(ratio > 10):
-    advice = 'Minimal traffic: about 2 in 10 people hike on this day - this is a good day to avoid crowds'
+    caution = 'green'
+    if type == 'time':
+      advice = 'Minimal traffic: about 2 in 10 people hike at this time - this is a good time to avoid people.'
+    else:
+      advice = 'Minimal traffic: about 2 in 10 people hike on this day - this is a good day to avoid crowds.'
   else:
-    advice = 'Solitude: few people hike on this day - this is the ideal day to avoid people'
-  return advice
+    caution = 'green'
+    if type == 'time':
+      advice = 'Solitude: few people hike at this time - this is an ideal time to avoid people.'
+    else:
+      advice = 'Solitude: few people hike on this day - this an ideal day to avoid people.'
+  return { 'advice': advice, 'caution': caution }

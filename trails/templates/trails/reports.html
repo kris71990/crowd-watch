@@ -57,8 +57,8 @@
     <div class="report">
     {% if reports_list %}
       {% if reports_total %}
-      <div id="advice">
-        <p>{{ reports_list_total }} submitted out of {{ reports_total }}</p>
+      <div id="advice" class="{{ caution }}">
+        <p>{{ reports_list_total }} out of {{ reports_total }} total submitted</p>
         <p>{{ advice }}</p>
       </div>
       {% endif %}

@@ -18,9 +18,7 @@ urlpatterns = [
 
   path('<str:region>/<str:trail>/<str:trailhead>/<str:report>/', views.report, name='report'),
 
-  # TODO
   path('<str:region>/<str:trail>/filtering/', views.reports_filter, name='reports_filter'),
   path('<str:region>/<str:trail>/day/<str:day>', views.reports_trail_day, name='reports_trail_day'),
   path('<str:region>/<str:trail>/time/<str:period>', views.reports_trail_time, name='reports_trail_time')
-  #
 ]

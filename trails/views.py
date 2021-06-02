@@ -1,9 +1,8 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.db.models import Count
 from django.forms import ModelChoiceField
 from django.utils import timezone
-from django.urls import reverse
 from django.shortcuts import redirect
 
 from .models import Trail, Trailhead, Report
@@ -157,13 +156,14 @@ def reports_trail_day(request, region, trail, day):
   else:
     total_trail_report_count = len(reports_total_trail)
     filter_report_count = len(reports_filter)
-    advice = create_advice(total_trail_report_count, filter_report_count)
+    advice = create_advice('day', filter_report_count, total_trail_report_count)
     context = { 
       'reports_list': reports_filter,
       'reports_total': total_trail_report_count,
       'reports_list_total': filter_report_count,
       'day': day,
-      'advice': advice
+      'advice': advice['advice'],
+      'caution': advice['caution']
     }
   return render(request, 'trails/reports.html', context)
 
@@ -195,13 +195,14 @@ def reports_trail_time(request, region, trail, period):
   else:
     total_trail_report_count = len(reports_total_trail)
     filter_report_count = len(reports_filter)
-    advice = create_advice(filter_report_count, total_trail_report_count)
+    advice = create_advice('time', filter_report_count, total_trail_report_count)
     context = { 
       'reports_list': reports_filter,
       'reports_total': total_trail_report_count,
       'reports_list_total': filter_report_count,
       'period': period_print,
-      'advice': advice
+      'advice': advice['advice'],
+      'caution': advice['caution']
     }
     
   return render(request, 'trails/reports.html', context)

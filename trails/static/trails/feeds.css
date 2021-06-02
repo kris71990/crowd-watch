@@ -33,3 +33,19 @@ span {
 #advice {
   border-bottom: 1px dashed black;
 }
+
+.green {
+  color: green;
+}
+
+.yellow {
+  color: yellow;
+}
+
+.orange {
+  color: orange;
+}
+
+.red {
+  color: red;
+}
