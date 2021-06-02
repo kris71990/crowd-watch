@@ -23,12 +23,20 @@
         <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a> | 
         {{ trailhead.name }}
       </h2>
-    {% elif reports_list_trail %}
+    {% else %}
+      {% if not reports_list %}
       <h2>
-        <a href="{% url 'trails' reports_list_trail.0.trail.region %}">{{ reports_list_trail.0.trail.get_region_display }}</a> | 
-        <a href="{% url 'trailheads' region=reports_list_trail.0.trail.region trail=reports_list_trail.0.trail.id %}">{{ reports_list_trail.0.trail.name }}</a> | 
-        {{ reports_list_trail.0.get_day_hiked_display }}
+        <a href="{% url 'trails' region %}">{{ trail_day_empty.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=region trail=trail_day_empty.id %}">{{ trail_day_empty.name }}</a> | 
+        {{ day }}
       </h2>
+      {% else %}
+      <h2>
+        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.trail.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=reports_list.0.trail.region trail=reports_list.0.trail.id %}">{{ reports_list.0.trail.name }}</a> | 
+        {{ reports_list.0.get_day_hiked_display }}
+      </h2>
+      {% endif %}
     {% endif %}
     </div>
 
@@ -39,7 +47,7 @@
         <table>
           <thead>
             <tr>
-              {% if trail %}<td>Trailhead</td>{% endif %}
+              {% if not trailhead %}<td>Trailhead</td>{% endif %}
               <td>Date Hiked</td>
               <td>Day Hiked</td>
               <td>Details</td>
@@ -48,9 +56,9 @@
           <tbody>
           {% for report in reports_list %}
             <tr>
-              {% if trail %}
+              {% if not trailhead %}
               <td>
-                <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ report.trailhead.name }}</a>
+                <a href="{% url 'reports_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
               </td>
               {% endif %}
 

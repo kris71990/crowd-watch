@@ -44,7 +44,7 @@ form {
   margin: 0;
 }
 
-form .button {
+.form-box form .button {
   margin-top: 10px;
   padding: 5px 40px;
   float: right;
@@ -61,4 +61,13 @@ form .button:hover {
 
 .field span {
   color: red;
+}
+
+.filter-day {
+  padding: 20px 0;
+  border-bottom: 1px dashed black;
+}
+
+.filter-day form {
+  border-top: none;
 }

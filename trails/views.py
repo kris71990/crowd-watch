@@ -5,9 +5,10 @@ from django.forms import ModelChoiceField
 from django.utils import timezone
 from django.urls import reverse
 from datetime import datetime, time
+from django.shortcuts import redirect
 
 from .models import Trail, Trailhead, Report
-from .forms import TrailForm, TrailheadForm, ReportForm
+from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm
 
 def regions(request):
   regions_list = Trail.REGION_CHOICES
@@ -55,20 +56,22 @@ def trailheads(request, region, trail):
   trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':
-    form = TrailheadForm(request.POST)
-    if form.is_valid():
+    formTh = TrailheadForm(request.POST)
+    if formTh.is_valid():
       trail_obj.update(modified=timezone.now())
-      form.save()
+      formTh.save()
       return HttpResponseRedirect(request.path_info)
   else:
     TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    form = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
+    formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
 
+  formFilter = SelectDayForm()
   context = {
     'trailheads_list': trailheads_list,
     'region': region,
     'trail': trail_obj[0],
-    'form': form
+    'formTh': formTh,
+    'formFilter': formFilter
   }
   return render(request, 'trails/trailheads.html', context)
 
@@ -123,15 +126,27 @@ def reports_day(request, day):
   return render(request, 'trails/reports_day.html', context)
 
 def reports_filter(request, region, trail):
-  print(region, trail)
   if request.method == 'POST':
-    day = request.POST.get('day')
-    print(day)
-    return HttpResponseRedirect(reverse('reports_trail_day'), args=(request, region, trail, day,))
+    form = SelectDayForm(request.POST)
+
+    if form.is_valid():
+      day = form.cleaned_data['days_field']
+      return redirect('reports_trail_day', region=region, trail=trail, day=day)
 
 def reports_trail_day(request, region, trail, day):
   reports = Report.objects.filter(trail=trail).filter(day_hiked=day).order_by('-day_hiked')
-  context = { 'reports_list_trail': reports }
+  
+  if not reports:
+    trail_obj = Trail.objects.get(pk=trail)
+    context = {
+      'region': region,
+      'trail_day_empty': trail_obj,
+      'day': day,
+    }
+  else:
+    context = { 
+      'reports_list': reports,
+    }
   return render(request, 'trails/reports.html', context)
 
 def parse_time(period):

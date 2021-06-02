@@ -428,7 +428,7 @@ class ReportFilterViews(TestCase):
 
     response = self.client.get(reverse('reports_trail_day', args=('NC', trailhead.trail.id, 'S',)))
 
-    reports_day = response.context['reports_list_trail']
+    reports_day = response.context['reports_list']
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('reports.html')
     self.assertEqual(len(reports_day), 1)
@@ -453,10 +453,11 @@ class ReportFilterViews(TestCase):
 
     response = self.client.get(reverse('reports_trail_day', args=('NC', trailhead.trail.id, 'S',)))
 
-    reports_day = response.context['reports_list_trail']
+    trail = response.context['trail_day_empty']
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('reports.html')
-    self.assertQuerysetEqual(reports_day, [])
+    self.assertEqual(trail.name, trailhead.trail.name)
+    self.assertContains(response, 'No reports found')
 
   # returns reports from all trails/regions for a time range
   def test_filter_by_time(self):

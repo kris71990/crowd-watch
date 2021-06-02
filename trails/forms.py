@@ -1,4 +1,4 @@
-from django.forms import ModelForm, SelectDateWidget, TimeInput
+from django.forms import ModelForm, SelectDateWidget, Form, ChoiceField
 from .models import Trail, Trailhead, Report
 from datetime import datetime
 
@@ -27,3 +27,17 @@ class ReportForm(ModelForm):
         empty_label=("Year", "Month", "Day")
       ),
     }
+
+class SelectDayForm(Form):
+  DAYS = [
+    ('', '------'),
+    ('M', 'Monday'),
+    ('T', 'Tuesday'),
+    ('W', 'Wednesday'),
+    ('Th', 'Thursday'),
+    ('F', 'Friday'),
+    ('S', 'Saturday'),
+    ('Su', 'Sunday')
+  ]
+
+  days_field = ChoiceField(choices = DAYS, label='')
