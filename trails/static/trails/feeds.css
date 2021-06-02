@@ -29,3 +29,7 @@ td:last-child a:hover {
 span {
   font-weight: bold;
 }
+
+#advice {
+  border-bottom: 1px dashed black;
+}

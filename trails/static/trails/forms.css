@@ -63,11 +63,11 @@ form .button:hover {
   color: red;
 }
 
-.filter-day {
+.filters {
   padding: 20px 0;
   border-bottom: 1px dashed black;
 }
 
-.filter-day form {
+.filters form {
   border-top: none;
 }

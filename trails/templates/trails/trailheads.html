@@ -18,10 +18,15 @@
       </h2>
     </div>
     {% if trailheads_list %}
-    <div class="filter-day">
+    <div class="filters">
       <form action="{% url 'reports_filter' region=trailheads_list.0.trail.region trail=trailheads_list.0.trail.id %}" method="post">
         {% csrf_token %}
-        {{ formFilter }}
+        {{ formDayFilter }}
+        <input class="button" type="submit" value="Filter">
+      </form>
+      <form action="{% url 'reports_filter' region=trailheads_list.0.trail.region trail=trailheads_list.0.trail.id %}" method="post">
+        {% csrf_token %}
+        {{ formTimeFilter }}
         <input class="button" type="submit" value="Filter">
       </form>
     </div>

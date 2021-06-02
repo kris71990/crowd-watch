@@ -13,6 +13,8 @@
     <div class="subheader">
     {% if reports_list %}
       <h2>Reports - {{ reports_list.0.get_day_hiked_display }}</h2>
+    {% else %}
+      <h2>Reports - {{ day }}</h2>
     {% endif %}
     </div>
     <div class="report">

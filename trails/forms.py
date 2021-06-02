@@ -41,3 +41,14 @@ class SelectDayForm(Form):
   ]
 
   days_field = ChoiceField(choices = DAYS, label='')
+
+class SelectTimeForm(Form):
+  TIME = [
+    ('', '------'),
+    ('morning', 'Morning'),
+    ('afternoon', 'Afternoon'),
+    ('evening', 'Evening'),
+    ('night', 'Night')
+  ]
+
+  time_field = ChoiceField(choices = TIME, label='')

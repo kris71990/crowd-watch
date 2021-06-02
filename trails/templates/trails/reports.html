@@ -23,18 +23,32 @@
         <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a> | 
         {{ trailhead.name }}
       </h2>
-    {% else %}
-      {% if not reports_list %}
+    {% elif day %}
+      {% if advice %}
+      <h2>
+        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.trail.get_region_display }}</a> |
+         <a href="{% url 'trailheads' region=reports_list.0.trail.region trail=reports_list.0.trail.id %}">{{ reports_list.0.trail.name }}</a> | 
+        {{ reports_list.0.get_day_hiked_display }}
+      </h2>
+      {% else %}
       <h2>
         <a href="{% url 'trails' region %}">{{ trail_day_empty.get_region_display }}</a> | 
         <a href="{% url 'trailheads' region=region trail=trail_day_empty.id %}">{{ trail_day_empty.name }}</a> | 
         {{ day }}
       </h2>
-      {% else %}
+      {% endif %}
+    {% elif period %}
+      {% if advice %}
       <h2>
         <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.trail.get_region_display }}</a> | 
         <a href="{% url 'trailheads' region=reports_list.0.trail.region trail=reports_list.0.trail.id %}">{{ reports_list.0.trail.name }}</a> | 
-        {{ reports_list.0.get_day_hiked_display }}
+        {{ period }}
+      </h2>
+      {% else %}
+      <h2>
+        <a href="{% url 'trails' region %}">{{ trail_time_empty.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=region trail=trail_time_empty.id %}">{{ trail_time_empty.name }}</a> | 
+        {{ period }}
       </h2>
       {% endif %}
     {% endif %}
@@ -43,8 +57,10 @@
     <div class="report">
     {% if reports_list %}
       {% if reports_total %}
+      <div id="advice">
         <p>{{ reports_list_total }} submitted out of {{ reports_total }}</p>
         <p>{{ advice }}</p>
+      </div>
       {% endif %}
       <div class="trail-table">
         <h3>Reports ({{ reports_list.count }})</h3>
@@ -54,6 +70,7 @@
               {% if not trailhead %}<td>Trailhead</td>{% endif %}
               <td>Date Hiked</td>
               <td>Day Hiked</td>
+              {% if period %}<td>Time Hiked</td>{% endif %}
               <td>Details</td>
             </tr>
           </thead>
@@ -68,6 +85,10 @@
 
               <td>{{ report.date_hiked }}</td> 
               <td>{{ report.get_day_hiked_display }}</td>
+
+              {% if period %}
+                <td>{{ report.trail_begin }} - {{ report.trail_end }}</td> 
+              {% endif %}
 
               {% if trail %}
               <td>

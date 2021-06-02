@@ -501,9 +501,9 @@ class ReportFilterViews(TestCase):
 
     response = self.client.get(reverse('reports_trail_time', args=('NC', trailhead.trail.id, 'morning',)))
 
-    reports_time = response.context['reports_list_trail']
+    reports_time = response.context['reports_list']
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_time.html')
+    self.assertTemplateUsed('reports.html')
     self.assertEqual(len(reports_time), 1)
     self.assertGreater(reports_time[0].trail_begin, time(0, 00))
     self.assertLess(reports_time[0].trail_begin, time(12, 00))
@@ -528,8 +528,9 @@ class ReportFilterViews(TestCase):
 
     response = self.client.get(reverse('reports_trail_time', args=('NC', trailhead.trail.id, 'morning',)))
 
-    reports_day = response.context['reports_list_trail']
+    trail = response.context['trail_time_empty']
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_time.html')
-    self.assertQuerysetEqual(reports_day, [])
+    self.assertTemplateUsed('reports.html')
+    self.assertEqual(trail.name, trailhead.trail.name)
+    self.assertContains(response, 'No reports found')
   

@@ -4,11 +4,11 @@ from django.db.models import Count
 from django.forms import ModelChoiceField
 from django.utils import timezone
 from django.urls import reverse
-from datetime import datetime, time
 from django.shortcuts import redirect
 
 from .models import Trail, Trailhead, Report
-from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm
+from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTimeForm
+from .utils import *
 
 def regions(request):
   regions_list = Trail.REGION_CHOICES
@@ -65,13 +65,15 @@ def trailheads(request, region, trail):
     TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
     formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
 
-  formFilter = SelectDayForm()
+  formDayFilter = SelectDayForm()
+  formTimeFilter = SelectTimeForm()
   context = {
     'trailheads_list': trailheads_list,
     'region': region,
     'trail': trail_obj[0],
     'formTh': formTh,
-    'formFilter': formFilter
+    'formDayFilter': formDayFilter,
+    'formTimeFilter': formTimeFilter,
   }
   return render(request, 'trails/trailheads.html', context)
 
@@ -120,26 +122,32 @@ def report(request, region, trail, trailhead, report):
   }
   return render(request, 'trails/report.html', context)
 
-def reports_day(request, day):
-  reports = Report.objects.filter(day_hiked=day).order_by('-day_hiked')
-  context = { 'reports_list': reports }
-  return render(request, 'trails/reports_day.html', context)
-
 def reports_filter(request, region, trail):
   if request.method == 'POST':
-    form = SelectDayForm(request.POST)
+    filter = request.POST.get('days_field')
+    if filter is None:
+      form = SelectTimeForm(request.POST)
+      if form.is_valid():
+        time = form.cleaned_data['time_field']
+        return redirect('reports_trail_time', region=region, trail=trail, period=time)
+    else:
+      form = SelectDayForm(request.POST)
+      if form.is_valid():
+        day = form.cleaned_data['days_field']
+        return redirect('reports_trail_day', region=region, trail=trail, day=day)
 
-    if form.is_valid():
-      day = form.cleaned_data['days_field']
-      return redirect('reports_trail_day', region=region, trail=trail, day=day)
+def reports_day(request, day):
+  reports = Report.objects.filter(day_hiked=day).order_by('-day_hiked')
+  context = { 'reports_list': reports, 'day': day }
+  return render(request, 'trails/reports_day.html', context)
 
 def reports_trail_day(request, region, trail, day):
-  reports_total = Report.objects.filter(trail=trail)
-  reports = reports_total.filter(day_hiked=day).order_by('-day_hiked')
+  reports_total_trail = Report.objects.filter(trail=trail)
+  reports_filter = reports_total_trail.filter(day_hiked=day).order_by('-day_hiked')
   
-  if not reports:
+  if not reports_filter:
     trail_obj = Trail.objects.get(pk=trail)
-    total = len(reports_total)
+    total = len(reports_total_trail)
     context = {
       'region': region,
       'trail_day_empty': trail_obj,
@@ -147,44 +155,17 @@ def reports_trail_day(request, region, trail, day):
       'reports_total': total,
     }
   else:
-    total = len(reports_total)
-    reports_list_total = len(reports)
-    ratio = (reports_list_total / total) * 100
-
-    if (ratio > 80):
-      advice = 'Crowded: at least 4 of 5 people hike on this day - choose a different day to avoid crowds.'
-    elif (ratio > 50):
-      advice = 'Popular: a majority of hikers hike on this day - consider choosing a different day to avoid crowds.'
-    elif (ratio > 40):
-      advice = 'Expect people: roughly half of hikers choose this day - consider choosing a different day to avoid people.'
-    elif (ratio > 25):
-      advice = 'Expect people: roughly 3 of every 10 hikers hike on this day - this is a good day to avoid crowds.'
-    elif(ratio > 10):
-      advice = 'Minimal traffic: about 2 in 10 people hike on this day - this is a good day to avoid crowds'
-    else:
-      advice = 'Solitude: few people hike on this day - this is the ideal day to avoid people'
+    total_trail_report_count = len(reports_total_trail)
+    filter_report_count = len(reports_filter)
+    advice = create_advice(total_trail_report_count, filter_report_count)
     context = { 
-      'reports_list': reports,
-      'reports_total': total,
-      'reports_list_total': reports_list_total,
+      'reports_list': reports_filter,
+      'reports_total': total_trail_report_count,
+      'reports_list_total': filter_report_count,
+      'day': day,
       'advice': advice
     }
   return render(request, 'trails/reports.html', context)
-
-def parse_time(period):
-  if period == 'morning':
-    min = time(0, 00)
-    max = time(11, 59)
-  elif period == 'afternoon':
-    min = time(12, 00)
-    max = time(17, 59)
-  elif period == 'evening':
-    min = time(18, 00)
-    max = time(21, 59)
-  else:
-    min = time(22, 00)
-    max = time(23, 59)
-  return { 'min': min, 'max': max }
 
 def reports_time(request, period):
   range = parse_time(period)
@@ -198,13 +179,32 @@ def reports_time(request, period):
 
 def reports_trail_time(request, region, trail, period):
   range = parse_time(period)
-  reports = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
+  reports_total_trail = Report.objects.filter(trail=trail)
+  reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
   period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
-  context = { 
-    'reports_list_trail': reports,
-    'period': period_print,
-  }
-  return render(request, 'trails/reports_time.html', context)
+
+  if not reports_filter:
+    trail_obj = Trail.objects.get(pk=trail)
+    total = len(reports_total_trail)
+    context = {
+      'region': region,
+      'trail_time_empty': trail_obj,
+      'period': period_print,
+      'reports_total': total,
+    }
+  else:
+    total_trail_report_count = len(reports_total_trail)
+    filter_report_count = len(reports_filter)
+    advice = create_advice(filter_report_count, total_trail_report_count)
+    context = { 
+      'reports_list': reports_filter,
+      'reports_total': total_trail_report_count,
+      'reports_list_total': filter_report_count,
+      'period': period_print,
+      'advice': advice
+    }
+    
+  return render(request, 'trails/reports.html', context)
 
 def index(request):
   return render(request, 'trails/index.html')
