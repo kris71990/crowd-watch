@@ -1,7 +1,7 @@
 from django.core import validators
 from django.db import models
 import uuid
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 
 class Trail(models.Model):
   def __str__(self):
@@ -87,12 +87,17 @@ class Trailhead(models.Model):
     choices=ACCESS_TYPES,
     help_text='How is the trailhead accessed?'
   )
-  pkg_type = models.CharField(
+  access_distance = models.IntegerField(
+    blank=True, null=True,
+    help_text='If accessed via service road, length of service road from paved road to trailhead',
+    validators=[MinValueValidator(0.1)]
+  )
+  pkg_type = models.CharField('Parking type',
     max_length=2, blank=True, null=True,
     choices=PARKING_TYPES,
     help_text='Type of Parking at Trailhead'
   )
-  pkg_capacity = models.IntegerField('Parking Capacity', 
+  pkg_capacity = models.IntegerField('Parking capacity', 
     blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
     validators=[MinValueValidator(0)]
@@ -137,9 +142,24 @@ class Report(models.Model):
     ('Su', 'Sunday')
   ]
 
+  CAR_TYPES = [
+    ('Suv', 'SUV'),
+    ('S', 'Sedan'),
+    ('T', 'Truck'),
+    ('4wd', 'Four-wheel drive')
+  ]
+
   ACCESS_TYPES = [
     ('FS', 'Forest Service Road'),
     ('P', 'Paved Road'),
+  ]
+
+  ACCESS_CONDITIONS = [
+    ('I', 'Impassable'),
+    ('P+', 'Many potholes'),
+    ('P', 'Potholes'),
+    ('P-', 'Occasional potholes'),
+    ('G', 'Good')
   ]
 
   BATHROOM_STATUS = [
@@ -151,6 +171,23 @@ class Report(models.Model):
     ('P', 'Portable/Outhouse'),
     ('FP', 'Fixed Building, Pit'),
     ('FR', 'Fixed Building with plumbing')
+  ]
+
+  WEATHER_TYPE = [
+    ('R', 'Rain'),
+    ('Sn', 'Snow'),
+    ('S', 'Sun'),
+    ('PC', 'Partly Cloudy'),
+    ('O', 'Overcast')
+  ]
+
+  TEMPERATURES = [
+    ('F', '< 32'),
+    ('C', '33-50'),
+    ('N', '51-70'),
+    ('W', '71-85'),
+    ('H', '86-100'),
+    ('E', '100 <')
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -166,10 +203,38 @@ class Report(models.Model):
     choices=DAYS,
     help_text='What day of the week was the hike?'
   )
+  weather_type = models.CharField(
+    max_length=2, blank=True, null=True,
+    choices=WEATHER_TYPE,
+    help_text='What was the weather like?'
+  )
+  temperature = models.CharField(
+    blank=True, null=True,
+    max_length=1,
+    choices=TEMPERATURES,
+    help_text='What was the temperature?'
+  )
+  car_type = models.CharField(
+    max_length=3, blank=True, null=True,
+    choices=CAR_TYPES,
+    help_text='With what type of car did you access the trail?'
+  )
   access = models.CharField(
     max_length=2, blank=True, null=True,
     choices=ACCESS_TYPES,
     help_text='How is the trailhead accessed?'
+  )
+  access_distance = models.DecimalField(
+    max_digits=3, decimal_places=1,
+    blank=True, null=True,
+    help_text='If accessed via service road, length of service road from paved road to trailhead',
+    validators=[MinValueValidator(0.1)]
+  )
+  access_condition = models.CharField(
+    blank=True, null=True,
+    max_length=2,
+    choices=ACCESS_CONDITIONS,
+    help_text='If accessed via service road, the condition of the service road?'
   )
   trail_begin = models.TimeField(help_text='What time did the hike begin?')
   trail_end = models.TimeField(help_text='What time did the hike end?')
@@ -185,7 +250,7 @@ class Report(models.Model):
     choices=BATHROOM_STATUS,
     help_text='Is the bathroom open?'
   )
-  pkg_location = models.CharField(
+  pkg_location = models.CharField('Type of Parking',
     max_length=2,
     choices=PARKING_TYPES,
     help_text='Where did you park at the trailhead?'
@@ -193,12 +258,12 @@ class Report(models.Model):
   pkg_estimate_begin = models.IntegerField(
     'Percentage Capacity Start',
     help_text='Approximate parking capacity full at trailhead arrival',
-    validators=[MinValueValidator(0), MaxValueValidator(100)]
+    validators=[MinValueValidator(0)]
   )
   pkg_estimate_end = models.IntegerField(
     'Percentage Capacity End',
     help_text='Approximate parking capacity full at trailhead departure',
-    validators=[MinValueValidator(0), MaxValueValidator(100)]
+    validators=[MinValueValidator(0)]
   )
   cars_seen = models.IntegerField(
     'Cars seen', help_text='Most cars seen at arrival/departure',

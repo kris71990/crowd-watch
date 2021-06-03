@@ -8,6 +8,28 @@
     {% include "./header.html" %}
     <h3>Welcome to the trail crowd tracker.</h3>
     <p>Search by <a href="{% url 'regions' %}">region</a></p>
-    <p>Or see the trail <a href="{% url 'trail_list' %}">list</a></p>
+    <p>Or see the trail <a href="{% url 'trail_list' %}">feed</a></p>
+    <p>Or see the report <a href="{% url 'reports_list' %}">feed</a></p>
+    <div>
+      <p>Or see reports by day of the week:</p>
+      <ul>
+        <li><a href="{% url 'reports_day' day='M'%}">Monday</a></li>
+        <li><a href="{% url 'reports_day' day='T'%}">Tuesday</a></li>
+        <li><a href="{% url 'reports_day' day='W'%}">Wednesday</a></li>
+        <li><a href="{% url 'reports_day' day='Th'%}">Thursday</a></li>
+        <li><a href="{% url 'reports_day' day='F'%}">Friday</a></li>
+        <li><a href="{% url 'reports_day' day='S'%}">Saturday</a></li>
+        <li><a href="{% url 'reports_day' day='Su'%}">Sunday</a></li>
+      </ul>
+    </div>
+    <div>
+      <p>Or see reports by time:</p>
+      <ul>
+        <li><a href="{% url 'reports_time' period='morning'%}">Morning</a></li>
+        <li><a href="{% url 'reports_time' period='afternoon'%}">Afternoon</a></li>
+        <li><a href="{% url 'reports_time' period='evening'%}">Evening</a></li>
+        <li><a href="{% url 'reports_time' period='night'%}">Night</a></li>
+      <ul>
+    </div>
   </body>
 </html>

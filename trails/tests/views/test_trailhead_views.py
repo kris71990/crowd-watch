@@ -3,7 +3,7 @@ from django.urls import reverse
 from faker import Faker
 
 from ...models import Trail, Trailhead
-from ..mocks import create_trail, create_trailhead
+from ..mocks import create_trail, create_trail_and_trailhead, create_trailhead
 
 fake = Faker()
 
@@ -32,14 +32,13 @@ class TrailheadViewTests(TestCase):
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads.html')
-    self.assertContains(response, 'Trailheads (2)')
+    self.assertContains(response, 'Trailhead')
     self.assertEqual(response.context['trail'], trail)
     self.assertEqual(len(trailheads), 2)
     self.assertGreater(trailheads[0].modified, trailheads[1].modified)
 
-
   # create trailhead, return new list of trailheads for trail, in order
-  def test_create_trailhead(self):
+  def test_create_trailhead_view(self):
     region = 'CC'
     trail_name = 'test_trail'
     trail = create_trail(name=trail_name, region=region, coordinates=fake.word())
@@ -55,7 +54,24 @@ class TrailheadViewTests(TestCase):
 
     self.assertEqual(get_response.status_code, 200)
     self.assertTemplateUsed('trailheads.html')
-    self.assertContains(get_response, 'Trailheads (3)')
+    self.assertContains(get_response, 'Trailhead')
     self.assertEqual(len(trailheads), 3)
     self.assertGreater(trailheads[0].modified, trailheads[1].modified)
     self.assertEqual(trailheads[0].name, 'abcd')
+
+  def test_create_trailhead_error_access_distance(self):
+    region = 'CC'
+    trail_name = 'test_trail'
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+
+    path = reverse('trailheads', args=(region, trailhead.trail.id,))
+    response = self.client.post(path, { 
+      'trail': trailhead.trail.id, 
+      'name': 'abcd', 
+      'coordinates': 'sffsd',
+      'access_distance': 0,
+    })
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('trailheads.html')
+    self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')

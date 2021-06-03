@@ -1,0 +1,50 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Report Feed</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    {% if reports_list %}
+      <div class="subheader"><h2>Report Feed</h2></div>
+      <div class="trail-table">
+        <table>
+          <thead>
+            <tr>
+              <td>Trail</td>
+              <td>Trailhead</td>
+              <td>Date Hiked</td>
+              <td>Day Hiked</td>
+              <td>Details</td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for report in reports_list %}
+              <tr>
+                <td>
+                  <a href="{% url 'trailheads' region=report.trail.region trail=report.trail.id %}">{{ report.trail.name }}
+                  </a>
+                </td>
+                <td>
+                  <a href="{% url 'reports_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
+                </td>
+                <td>{{ report.date_hiked|date:"m/d/y" }}</td>
+                <td>{{ report.get_day_hiked_display }}</td>
+                <td>
+                  <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    {% else %}
+      <p>No trails found</p>
+    {% endif %}
+  </body>
+</html>

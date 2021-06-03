@@ -28,7 +28,7 @@ class ReportModelTests(TestCase):
     time = datetime.now()
 
     report = create_report(report={ 
-      'trail': trail, 'trailhead': trailhead, 'date_hiked': time.date(), 'day_hiked': 'Th', 'trail_begin': time.time(), 'trail_end': time.time(), 'bathroom': 'N', 'pkg_location': 'P', 'pkg_estimate_begin': 15, 'pkg_estimate_end': 50, 'cars_seen': 30, 'people_seen': 100, 'horses_seen': False, 'dogs_seen': True
+      'trail': trail, 'trailhead': trailhead, 'date_hiked': time.date(), 'day_hiked': 'Th', 'trail_begin': time.time(), 'trail_end': time.time(), 'car_type': 'Suv', 'temperature': 'W', 'weather_type': 'S', 'access': 'P', 'access_distance': 5.0, 'access_condition': 'P+', 'bathroom_status': 'O', 'bathroom_type': 'FP', 'pkg_location': 'P', 'pkg_estimate_begin': 15, 'pkg_estimate_end': 50, 'cars_seen': 30, 'people_seen': 100, 'horses_seen': False, 'dogs_seen': True
     })
 
     self.assertIs(report.cars_seen, 30)

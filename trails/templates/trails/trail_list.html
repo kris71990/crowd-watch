@@ -1,5 +1,6 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
 
 <!DOCTYPE html>
 <html>
@@ -8,21 +9,36 @@
     <title>Trail Feed</title>
   </head>
   <body>
+    {% include "./header.html" %}
     {% if trails_list %}
-      {% include "./header.html" %}
-      <h2>Trail Feed</h2>
-      <ul>
-        {% for trail in trails_list %}
-          <li>
-            <div>
-              <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a>
-              <span> | {{ trail.get_region_display }} | {{ trail.modified }} || 
-                <a href="{% url 'reports_trail' region=trail.region trail=trail.id %}">{{ trail.report__count }}</a>
-              </span>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
+      <div class="subheader"><h2>Trail Feed</h2></div>
+      <div class="trail-table">
+        <table>
+          <thead>
+            <tr>
+              <td>Trail</td>
+              <td>Region</td>
+              <td>Updated</td>
+              <td>Reports</td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for trail in trails_list %}
+              <tr>
+                <td>
+                  <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}
+                  </a>
+                </td>
+                <td>{{ trail.get_region_display }}</td>
+                <td>{{ trail.modified|date:"m/d/y" }}</td>
+                <td>
+                  <a href="{% url 'reports_trail' region=trail.region trail=trail.id %}">{{ trail.report__count }}
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
     {% else %}
       <p>No trails found</p>
     {% endif %}

@@ -1,0 +1,75 @@
+.form-box form {
+  border-top: 1px dashed black;
+  display: inline-block;
+  width: 500px;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  margin: 10px 0;
+}
+
+.field input, .field select {
+  width: 200px;
+}
+
+.field select {
+  display: block;
+}
+
+.field:first-of-type {
+  margin-top: 10px;
+}
+
+.field:last-of-type {
+  border-bottom: 1px dashed black;
+  padding-bottom: 10px;
+}
+
+.field label {
+  font-weight: bold;
+}
+
+.field p {
+  margin-top: 0;
+  font-size: 0.8em;
+  font-style: italic;
+}
+
+.field .label {
+  font-size: initial;
+  font-style: initial;
+  padding: 0;
+  margin: 0;
+}
+
+.form-box form .button {
+  margin-top: 10px;
+  padding: 5px 40px;
+  float: right;
+}
+
+form .button:hover {
+  cursor: pointer;
+}
+
+.errorlist {
+  color: red;
+  font-size: 0.8em;
+}
+
+.field span {
+  color: red;
+}
+
+.filters {
+  padding: 10px 0;
+  border-bottom: 1px dashed black;
+}
+
+.filters form {
+  display: inline;
+  padding-right: 20px;
+  border-top: none;
+}

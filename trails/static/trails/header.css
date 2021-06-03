@@ -14,5 +14,8 @@
 #header h2 {
   float: right;
   font-style: italic;
+}
+
+#header h2 a {
   color: #2C520F;
 }

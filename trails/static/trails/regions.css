@@ -1,0 +1,19 @@
+ul {
+  display: inline-block;
+  border: 2px solid black;
+}
+
+li {
+  padding: 5px 10px;
+  background-color: beige;
+  justify-content: space-between;
+  display: flex;
+}
+
+a:hover {
+  color: #2C520F;
+}
+
+span {
+  padding-left: 20px;
+}

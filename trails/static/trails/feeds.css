@@ -1,0 +1,51 @@
+.trail-table {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+thead td {
+  font-weight: bold;
+}
+
+td {
+  padding: 0.5em 3em;
+  border-bottom: 1px solid black;
+  border-right: 1px dashed black;
+  color: black;
+}
+
+td:last-child {
+  border-right: none;
+}
+
+td:last-child a {
+  color: #2C520F;
+}
+
+td:last-child a:hover {
+  font-weight: bold;
+}
+
+span {
+  font-weight: bold;
+}
+
+#advice {
+  border-bottom: 1px dashed black;
+}
+
+.green {
+  color: green;
+}
+
+.yellow {
+  color: yellow;
+}
+
+.orange {
+  color: orange;
+}
+
+.red {
+  color: red;
+}

@@ -1,5 +1,7 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/forms.css' %}">
 
 <!DOCTYPE html>
 <html>
@@ -13,29 +15,56 @@
     <div class="subheader">
       <h2>{{ trails_list.0.get_region_display }} Trails</h2>
     </div>
-    <ul>
-      {% for trail in trails_list %}
-        <li>
-          <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a>
-          <span> | {{ trail.modified }} | 
-            <a href="{% url 'reports_trail' region=trail.region trail=trail.id %}">{{ trail.report__count }}</a>
-          </span>
-        </li>
-      {% endfor%}
-    </ul>
+    <div class="trail-table">
+      <table>
+        <thead>
+          <tr>
+            <td>Trail</td>
+            <td>Updated</td>
+            <td>Reports</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trail in trails_list %}
+            <tr>
+              <td>
+                <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a>
+              </td>
+              <td>{{ trail.modified|date:"m/d/y" }}</td>
+              <td>
+                <a href="{% url 'reports_trail' region=trail.region trail=trail.id %}">{{ trail.report__count }}</a>
+              </td>
+            </tr>
+          {% endfor%}
+        </tbody>
+      </table>
+    </div>
     {% else %}
       <p>No trails found</p>
     {% endif %}
 
-    {% if error_message %}
-      <p>{{ error_message }}</p>
-    {% endif %}
+    <div class="form-box">
+      <h4>Add Trail</h4>
+      <form action="{% url 'trails' region %}" method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          <div class="field">
+            {% if field.field.required %}
+              <p class="label"><span>*</span> {{ field.label_tag }}</p>
+            {% else %}
+              {{ field.label_tag }}
+            {% endif %}
 
-    <h4>Add Trail</h4>
-    <form action="{% url 'trails' region %}" method="post">
-      {% csrf_token %}
-      <table>{{ form.as_table }}</table>
-      <input type="submit" value="Add">
-    </form>
+            {{ field }}
+            {% if field.help_text %}
+              <p class="help">{{ field.help_text|safe }}</p>
+            {% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+        <input class="button" type="submit" value="Add">
+      </form>
+    </div>
   </body>
 </html>

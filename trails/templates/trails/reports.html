@@ -1,5 +1,7 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/forms.css' %}">
 
 <!DOCTYPE html>
 <html>
@@ -11,33 +13,106 @@
     {% include "./header.html" %}
     <div class="subheader">
     {% if trail %}
-      <h2>{{ trail.get_region_display }} | {{ trail.name }}</h2>
+      <h2>
+        <a href="{% url 'trails' trail.region %}">{{ trail.get_region_display }}</a> | 
+        {{ trail.name }}
+      </h2>
     {% elif trailhead %}
-      <h2>{{ trailhead.trail.get_region_display }} | {{ trailhead.trail.name }} | {{ trailhead.name }}</h2>
+      <h2>
+        <a href="{% url 'trails' trailhead.trail.region %}">{{ trailhead.trail.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a> | 
+        {{ trailhead.name }}
+      </h2>
+    {% elif day %}
+      {% if advice %}
+      <h2>
+        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.trail.get_region_display }}</a> |
+         <a href="{% url 'trailheads' region=reports_list.0.trail.region trail=reports_list.0.trail.id %}">{{ reports_list.0.trail.name }}</a> | 
+        {{ reports_list.0.get_day_hiked_display }}
+      </h2>
+      {% else %}
+      <h2>
+        <a href="{% url 'trails' region %}">{{ trail_day_empty.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=region trail=trail_day_empty.id %}">{{ trail_day_empty.name }}</a> | 
+        {{ day }}
+      </h2>
+      {% endif %}
+    {% elif period %}
+      {% if advice %}
+      <h2>
+        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.trail.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=reports_list.0.trail.region trail=reports_list.0.trail.id %}">{{ reports_list.0.trail.name }}</a> | 
+        {{ period }}
+      </h2>
+      {% else %}
+      <h2>
+        <a href="{% url 'trails' region %}">{{ trail_time_empty.get_region_display }}</a> | 
+        <a href="{% url 'trailheads' region=region trail=trail_time_empty.id %}">{{ trail_time_empty.name }}</a> | 
+        {{ period }}
+      </h2>
+      {% endif %}
     {% endif %}
     </div>
 
     <div class="report">
     {% if reports_list %}
-      <h3>Reports ({{ reports_list.count }})</h3>
-      <ul>
-        {% for report in reports_list %}
-          <li>
-            <div>
-              <p>
-              {% if trail %}<span>{{ report.trailhead.name }} - </span>{% endif %}
-                <span>{{ report.get_day_hiked_display }}, {{ report.date_hiked }}</span> || 
+      {% if reports_total %}
+      <div id="advice" class="{{ caution }}">
+        <p>{{ reports_list_total }} out of {{ reports_total }} total submitted</p>
+        <p>{{ advice }}</p>
+      </div>
+      {% endif %}
+      <div class="trail-table">
+        <h3>Reports ({{ reports_list.count }})</h3>
+        <table>
+          <thead>
+            <tr>
+              {% if not trailhead %}<td>Trailhead</td>{% endif %}
+              <td>Date Hiked</td>
+              <td>Day Hiked</td>
+              {% if period %}<td>Time Hiked</td>{% endif %}
+              <td>Details</td>
+            </tr>
+          </thead>
+          <tbody>
+          {% for report in reports_list %}
+            <tr>
+              {% if not trailhead %}
+              <td>
+                <a href="{% url 'reports_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
+              </td>
+              {% endif %}
+
+              <td>{{ report.date_hiked }}</td> 
+              <td>{{ report.get_day_hiked_display }}</td>
+
+              {% if period %}
+                <td>{{ report.trail_begin }} - {{ report.trail_end }}</td> 
+              {% endif %}
+
               {% if trail %}
-                <a href="{% url 'report' region=region trail=trail.id trailhead=report.trailhead.id report=report.id %}">Details</a></p>
+              <td>
+                <a href="{% url 'report' region=region trail=trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+              </td>
+              {% elif trailhead %}
+              <td>
+                <a href="{% url 'report' region=region trail=trailhead.trail.id trailhead=trailhead.id report=report.id %}">More</a>
+              </td>
               {% else %}
-                <a href="{% url 'report' region=region trail=trailhead.trail.id trailhead=trailhead.id report=report.id %}">Details</a></p>
+              <td>
+                <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+              </td>
               {% endif %}
             </div>
-          </li>
-        {% endfor%}
-      </ul>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% else %}
       <p>No reports found</p>
+      {% if reports_total %}
+        <p><span>Note</span> - There have been <span>{{ reports_total }}</span> submitted for this trail. If there have not been many reports, there may not be enough data to determine popularity.</p>
+      {% endif %}
     {% endif %}
     {% if trail %}
     <div class="report-footer">
@@ -47,12 +122,29 @@
     </div>
 
     {% if trailhead %}
+    <div class="form-box">
       <h4>Add Report</h4>
       <form action="{% url 'reports_trailhead' region trailhead.trail.id trailhead.id %}" method="post">
         {% csrf_token %}
-        <table>{{ form.as_table }}</table>
-        <input type="submit" value="Add">
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          <div class="field">
+            {% if field.field.required %}
+              <p class="label"><span>*</span> {{ field.label_tag }}</p>
+            {% else %}
+              {{ field.label_tag }}
+            {% endif %}
+
+            <div>{{ field }}</div>
+            {% if field.help_text %}
+              <p>{{ field.help_text|safe }}</p>
+            {% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+        <input class="button" type="submit" value="Add">
       </form>
+    </div>
     {% endif %}
   </body>
 </html>

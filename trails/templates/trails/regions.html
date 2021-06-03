@@ -1,5 +1,8 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/regions.css' %}">
+
+{% load trail_extras %}
 
 <!DOCTYPE html>
 <html>
@@ -12,8 +15,10 @@
       {% include "./header.html" %}
       <ul>
         {% for abbr, region in regions_list %}
-          <li><a href="{% url 'trails' abbr %}">{{ region }}</a></li>
-        {% endfor%}
+          <li><a href="{% url 'trails' abbr %}">{{ region }}</a> 
+            <span>{{ region_trail_count|lookup:forloop.counter0 }}</span>
+          </li>
+        {% endfor %}
       </ul>
     {% else %}
       <p>Regions not found</p>
