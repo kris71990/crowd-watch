@@ -30,7 +30,7 @@ class ReportForm(ModelForm):
 
 class SelectDayForm(Form):
   DAYS = [
-    ('', '------'),
+    ('', 'Day'),
     ('M', 'Monday'),
     ('T', 'Tuesday'),
     ('W', 'Wednesday'),
@@ -44,7 +44,7 @@ class SelectDayForm(Form):
 
 class SelectTimeForm(Form):
   TIME = [
-    ('', '------'),
+    ('', 'Time'),
     ('morning', 'Morning'),
     ('afternoon', 'Afternoon'),
     ('evening', 'Evening'),
