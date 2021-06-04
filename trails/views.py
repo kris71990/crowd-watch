@@ -76,6 +76,24 @@ def trailheads(request, region, trail):
   }
   return render(request, 'trails/trailheads.html', context)
 
+def trailheads_filter_bathroom(request, region):
+  trailheads_list = Trailhead.objects.filter(trail__region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
+  context = {
+    'trailheads_list': trailheads_list,
+    'region': region,
+    'type': 'bathroom',
+  }
+  return render(request, 'trails/trailheads_filter.html', context)
+
+def trailheads_filter_access(request, region):
+  trailheads_list = Trailhead.objects.filter(trail__region=region).filter(access='P').annotate(Count('report')).order_by('-modified')
+  context = {
+    'trailheads_list': trailheads_list,
+    'region': region,
+    'type': 'access',
+  }
+  return render(request, 'trails/trailheads_filter.html', context)
+
 def reports_trailhead(request, region, trail, trailhead):
   reports = Report.objects.filter(trailhead=trailhead).order_by('-modified')
   trailhead_obj = Trailhead.objects.get(pk=trailhead)

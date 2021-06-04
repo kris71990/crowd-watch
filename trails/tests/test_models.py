@@ -16,7 +16,7 @@ class TrailheadModelTests(TestCase):
   # create trailhead for a trail, returns trailhead
   def test_create_trailhead(self):
     trail = create_trail(name='test_name', region='CC', coordinates='4352')
-    trailhead = create_trailhead(trail=trail, name='th', coordinates='4535')
+    trailhead = create_trailhead(trail=trail, name='th', coordinates='4535', filters=None)
     self.assertIs(trailhead.name, 'th')
     self.assertIs(trailhead.trail.name, 'test_name')
 
@@ -24,7 +24,7 @@ class ReportModelTests(TestCase):
   # create report for a trailhead/trail
   def test_create_report(self):
     trail = create_trail(name='test_name', region='CC', coordinates='4352')
-    trailhead = create_trailhead(trail=trail, name='th', coordinates='4535')
+    trailhead = create_trailhead(trail=trail, name='th', coordinates='4535', filters=None)
     time = datetime.now()
 
     report = create_report(report={ 

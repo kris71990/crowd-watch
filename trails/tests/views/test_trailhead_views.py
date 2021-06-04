@@ -25,7 +25,7 @@ class TrailheadViewTests(TestCase):
     region = 'CC'
     trail = create_trail(name=fake.name(), region=region, coordinates=fake.word())
     for i in range(2):
-      create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word())
+      create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word(), filters=None)
 
     response = self.client.get(reverse('trailheads', args=(region, trail.id,)))
     trailheads = response.context['trailheads_list']
@@ -43,7 +43,7 @@ class TrailheadViewTests(TestCase):
     trail_name = 'test_trail'
     trail = create_trail(name=trail_name, region=region, coordinates=fake.word())
     for i in range(2):
-      create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word())
+      create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word(), filters=None)
 
     path = reverse('trailheads', args=(region, trail.id,))
     post_response = self.client.post(path, { 'trail': trail.id, 'name': 'abcd', 'coordinates': 'sffsd' })
@@ -62,7 +62,7 @@ class TrailheadViewTests(TestCase):
   def test_create_trailhead_error_access_distance(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
 
     path = reverse('trailheads', args=(region, trailhead.trail.id,))
     response = self.client.post(path, { 
@@ -75,3 +75,55 @@ class TrailheadViewTests(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads.html')
     self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')
+
+
+# <region>/bathroom
+# <region>/access
+class TrailheadFilterTests(TestCase):
+  # returns trailheads in region with open bathroom
+  def test_filter_trailheads_open_bathroom(self):
+    region = 'NC'
+    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'br': 'O' }) # set bathroom to open
+    response = self.client.get(reverse('trailheads_filter_bathroom', args=(region,)))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertEqual(response.context['type'], 'bathroom')
+    self.assertEqual(len(response.context['trailheads_list']), 1)
+    self.assertEqual(response.context['trailheads_list'][0].name, trailhead.name)
+
+  # returns empty set if no trailheads in region have open bathrooms
+  def test_filter_trailheads_open_bathroom_empty(self):
+    region = 'NC'
+    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'br': 'C' }) # set bathroom to closed
+    response = self.client.get(reverse('trailheads_filter_bathroom', args=(region,)))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertEqual(response.context['type'], 'bathroom')
+    self.assertQuerysetEqual(response.context['trailheads_list'], [])
+    self.assertContains(response, 'No trailheads found')
+
+  # returns trailheads in region with paved road access
+  def test_filter_trailheads_paved_access(self):
+    region = 'NC'
+    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'access': 'P' }) # set access to paved
+    response = self.client.get(reverse('trailheads_filter_access', args=(region,)))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertEqual(response.context['type'], 'access')
+    self.assertEqual(len(response.context['trailheads_list']), 1)
+    self.assertEqual(response.context['trailheads_list'][0].name, trailhead.name)
+
+  # return empty set if no trailheads in region have paved access
+  def test_filter_trailheads_paved_access_empty(self):
+    region = 'NC'
+    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'access': 'FS' }) # set access to service road
+    response = self.client.get(reverse('trailheads_filter_access', args=(region,)))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertEqual(response.context['type'], 'access')
+    self.assertQuerysetEqual(response.context['trailheads_list'], [])
+    self.assertContains(response, 'No trailheads found')

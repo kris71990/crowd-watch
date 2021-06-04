@@ -1,0 +1,76 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/forms.css' %}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Trailheads - Find</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    <div class="subheader">
+      {% if trailheads_list %}
+        {% if type == 'bathroom' %}
+          <h2>
+            <a href="{% url 'trails' region %}">{{ trailheads_list.0.trail.get_region_display }}</a> | 
+            Trailheads - Open Bathrooms
+          </h2>
+        {% elif type == 'access' %}
+          <h2>
+            <a href="{% url 'trails' region %}">{{ trailheads_list.0.trail.get_region_display }}</a> | 
+            Trailheads - Paved Access
+          </h2>
+        {% endif %}
+      {% else %}
+        {% if type == 'bathroom' %}
+          <h2><a href="{% url 'trails' region %}">{{ region }}</a> | Trailheads - Open Bathrooms</h2>
+        {% else %}
+          <h2><a href="{% url 'trails' region %}">{{ region }}</a> | Trailheads - Paved Access</h2>
+        {% endif %}
+      {% endif %}
+    </div>
+    {% if trailheads_list %}
+    <div class="trail-table">
+      <table>
+        <thead>
+          <tr>
+            <td>Trailhead</td>
+            <td>Trail</td>
+            <td>Location</td>
+            {% if type == 'bathroom' %}
+              <td>Bathroom</td>
+            {% elif type == 'access' %}
+              <td>Access</td>
+            {% endif %}
+            <td>Updated</td>
+            <td>Reports</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trailhead in trailheads_list %}
+            <tr>
+              <td>
+                <a href="{% url 'reports_trailhead' region=region trail=trailhead.trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a>
+              </td>
+              <td>
+                <a href="{% url 'reports_trail' region=region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a>
+              </td>
+              <td>{{ trailhead.coordinates }}</td>
+              {% if type == 'bathroom' %}<td>{{ trailhead.get_bathroom_type_display }}</td>
+              {% elif type == 'access' %}<td>{{ trailhead.get_access_display }}</td>
+              {% endif %}
+              <td>{{ trailhead.modified|date:"m/d/y" }}</td>
+              <td>{{ trailhead.report__count }}</td>
+            </li>
+          {% endfor%}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p>No trailheads found</p>
+    {% endif %}
+  </body>
+</html>

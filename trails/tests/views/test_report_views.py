@@ -14,7 +14,7 @@ class ReportViewTests(TestCase):
     regions = ['CC', 'WW', 'NC']
     days = ['M', 'T', 'W', 'TH', 'F']
     for i in range(3):
-      trailhead = create_trail_and_trailhead(name=fake.name(), region=regions[i], coordinates=fake.word())
+      trailhead = create_trail_and_trailhead(name=fake.name(), region=regions[i], coordinates=fake.word(), filters=None)
       create_report(report={
         'trail': trailhead.trail, 
         'trailhead': trailhead,
@@ -44,7 +44,7 @@ class ReportViewTests(TestCase):
   # returns empty list of reports for a trail
   def test_report_list_trail_empty(self):
     region = 'CC'
-    trailhead = create_trail_and_trailhead(name=fake.name(), region='CC', coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=fake.name(), region='CC', coordinates=fake.word(), filters=None)
     response = self.client.get(reverse('reports_trail', args=(region, trailhead.trail.id,)))
 
     self.assertEqual(response.status_code, 200)
@@ -56,7 +56,7 @@ class ReportViewTests(TestCase):
   # returns empty list of reports for a trailhead
   def test_report_list_trailhead_empty(self):
     region = 'CC'
-    trailhead = create_trail_and_trailhead(name=fake.name(), region='CC', coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=fake.name(), region='CC', coordinates=fake.word(), filters=None)
     response = self.client.get(reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,)))
 
     self.assertEqual(response.status_code, 200)
@@ -68,7 +68,7 @@ class ReportViewTests(TestCase):
   # returns list of reports for a trailhead in order of most recent
   def test_report_list_trailhead(self):
     region = 'CC'
-    trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word(), filters=None)
     days = ['M', 'T', 'W', 'TH', 'F']
 
     for i in range(5):
@@ -106,7 +106,7 @@ class ReportViewTests(TestCase):
     days = ['M', 'T', 'W', 'TH', 'F']
 
     for i in range(2):
-      trailhead = create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word())
+      trailhead = create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word(), filters=None)
       create_report(report={
         'trail': trailhead.trail, 
         'trailhead': trailhead,
@@ -136,7 +136,7 @@ class ReportViewTests(TestCase):
   def test_create_report_view(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -178,7 +178,7 @@ class ReportViewTests(TestCase):
   def test_create_report_error_access_distance(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -205,7 +205,7 @@ class ReportViewTests(TestCase):
   def test_create_report_error_time_begin(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -231,7 +231,7 @@ class ReportViewTests(TestCase):
   def test_create_report_error_time_end(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -257,7 +257,7 @@ class ReportViewTests(TestCase):
   def test_create_report_error_parking_capacity_start(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -284,7 +284,7 @@ class ReportViewTests(TestCase):
   def test_create_report_error_parking_capacity_end(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -310,7 +310,7 @@ class ReportViewTests(TestCase):
   def test_create_report_error_cars_seen(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -336,7 +336,7 @@ class ReportViewTests(TestCase):
   def test_create_report_error_people_seen(self):
     region = 'CC'
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
 
     path = reverse('reports_trailhead', args=(region, trailhead.trail.id, trailhead.id,))
@@ -363,7 +363,7 @@ class SingleReportViewTests(TestCase):
   # renders single report 
   def test_single_report(self):
     region = 'CC'
-    trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word())
+    trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word(), filters=None)
     time = datetime.now()
     report = create_report(report={
       'trail': trailhead.trail, 
@@ -410,7 +410,7 @@ class ReportFilterViews(TestCase):
   # returns reports from a trail for a specific day
   def test_filter_by_day_trail(self):
     create_bulk_reports('CC', 2)
-    trailhead = create_trail_and_trailhead('sfdsf', 'NC', '342323')
+    trailhead = create_trail_and_trailhead('sfdsf', 'NC', '342323', None)
     create_report(report={
       'trail': trailhead.trail, 
       'trailhead': trailhead,
@@ -435,7 +435,7 @@ class ReportFilterViews(TestCase):
     self.assertEqual(reports_day[0].day_hiked, 'S')
 
   def test_filter_by_day_trail_empty(self):
-    trailhead = create_trail_and_trailhead('test', 'NC', '34223')
+    trailhead = create_trail_and_trailhead('test', 'NC', '34223', None)
     create_report(report={
       'trail': trailhead.trail, 
       'trailhead': trailhead,
@@ -482,7 +482,7 @@ class ReportFilterViews(TestCase):
 
   # returns reports from a trail for a specific time
   def test_filter_by_time_trail(self):
-    trailhead = create_trail_and_trailhead('test', 'NC', '342323')
+    trailhead = create_trail_and_trailhead('test', 'NC', '342323', None)
     create_report(report={
       'trail': trailhead.trail, 
       'trailhead': trailhead,
@@ -509,7 +509,7 @@ class ReportFilterViews(TestCase):
     self.assertLess(reports_time[0].trail_begin, time(12, 00))
 
   def test_filter_by_time_trail_empty(self):
-    trailhead = create_trail_and_trailhead('test', 'NC', '34223')
+    trailhead = create_trail_and_trailhead('test', 'NC', '34223', None)
     create_report(report={
       'trail': trailhead.trail, 
       'trailhead': trailhead,
