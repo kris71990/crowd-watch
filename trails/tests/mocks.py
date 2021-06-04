@@ -7,12 +7,17 @@ fake = Faker()
 def create_trail(name, region, coordinates):
   return Trail.objects.create(name=name, region=region, coordinates=coordinates)
 
-def create_trailhead(trail, name, coordinates):
-  return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates)
+def create_trailhead(trail, name, coordinates, filters):
+  if filters is None:
+    return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates)
+  elif 'br' in filters:
+    return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates, bathroom_status=filters['br'])
+  elif 'access' in filters:
+    return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates, access=filters['access'])
 
-def create_trail_and_trailhead(name, region, coordinates):
+def create_trail_and_trailhead(name, region, coordinates, filters):
   trail = create_trail(name, region, coordinates)
-  return create_trailhead(trail, fake.name(), coordinates)
+  return create_trailhead(trail, fake.name(), coordinates, filters)
 
 def generate_random_choices():
   day_hiked = Report.DAYS[randint(0, len(Report.DAYS) - 1)][0]
@@ -62,7 +67,7 @@ def create_report(report):
   )
 
 def create_bulk_reports(region, total):
-  trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word())
+  trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word(), filters=None)
 
   for i in range(total):
     random_choices = generate_random_choices()
