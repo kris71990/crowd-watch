@@ -76,6 +76,16 @@ def trailheads(request, region, trail):
   }
   return render(request, 'trails/trailheads.html', context)
 
+def trail_summary(request, region, trail):
+  trail_obj = Trail.objects.get(pk=trail)
+  trailheads_obj = Trailhead.objects.filter(trail=trail)
+  context = {
+    'region': region,
+    'trail': trail_obj,
+    'trailheads': trailheads_obj,
+  }
+  return render(request, 'trails/trail-summary.html', context)
+
 def trailheads_filter_bathroom(request, region):
   trailheads_list = Trailhead.objects.filter(trail__region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
   context = {

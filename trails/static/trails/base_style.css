@@ -7,6 +7,16 @@ ul {
   border-bottom: 1px dashed black;
 }
 
+.subheader * {
+  display: inline-block;
+}
+
+.subheader p a {
+  color: blue;
+  font-weight: bold;
+  padding-left: 20px;
+}
+
 .report-footer {
   border-top: 1px dashed black;
 }

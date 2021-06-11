@@ -1,0 +1,20 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Trail Summary</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    <div class="subheader">
+      <h2>
+        <a href="{% url 'trails' trail.region %}">{{ trail.get_region_display }}</a> | 
+        {{ trail.name }}
+      </h2>
+    </div>
+    <p>Summary</p>
+  </body>
+</html>
