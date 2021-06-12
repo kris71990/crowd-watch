@@ -1,5 +1,6 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/trail_summary.css' %}">
 
 <!DOCTYPE html>
 <html>
@@ -12,9 +13,18 @@
     <div class="subheader">
       <h2>
         <a href="{% url 'trails' trail.region %}">{{ trail.get_region_display }}</a> | 
-        {{ trail.name }}
+        {{ trail.name }} - Report of Reports
       </h2>
     </div>
-    <p>Summary</p>
+    {% if summary %}
+    <div>
+      <h4>Facilities and Access</h4>
+      <p>Trailheads: {{ trailheads.obj.count }}</p>
+      <p>Access: {{ trailheads.access }}</p>
+      <p>Bathroom: {{ trailheads.bathroom_type }} | <span>{{ trailheads.bathroom_status }}</span></p> 
+      <h4>Popularity</h4>
+      <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ trail.get_region_display }}</p>
+    </div>
+    {% endif %}
   </body>
 </html>
