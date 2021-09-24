@@ -54,3 +54,7 @@ def create_advice(type, filtered, total):
     else:
       advice = 'Solitude: few people hike on this day - this an ideal day to avoid people.'
   return { 'advice': advice, 'caution': caution }
+
+def find_tuple_display_value(model_tuple, value):
+  target = [item for item in model_tuple if item[0] == value]
+  return target[0][1]

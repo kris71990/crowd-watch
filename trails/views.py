@@ -76,6 +76,62 @@ def trailheads(request, region, trail):
   }
   return render(request, 'trails/trailheads.html', context)
 
+def trail_summary(request, region, trail):
+  trail_obj = Trail.objects.get(pk=trail)
+  trailheads_obj = Trailhead.objects.filter(trail=trail)
+
+  trailheads_access_values = trailheads_obj.values('access').distinct().exclude(access=None)
+  trailheads_bathroom_type_values = trailheads_obj.values('bathroom_type').distinct().exclude(bathroom_type=None)
+  trailheads_bathroom_open = trailheads_obj.filter(bathroom_status='O').values('name')
+
+  reports_all_region = Report.objects.filter(trail__region=region).count()
+  reports_all_trail = Report.objects.filter(trail=trail).count()
+
+  trailheads_bathroom_status_str = ''
+  if len(trailheads_bathroom_open) > 0:
+    trailheads_bathroom_status_str += 'Open ('
+    for trailhead in trailheads_bathroom_open:
+      trailheads_bathroom_status_str += trailhead['name']
+    trailheads_bathroom_status_str += ')'
+  else:
+    trailheads_bathroom_status_str = 'Closed'
+
+  trailheads_access_str = 'via '
+  if len(trailheads_access_values) == 0:
+    trailheads_access_str = 'Unknown'
+  if len(trailheads_access_values) == 1:
+    trailheads_access_str += find_tuple_display_value(Trailhead.ACCESS_TYPES, trailheads_access_values[0]['access'])
+  else:
+    for access in trailheads_access_values:
+      val = find_tuple_display_value(Trailhead.ACCESS_TYPES, access['access'])
+      trailheads_access_str += val
+
+  trailheads_bathroom_type_str = ''
+  if len(trailheads_bathroom_type_values) == 0:
+    trailheads_bathroom_type_str = 'Unknown'
+  elif len(trailheads_bathroom_type_values) == 1:
+    trailheads_bathroom_type_str += find_tuple_display_value(Trailhead.BATHROOM_TYPE, trailheads_bathroom_type_values[0]['bathroom_type'])
+  else:
+    for type in trailheads_bathroom_type_values:
+      val = find_tuple_display_value(Trailhead.BATHROOM_TYPE, type['bathroom_type'])
+      trailheads_bathroom_type_str += val
+
+  context = {
+    'region': region,
+    'trail': trail_obj,
+    'trailheads': {
+      'obj': trailheads_obj,
+      'access': trailheads_access_str,
+      'bathroom_type': trailheads_bathroom_type_str,
+      'bathroom_status': trailheads_bathroom_status_str
+    },
+    'summary': {
+      'reports_region_count': reports_all_region,
+      'reports_trail_count': reports_all_trail
+    }
+  }
+  return render(request, 'trails/trail-summary.html', context)
+
 def trailheads_filter_bathroom(request, region):
   trailheads_list = Trailhead.objects.filter(trail__region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
   context = {

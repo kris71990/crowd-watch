@@ -16,6 +16,7 @@
         <a href="{% url 'trails' trail.region %}">{{ trail.get_region_display }}</a> | 
         {{ trail.name }}
       </h2>
+      <p><a href="{% url 'trail_summary' region=region trail=trail.id %}">(Trail Summary)</a></p>
     </div>
     {% if trailheads_list %}
     <div class="filters">

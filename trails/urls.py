@@ -13,10 +13,12 @@ urlpatterns = [
   path('<str:region>/', views.trails, name='trails'),
   path('<str:region>/<str:trail>/', views.trailheads, name='trailheads'),
 
-  # TODO
+  #TODO
+  path('<str:region>/<str:trail>/summary', views.trail_summary, name='trail_summary'),
+  #
+
   path('<str:region>/trailheads/bathroom/', views.trailheads_filter_bathroom, name='trailheads_filter_bathroom'),
   path('<str:region>/trailheads/access/', views.trailheads_filter_access, name='trailheads_filter_access'),
-  #
 
   path('<str:region>/<str:trail>/reports/', views.reports_trail, name='reports_trail'),
   path('<str:region>/<str:trail>/<str:trailhead>/reports/', views.reports_trailhead, name='reports_trailhead'),
