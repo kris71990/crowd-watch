@@ -24,12 +24,18 @@ def regions(request):
 
 def trail_list(request):
   trails_list = Trail.objects.annotate(Count('report')).order_by('-modified')
-  context = { 'trails_list': trails_list }
+  context = { 
+    'date': timezone.localdate(),
+    'trails_list': trails_list
+  }
   return render(request, 'trails/trail_list.html', context)
 
 def reports_list(request):
-  reports_list = Report.objects.all().order_by('-modified')
-  context = { 'reports_list': reports_list }
+  reports_list = Report.objects.all().order_by('-date_hiked')
+  context = { 
+    'reports_list': reports_list, 
+    'date': timezone.localdate(),
+  }
   return render(request, 'trails/report_list.html', context)
 
 def trails(request, region):
@@ -45,6 +51,7 @@ def trails(request, region):
 
   context = { 
     'trails_list': trails_list,
+    'date': timezone.localdate(),
     'region': region,
     'form': form
   }
@@ -67,6 +74,7 @@ def trailheads(request, region, trail):
   formDayFilter = SelectDayForm()
   formTimeFilter = SelectTimeForm()
   context = {
+    'date': timezone.localdate(),
     'trailheads_list': trailheads_list,
     'region': region,
     'trail': trail_obj[0],
@@ -135,6 +143,7 @@ def trail_summary(request, region, trail):
 def trailheads_filter_bathroom(request, region):
   trailheads_list = Trailhead.objects.filter(trail__region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
   context = {
+    'date': timezone.localdate(),
     'trailheads_list': trailheads_list,
     'region': region,
     'type': 'bathroom',
@@ -144,6 +153,7 @@ def trailheads_filter_bathroom(request, region):
 def trailheads_filter_access(request, region):
   trailheads_list = Trailhead.objects.filter(trail__region=region).filter(access='P').annotate(Count('report')).order_by('-modified')
   context = {
+    'date': timezone.localdate(),
     'trailheads_list': trailheads_list,
     'region': region,
     'type': 'access',
@@ -151,7 +161,7 @@ def trailheads_filter_access(request, region):
   return render(request, 'trails/trailheads_filter.html', context)
 
 def reports_trailhead(request, region, trail, trailhead):
-  reports = Report.objects.filter(trailhead=trailhead).order_by('-modified')
+  reports = Report.objects.filter(trailhead=trailhead).order_by('-date_hiked')
   trailhead_obj = Trailhead.objects.get(pk=trailhead)
   trail_obj = Trail.objects.filter(pk=trail)
 
@@ -170,6 +180,7 @@ def reports_trailhead(request, region, trail, trailhead):
     form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead }, label_suffix='')
 
   context = {
+    'date': timezone.localdate(),
     'reports_list': reports,
     'region': region, 
     'trailhead': trailhead_obj,
@@ -182,6 +193,7 @@ def reports_trail(request, region, trail):
   trail_obj = Trail.objects.get(pk=trail)
 
   context = {
+    'date': timezone.localdate(),
     'reports_list': reports,
     'region': region,
     'trail': trail_obj,
@@ -210,8 +222,12 @@ def reports_filter(request, region, trail):
         return redirect('reports_trail_day', region=region, trail=trail, day=day)
 
 def reports_day(request, day):
-  reports = Report.objects.filter(day_hiked=day).order_by('-day_hiked')
-  context = { 'reports_list': reports, 'day': day }
+  reports = Report.objects.filter(day_hiked=day).order_by('-date_hiked')
+  context = { 
+    'reports_list': reports, 
+    'day': day,
+    'date': timezone.localdate(),
+  }
   return render(request, 'trails/reports_day.html', context)
 
 def reports_trail_day(request, region, trail, day):
@@ -236,6 +252,7 @@ def reports_trail_day(request, region, trail, day):
       'reports_total': total_trail_report_count,
       'reports_list_total': filter_report_count,
       'day': day,
+      'date': timezone.localdate(),
       'advice': advice['advice'],
       'caution': advice['caution']
     }
@@ -254,13 +271,14 @@ def reports_time(request, period):
 def reports_trail_time(request, region, trail, period):
   range = parse_time(period)
   reports_total_trail = Report.objects.filter(trail=trail)
-  reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
+  reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max']).order_by('-date_hiked')
   period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
 
   if not reports_filter:
     trail_obj = Trail.objects.get(pk=trail)
     total = len(reports_total_trail)
     context = {
+      'date': timezone.localdate(),
       'region': region,
       'trail_time_empty': trail_obj,
       'period': period_print,
@@ -271,6 +289,7 @@ def reports_trail_time(request, region, trail, period):
     filter_report_count = len(reports_filter)
     advice = create_advice('time', filter_report_count, total_trail_report_count)
     context = { 
+      'date': timezone.localdate(),
       'reports_list': reports_filter,
       'reports_total': total_trail_report_count,
       'reports_list_total': filter_report_count,

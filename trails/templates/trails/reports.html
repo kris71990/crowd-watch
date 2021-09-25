@@ -83,7 +83,11 @@
               </td>
               {% endif %}
 
-              <td>{{ report.date_hiked }}</td> 
+              {% if date == report.date_hiked %}
+                <td>Today</td>
+              {% else %}
+                <td>{{ report.date_hiked }}</td>
+              {% endif %}
               <td>{{ report.get_day_hiked_display }}</td>
 
               {% if period %}

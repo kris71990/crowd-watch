@@ -48,7 +48,13 @@
                 <a href="{% url 'reports_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a>
               </td>
               <td>{{ trailhead.coordinates }}</td>
-              <td>{{ trailhead.modified|date:"m/d/y" }}</td>
+
+              {% if date == trailhead.modified.date %}
+                <td>Today</td>
+              {% else %}
+                <td>{{ trailhead.modified|date:"m/d/y" }}</td>
+              {% endif %}
+
               <td>{{ trailhead.report__count }}</td>
             </li>
           {% endfor%}
