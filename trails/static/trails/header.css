@@ -1,5 +1,6 @@
 #header {
   border-bottom: 3px double black;
+  background-color: #96B281;
 }
 
 #header a {
@@ -11,9 +12,14 @@
   display: inline-block;
 }
 
+#header h1 {
+  padding-left: 20px;
+}
+
 #header h2 {
   float: right;
   font-style: italic;
+  padding-right: 20px;
 }
 
 #header h2 a {
