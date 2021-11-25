@@ -11,15 +11,22 @@
     <title>Regions</title>
   </head>
   <body>
-    {% if regions_list %}
+    {% if regions_table %}
       {% include "./header.html" %}
-      <ul>
-        {% for abbr, region in regions_list %}
-          <li><a href="{% url 'trails' abbr %}">{{ region }}</a> 
-            <span>{{ region_trail_count|lookup:forloop.counter0 }}</span>
-          </li>
+      <table>
+        <thead>
+          <td class="region_head">Region</td>
+          <td class="count_head">Trail Count</td>
+        </thead>
+        <tbody>
+        {% for region in regions_table %}
+          <tr>
+            <td class="region_name"><a href="{% url 'trails' region.abbr %}">{{ region.region }}</a></td>
+            <td class="trail_count"><p>{{ region.trail_count }}</p></td>
+          </tr>
         {% endfor %}
-      </ul>
+        <tbody>
+      </table>
     {% else %}
       <p>Regions not found</p>
     {% endif %}

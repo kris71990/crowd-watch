@@ -12,13 +12,18 @@ from .utils import *
 def regions(request):
   regions_list = Trail.REGION_CHOICES
   region_trail_count = []
-  for i in Trail.REGION_CHOICES:
+  for i in regions_list:
     trail_count = len(Trail.objects.filter(region=i[0]).values('name'))
-    region_trail_count.append(trail_count)
+    region_trail_count.append({
+      'abbr': i[0],
+      'region': i[1],
+      'trail_count': trail_count,
+    })
+
+  sorted_trails = sorted(region_trail_count, key=lambda x: x['trail_count'], reverse=True)
 
   context = { 
-    'regions_list': regions_list,
-    'region_trail_count': region_trail_count
+    'regions_table': sorted_trails,
   }
   return render(request, 'trails/regions.html', context)
 
