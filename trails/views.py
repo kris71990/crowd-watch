@@ -5,6 +5,7 @@ from django.forms import ModelChoiceField
 from django.utils import timezone
 from django.shortcuts import redirect
 
+import datetime
 from .models import Region, Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTimeForm
 from .utils import *
@@ -260,7 +261,7 @@ def reports_trail_day(request, region, trail, day):
 def reports_time(request, period):
   range = parse_time(period)
   reports = Report.objects.filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
-  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
+  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'].strftime('%H:%M'), range['max'].strftime('%H:%M'))
   context = { 
     'reports_list': reports,
     'period': period_print,
@@ -271,7 +272,7 @@ def reports_trail_time(request, region, trail, period):
   range = parse_time(period)
   reports_total_trail = Report.objects.filter(trail=trail)
   reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max']).order_by('-date_hiked')
-  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
+  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'].strftime('%H:%M'), range['max'].strftime('%H:%M'))
 
   if not reports_filter:
     trail_obj = Trail.objects.get(pk=trail)

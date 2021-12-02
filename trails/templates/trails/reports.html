@@ -19,7 +19,7 @@
       </h2>
     {% elif trailhead %}
       <h2>
-        <a href="{% url 'trails' trailhead.trail.region %}">{{ trailhead.region.get_name_display }}</a> | 
+        <a href="{% url 'trails' trailhead.trail.region %}">{{ trailhead.region }}</a> | 
         <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a> | 
         {{ trailhead.name }}
       </h2>
@@ -32,7 +32,7 @@
       </h2>
       {% else %}
       <h2>
-        <a href="{% url 'trails' region %}">{{ trail_day_empty.get_name_display }}</a> | 
+        <a href="{% url 'trails' region %}">{{ trail_day_empty.region.get_name_display }}</a> | 
         <a href="{% url 'trailheads' region=region trail=trail_day_empty.id %}">{{ trail_day_empty.name }}</a> | 
         {{ day }}
       </h2>
