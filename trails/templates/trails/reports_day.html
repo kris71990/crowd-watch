@@ -36,7 +36,7 @@
           {% for report in reports_list %}
             <tr>
               <td>
-                <a href="{% url 'trails' report.trail.region %}">{{ report.trail.get_region_display }}</a>
+                <a href="{% url 'trails' report.trail.region %}">{{ report.region.get_name_display }}</a>
               </td>
               <td>
                 <a href="{% url 'trailheads' region=report.trail.region trail=report.trail.id %}">{{ report.trail.name }}</a>

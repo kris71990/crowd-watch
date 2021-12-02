@@ -13,6 +13,7 @@ def regions(request):
   trail_count = Count('trail')
   report_count = Count('report')
   trailhead_count = Count('trailhead')
+  
   regions_list = Region.objects.annotate(trails=trail_count, trailheads=trailhead_count, reports=report_count).order_by('-trail')
 
   context = { 

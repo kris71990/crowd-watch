@@ -15,12 +15,12 @@
       {% if trailheads_list %}
         {% if type == 'bathroom' %}
           <h2>
-            <a href="{% url 'trails' region %}">{{ trailheads_list.0.trail.get_region_display }}</a> | 
+            <a href="{% url 'trails' region %}">{{ trailheads_list.0.region }}</a> | 
             Trailheads - Open Bathrooms
           </h2>
         {% elif type == 'access' %}
           <h2>
-            <a href="{% url 'trails' region %}">{{ trailheads_list.0.trail.get_region_display }}</a> | 
+            <a href="{% url 'trails' region %}">{{ trailheads_list.0.region }}</a> | 
             Trailheads - Paved Access
           </h2>
         {% endif %}
