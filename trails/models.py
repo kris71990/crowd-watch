@@ -3,12 +3,9 @@ from django.db import models
 import uuid
 from django.core.validators import MinValueValidator
 
-class Trail(models.Model):
+class Region(models.Model):
   def __str__(self):
     return self.name
-
-  def get_id(self):
-    return self.id
 
   REGION_CHOICES = [
     ('OP', 'Olympic Peninsula'),
@@ -23,14 +20,25 @@ class Trail(models.Model):
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  name = models.CharField(
+    choices=REGION_CHOICES,
+    max_length=2, 
+    unique=True, 
+    help_text='Region Name'
+  )
+
+class Trail(models.Model):
+  def __str__(self):
+    return self.name
+
+  def get_id(self):
+    return self.id
+
+  region = models.ForeignKey(Region, on_delete=models.CASCADE)
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   modified = models.DateTimeField('time modified', auto_now=True)
 
   name = models.CharField(max_length=100, unique=True, help_text='Trail Name')
-  region = models.CharField(
-    max_length=2,
-    choices=REGION_CHOICES,
-    help_text='Geographic region in Washington where trail is located'
-  )
   coordinates = models.CharField(
     max_length=25,
     help_text='Geographic coordinates searchable via Google Maps'
@@ -73,6 +81,7 @@ class Trailhead(models.Model):
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
   trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
   modified = models.DateTimeField('time modified', auto_now=True)
 
@@ -193,6 +202,7 @@ class Report(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
   trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE)
+  region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
 
   created = models.DateTimeField('time created', auto_now_add=True)
   modified = models.DateTimeField('time modified', auto_now=True)

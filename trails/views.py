@@ -5,25 +5,18 @@ from django.forms import ModelChoiceField
 from django.utils import timezone
 from django.shortcuts import redirect
 
-from .models import Trail, Trailhead, Report
+from .models import Region, Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTimeForm
 from .utils import *
 
 def regions(request):
-  regions_list = Trail.REGION_CHOICES
-  region_trail_count = []
-  for i in regions_list:
-    trail_count = len(Trail.objects.filter(region=i[0]).values('name'))
-    region_trail_count.append({
-      'abbr': i[0],
-      'region': i[1],
-      'trail_count': trail_count,
-    })
-
-  sorted_trails = sorted(region_trail_count, key=lambda x: x['trail_count'], reverse=True)
+  trail_count = Count('trail')
+  report_count = Count('report')
+  trailhead_count = Count('trailhead')
+  regions_list = Region.objects.annotate(trails=trail_count, trailheads=trailhead_count, reports=report_count).order_by('-trail')
 
   context = { 
-    'regions_table': sorted_trails,
+    'regions_table': regions_list,
   }
   return render(request, 'trails/regions.html', context)
 

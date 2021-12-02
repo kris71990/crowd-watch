@@ -11,18 +11,38 @@
     <title>Regions</title>
   </head>
   <body>
+    {% include "./header.html" %}
     {% if regions_table %}
-      {% include "./header.html" %}
       <table>
         <thead>
           <td class="region_head">Region</td>
-          <td class="count_head">Trail Count</td>
+          <td class="trail_count_head">Trails</td>
+          <td class="trailhead_count_head">Trailheads</td>
+          <td class="report_count_head">Reports</td>
         </thead>
         <tbody>
         {% for region in regions_table %}
           <tr>
-            <td class="region_name"><a href="{% url 'trails' region.abbr %}">{{ region.region }}</a></td>
-            <td class="trail_count"><p>{{ region.trail_count }}</p></td>
+            <td class="region_name"><a href="{% url 'trails' region.id %}">{{ region.get_name_display }}</a></td>
+
+            {% if region.trails > 0 %}
+              <td class="trail_count"><p>{{ region.trails }}</p></td>
+            {% else %}
+              <td class="trail_count"><p>0</p></td>
+            {% endif %}
+
+            {% if region.trailheads > 0 %}
+              <td class="trailhead_count"><p>{{ region.trailheads }}</p></td>
+            {% else %}
+              <td class="trailhead_count"><p>0</p></td>
+            {% endif %}
+
+
+            {% if region.reports > 0 %}
+              <td class="report_count"><p>{{ region.reports }}</p></td>
+            {% else %}
+              <td class="report_count"><p>0</p></td>
+            {% endif %}
           </tr>
         {% endfor %}
         <tbody>

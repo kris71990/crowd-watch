@@ -1,6 +1,6 @@
 table {
   margin-top: 20px;
-  width: 30%;
+  width: 40%;
 }
 
 thead td {
@@ -13,8 +13,16 @@ tbody td {
   background-color: beige;
 }
 
-.trail_count, .count_head {
+tbody td:first-child {
+  width: 60%;
+}
+
+td {
   text-align: right;
+}
+
+.region_head, .region_name {
+  text-align: left;
 }
 
 a:hover {

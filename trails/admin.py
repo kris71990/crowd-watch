@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db.models import Count
-from .models import Trail, Trailhead, Report
+from .models import Region, Trail, Trailhead, Report
 
 class TrailheadInline(admin.StackedInline):
   model = Trailhead
@@ -23,6 +23,9 @@ class TrailheadInline(admin.StackedInline):
     })
   )
   extra = 1
+
+class RegionAdmin(admin.ModelAdmin):
+  readonly_fields = ['id']
 
 class TrailAdmin(admin.ModelAdmin):
   def get_queryset(self, request):
@@ -72,6 +75,6 @@ class ReportAdmin(admin.ModelAdmin):
   list_display = ('get_trail', 'get_trailhead', 'day_hiked', 'date_hiked')
   list_filter = ['trail', 'trail__region']
   
-
+admin.site.register(Region, RegionAdmin)
 admin.site.register(Trail, TrailAdmin)
 admin.site.register(Report, ReportAdmin)
