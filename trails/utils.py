@@ -58,3 +58,9 @@ def create_advice(type, filtered, total):
 def find_tuple_display_value(model_tuple, value):
   target = [item for item in model_tuple if item[0] == value]
   return target[0][1]
+
+def abbreviate_day(day):
+  if day == 'thursday' or day == 'sunday':
+    return day[:2].capitalize()
+  else:
+    return day[0].upper()

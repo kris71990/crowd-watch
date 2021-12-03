@@ -20,7 +20,6 @@ def regions(request):
   context = { 
     'regions_table': regions_list,
   }
-  print(regions_list.values())
   return render(request, 'trails/regions.html', context)
 
 def trail_list(request):
@@ -69,8 +68,8 @@ def trailheads(request, region, trail):
       formTh.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
+    TrailheadForm.base_fields['trails'] = ModelChoiceField(queryset=trail_obj)
+    formTh = TrailheadForm(initial={ 'trails': trail }, label_suffix='')
 
   formDayFilter = SelectDayForm()
   formTimeFilter = SelectTimeForm()
@@ -223,17 +222,19 @@ def reports_filter(request, region, trail):
         return redirect('reports_trail_day', region=region, trail=trail, day=day)
 
 def reports_day(request, day):
-  reports = Report.objects.filter(day_hiked=day).order_by('-date_hiked')
+  formatted_day = abbreviate_day(day)
+  reports = Report.objects.filter(day_hiked=formatted_day).order_by('-date_hiked')
   context = { 
     'reports_list': reports, 
-    'day': day,
+    'day': day.capitalize(),
     'date': timezone.localdate(),
   }
   return render(request, 'trails/reports_day.html', context)
 
 def reports_trail_day(request, region, trail, day):
+  formatted_day = abbreviate_day(day)
   reports_total_trail = Report.objects.filter(trail=trail)
-  reports_filter = reports_total_trail.filter(day_hiked=day).order_by('-day_hiked')
+  reports_filter = reports_total_trail.filter(day_hiked=formatted_day).order_by('-day_hiked')
   
   if not reports_filter:
     trail_obj = Trail.objects.get(pk=trail)
@@ -241,7 +242,7 @@ def reports_trail_day(request, region, trail, day):
     context = {
       'region': region,
       'trail_day_empty': trail_obj,
-      'day': day,
+      'day': day.capitalize(),
       'reports_total': total,
     }
   else:
