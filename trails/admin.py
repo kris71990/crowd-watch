@@ -3,8 +3,7 @@ from django.db.models import Count
 from .models import Region, Trail, Trailhead, Report
 
 class TrailheadInline(admin.StackedInline):
-  model = Trailhead
-  readonly_fields = ('id', 'get_trail', 'modified')
+  model = Trail.trailheads.through
 
   def get_trail(self, obj):
     return obj.trail.name
@@ -18,9 +17,6 @@ class TrailheadInline(admin.StackedInline):
     (None, {
       'fields': ('name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
     }),
-    ('Metadata', {
-      'fields': ('id', 'modified')
-    })
   )
   extra = 1
 

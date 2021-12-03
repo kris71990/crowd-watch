@@ -1,0 +1,22 @@
+[
+  {
+    "model": "trails.trailhead",
+    "pk": 1,
+    "fields": {
+      "region": 4,
+      "modified": "2012-09-15T22:17:44Z",
+      "name": "Sky Country",
+      "coordinates": "47.5311, -122.1141"
+    }
+  },
+  {
+    "model": "trails.trailhead",
+    "pk": 2,
+    "fields": {
+      "region": 4,
+      "modified": "2012-09-15T22:17:44Z",
+      "name": "Harvey Manning",
+      "coordinates": "47.540359, -122.099538"
+    }
+  }
+]

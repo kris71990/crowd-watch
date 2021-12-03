@@ -11,15 +11,16 @@ from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTi
 from .utils import *
 
 def regions(request):
-  trail_count = Count('trail')
-  report_count = Count('report')
-  trailhead_count = Count('trailhead')
+  trail_count = Count('trail', distinct=True)
+  report_count = Count('report', distinct=True)
+  trailhead_count = Count('trailhead', distinct=True)
   
-  regions_list = Region.objects.annotate(trails=trail_count, trailheads=trailhead_count, reports=report_count).order_by('-trail')
+  regions_list = Region.objects.annotate(trails=trail_count, trailheads=trailhead_count, reports=report_count).order_by('-trails')
 
   context = { 
     'regions_table': regions_list,
   }
+  print(regions_list.values())
   return render(request, 'trails/regions.html', context)
 
 def trail_list(request):

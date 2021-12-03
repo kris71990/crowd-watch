@@ -1,0 +1,30 @@
+[
+  {
+    "model": "trails.region",
+    "pk": 1,
+    "fields": {
+      "name": "CC"
+    }
+  },
+  {
+    "model": "trails.region",
+    "pk": 2,
+    "fields": {
+      "name": "NC"
+    }
+  },
+  {
+    "model": "trails.region",
+    "pk": 3,
+    "fields": {
+      "name": "WW"
+    }
+  },
+  {
+    "model": "trails.region",
+    "pk": 4,
+    "fields": {
+      "name": "SQ"
+    }
+  }
+]
