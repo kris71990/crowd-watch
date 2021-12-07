@@ -1,38 +1,19 @@
 from django.contrib import admin
-from django.db.models import Count
 from .models import Region, Trail, Trailhead, Report
-
-class TrailheadInline(admin.StackedInline):
-  model = Trail.trailheads.through
-
-  def get_trail(self, obj):
-    return obj.trail.name
-
-  get_trail.short_description = 'Trail'
-
-  fieldsets = (
-    ('For Trail', {
-      'fields': ('get_trail',)
-    }),
-    (None, {
-      'fields': ('name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
-    }),
-  )
-  extra = 1
 
 class RegionAdmin(admin.ModelAdmin):
   readonly_fields = ['id']
 
 class TrailAdmin(admin.ModelAdmin):
-  def get_queryset(self, request):
-    return Trail.objects.annotate(trailhead_count=Count('trailhead'))
+  def get_trailheads(self, obj):
+    trailheads = []
+    for trailhead in obj.trailheads.all():
+      trailheads.append(trailhead.name)
+    return trailheads
 
-  def trailhead_count(self, obj):
-    return obj.trailhead_count
+  get_trailheads.short_description = 'Trailheads'
 
-  trailhead_count.short_description = 'Trailheads'
-
-  readonly_fields = ['id', 'modified']
+  readonly_fields = ['id', 'modified', 'get_trailheads']
   fieldsets = (
     (None, {
       'fields': ('name', 'region', 'coordinates', 'length', 'elevation_gain')
@@ -41,8 +22,30 @@ class TrailAdmin(admin.ModelAdmin):
       'fields': readonly_fields
     })
   )
-  inlines = [TrailheadInline]
-  list_display = ('name', 'region', 'trailhead_count')
+  list_display = ('name', 'region', 'get_trailheads')
+  list_filter = ['region']
+
+class TrailheadAdmin(admin.ModelAdmin):
+  def get_trails(self, obj):
+    trails = []
+    for trail in obj.trails.all():
+      trails.append(trail.name)
+    return trails
+  get_trails.short_description = 'Trails'
+
+  readonly_fields = ['id', 'modified', 'get_trails']
+  fieldsets = (
+    ('For', {
+      'fields': ['region', 'trails']
+    }),
+    ('Trailhead Data', {
+      'fields': ('name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
+    }),
+    ('Metadata', {
+      'fields': readonly_fields
+    })
+  )
+  list_display = ('name', 'get_trails')
   list_filter = ['region']
 
 class ReportAdmin(admin.ModelAdmin):
@@ -73,4 +76,5 @@ class ReportAdmin(admin.ModelAdmin):
   
 admin.site.register(Region, RegionAdmin)
 admin.site.register(Trail, TrailAdmin)
+admin.site.register(Trailhead, TrailheadAdmin)
 admin.site.register(Report, ReportAdmin)

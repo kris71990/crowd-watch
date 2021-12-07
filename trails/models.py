@@ -27,6 +27,32 @@ class Region(models.Model):
     help_text='Region Name'
   )
 
+class Trail(models.Model):
+  def __str__(self):
+    return self.name
+
+  def get_id(self):
+    return self.id
+
+  region = models.ForeignKey(Region, on_delete=models.CASCADE)
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  modified = models.DateTimeField('time modified', auto_now=True)
+
+  name = models.CharField(max_length=100, unique=True, help_text='Trail Name')
+  coordinates = models.CharField(
+    max_length=25,
+    help_text='Geographic coordinates searchable via Google Maps'
+  )
+  length = models.DecimalField(
+    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
+    validators=[MinValueValidator(0.1)]
+  )
+  elevation_gain = models.IntegerField('Elevation Gain', 
+    blank=True, null=True,
+    help_text='From trailhead to highest point of trail',
+    validators=[MinValueValidator(1)]
+  )
+
 class Trailhead(models.Model):
   def __str__(self):
     return self.name
@@ -56,6 +82,7 @@ class Trailhead(models.Model):
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+  trails = models.ManyToManyField(Trail, related_name='trailheads')
   modified = models.DateTimeField('time modified', auto_now=True)
 
   name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
@@ -95,33 +122,6 @@ class Trailhead(models.Model):
     max_length=1, 
     choices=BATHROOM_STATUS,
     help_text='Is the bathroom open?'
-  )
-
-class Trail(models.Model):
-  def __str__(self):
-    return self.name
-
-  def get_id(self):
-    return self.id
-
-  region = models.ForeignKey(Region, on_delete=models.CASCADE)
-  trailheads = models.ManyToManyField(Trailhead, related_name='trails')
-  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  modified = models.DateTimeField('time modified', auto_now=True)
-
-  name = models.CharField(max_length=100, unique=True, help_text='Trail Name')
-  coordinates = models.CharField(
-    max_length=25,
-    help_text='Geographic coordinates searchable via Google Maps'
-  )
-  length = models.DecimalField(
-    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
-    validators=[MinValueValidator(0.1)]
-  )
-  elevation_gain = models.IntegerField('Elevation Gain', 
-    blank=True, null=True,
-    help_text='From trailhead to highest point of trail',
-    validators=[MinValueValidator(1)]
   )
 
 class Report(models.Model):
