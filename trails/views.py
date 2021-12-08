@@ -58,7 +58,7 @@ def trails(request, region):
   return render(request, 'trails/trails.html', context)
 
 def trailheads(request, region, trail):
-  trailheads_list = Trailhead.objects.filter(trail=trail).annotate(Count('report')).order_by('-modified')
+  trailheads_list = Trailhead.objects.filter(trails__id=trail).annotate(Count('report')).order_by('-modified')
   trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':

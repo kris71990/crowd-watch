@@ -13,19 +13,19 @@
     {% include "./header.html" %}
     <div class="subheader">
       <h2>
-        <a href="{% url 'trails' trail.region %}">{{ trail.region.get_name_display }}</a> | 
+        <a href="{% url 'trails' trail.region.id %}">{{ trail.region.get_name_display }}</a> | 
         {{ trail.name }}
       </h2>
       <p><a href="{% url 'trail_summary' region=trail.region.id trail=trail.id %}">(Trail Summary)</a></p>
     </div>
-    {% if trailheads_list %}
+    {% if trailheads_list.count > 0 %}
     <div class="filters">
-      <form action="{% url 'reports_filter' region=trailheads_list.0.trail.region trail=trailheads_list.0.trail.id %}" method="post">
+      <form action="{% url 'reports_filter' region=trailheads_list.0.region.id trail=trail.id %}" method="post">
         {% csrf_token %}
         {{ formDayFilter }}
         <input class="button" type="submit" value="Filter">
       </form>
-      <form action="{% url 'reports_filter' region=trailheads_list.0.trail.region trail=trailheads_list.0.trail.id %}" method="post">
+      <form action="{% url 'reports_filter' region=trailheads_list.0.region.id trail=trail.id %}" method="post">
         {% csrf_token %}
         {{ formTimeFilter }}
         <input class="button" type="submit" value="Filter">
