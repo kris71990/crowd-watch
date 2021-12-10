@@ -1,10 +1,37 @@
 from django.contrib import admin
+from django.db.models import Count
 from .models import Region, Trail, Trailhead, Report
 
 class RegionAdmin(admin.ModelAdmin):
+  def get_queryset(self, request):
+    trail_count = Count('trail', distinct=True)
+    report_count = Count('report', distinct=True)
+    trailhead_count = Count('trailhead', distinct=True)
+    return Region.objects.annotate(trails_count=trail_count, trailheads_count=trailhead_count, reports_count=report_count)
+
+  def get_trails(self, obj):
+    return obj.trails_count
+
+  def get_trailheads(self, obj):
+    return obj.trailheads_count
+
+  def get_reports(self, obj):
+    return obj.reports_count
+
+  get_trails.short_description = 'Trails'
+  get_trailheads.short_description = 'Trailheads'
+  get_reports.short_description = 'Reports'
+
   readonly_fields = ['id']
+  list_display = ('name', 'get_trails', 'get_trailheads', 'get_reports')
 
 class TrailAdmin(admin.ModelAdmin):
+  def get_queryset(self, request):
+    return Trail.objects.annotate(report_count=Count('report'))
+
+  def get_reports(self, obj):
+    return obj.report_count
+
   def get_trailheads(self, obj):
     trailheads = []
     for trailhead in obj.trailheads.all():
@@ -12,6 +39,7 @@ class TrailAdmin(admin.ModelAdmin):
     return trailheads
 
   get_trailheads.short_description = 'Trailheads'
+  get_reports.short_description = 'Reports'
 
   readonly_fields = ['id', 'modified', 'get_trailheads']
   fieldsets = (
@@ -22,7 +50,7 @@ class TrailAdmin(admin.ModelAdmin):
       'fields': readonly_fields
     })
   )
-  list_display = ('name', 'region', 'get_trailheads')
+  list_display = ('name', 'region', 'get_trailheads', 'get_reports')
   list_filter = ['region']
 
 class TrailheadAdmin(admin.ModelAdmin):
@@ -62,7 +90,7 @@ class ReportAdmin(admin.ModelAdmin):
 
   fieldsets = (
     ('For Trail', {
-      'fields': ('trail', 'trailhead')
+      'fields': ('region', 'trail', 'trailhead')
     }),
     (None, {
       'fields': ('date_hiked', 'day_hiked', 'car_type', 'access', 'access_distance', 'access_condition', 'trail_begin', 'trail_end', 'weather_type', 'temperature', 'bathroom_type', 'bathroom_status', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'dogs_seen', 'horses_seen')

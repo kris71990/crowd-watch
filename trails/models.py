@@ -81,7 +81,7 @@ class Trailhead(models.Model):
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+  region = models.ForeignKey(Region, on_delete=models.CASCADE)
   trails = models.ManyToManyField(Trail, related_name='trailheads')
   modified = models.DateTimeField('time modified', auto_now=True)
 
@@ -202,7 +202,7 @@ class Report(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
   trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE)
-  region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+  region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
   created = models.DateTimeField('time created', auto_now_add=True)
   modified = models.DateTimeField('time modified', auto_now=True)
