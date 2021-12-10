@@ -50,7 +50,7 @@ class Trail(models.Model):
   elevation_gain = models.IntegerField('Elevation Gain', 
     blank=True, null=True,
     help_text='From trailhead to highest point of trail',
-    validators=[MinValueValidator(1)]
+    validators=[MinValueValidator(0)]
   )
 
 class Trailhead(models.Model):
@@ -206,6 +206,16 @@ class Report(models.Model):
 
   created = models.DateTimeField('time created', auto_now_add=True)
   modified = models.DateTimeField('time modified', auto_now=True)
+
+  length = models.DecimalField(
+    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
+    validators=[MinValueValidator(0.1)]
+  )
+  elevation_gain = models.IntegerField('Elevation Gain', 
+    blank=True, null=True,
+    help_text='From trailhead to highest point of trail',
+    validators=[MinValueValidator(0)]
+  )
 
   date_hiked = models.DateField(help_text='What date was the hike?')
   day_hiked = models.CharField(

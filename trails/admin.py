@@ -41,10 +41,10 @@ class TrailAdmin(admin.ModelAdmin):
   get_trailheads.short_description = 'Trailheads'
   get_reports.short_description = 'Reports'
 
-  readonly_fields = ['id', 'modified', 'get_trailheads']
+  readonly_fields = ['id', 'modified', 'get_trailheads', 'length', 'elevation_gain']
   fieldsets = (
     (None, {
-      'fields': ('name', 'region', 'coordinates', 'length', 'elevation_gain')
+      'fields': ('name', 'region', 'coordinates')
     }),
     ('Metadata', {
       'fields': readonly_fields
@@ -74,7 +74,7 @@ class TrailheadAdmin(admin.ModelAdmin):
     })
   )
   list_display = ('name', 'get_trails')
-  list_filter = ['region']
+  list_filter = ['region', 'trails']
 
 class ReportAdmin(admin.ModelAdmin):
   readonly_fields = ('id', 'modified')
@@ -93,14 +93,14 @@ class ReportAdmin(admin.ModelAdmin):
       'fields': ('region', 'trail', 'trailhead')
     }),
     (None, {
-      'fields': ('date_hiked', 'day_hiked', 'car_type', 'access', 'access_distance', 'access_condition', 'trail_begin', 'trail_end', 'weather_type', 'temperature', 'bathroom_type', 'bathroom_status', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'dogs_seen', 'horses_seen')
+      'fields': ('length', 'elevation_gain', 'date_hiked', 'day_hiked', 'car_type', 'access', 'access_distance', 'access_condition', 'trail_begin', 'trail_end', 'weather_type', 'temperature', 'bathroom_type', 'bathroom_status', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'dogs_seen', 'horses_seen')
     }),
     ('Metadata', {
       'fields': readonly_fields
     })
   )
   list_display = ('get_trail', 'get_trailhead', 'day_hiked', 'date_hiked')
-  list_filter = ['trail', 'trail__region']
+  list_filter = ['trail__region', 'trail', 'trailhead']
   
 admin.site.register(Region, RegionAdmin)
 admin.site.register(Trail, TrailAdmin)
