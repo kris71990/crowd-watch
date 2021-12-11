@@ -2,7 +2,7 @@ from datetime import time
 
 def parse_time(period):
   if period == 'morning':
-    min = time(0, 00)
+    min = time(4, 00)
     max = time(11, 59)
   elif period == 'afternoon':
     min = time(12, 00)
@@ -12,7 +12,7 @@ def parse_time(period):
     max = time(21, 59)
   else:
     min = time(22, 00)
-    max = time(23, 59)
+    max = time(3, 59)
   return { 'min': min, 'max': max }
 
 def create_advice(type, filtered, total):
@@ -58,3 +58,9 @@ def create_advice(type, filtered, total):
 def find_tuple_display_value(model_tuple, value):
   target = [item for item in model_tuple if item[0] == value]
   return target[0][1]
+
+def abbreviate_day(day):
+  if day == 'thursday' or day == 'sunday':
+    return day[:2].capitalize()
+  else:
+    return day[0].upper()

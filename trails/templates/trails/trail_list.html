@@ -29,7 +29,7 @@
                   <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}
                   </a>
                 </td>
-                <td>{{ trail.get_region_display }}</td>
+                <td>{{ trail.region.get_name_display }}</td>
                 {% if date == trail.modified.date %}
                   <td>Today</td>
                 {% else %}

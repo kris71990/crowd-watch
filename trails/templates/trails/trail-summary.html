@@ -12,7 +12,7 @@
     {% include "./header.html" %}
     <div class="subheader">
       <h2>
-        <a href="{% url 'trails' trail.region %}">{{ trail.get_region_display }}</a> | 
+        <a href="{% url 'trails' trail.region %}">{{ trail.region.get_name_display }}</a> | 
         {{ trail.name }} - Report of Reports
       </h2>
     </div>
@@ -23,7 +23,7 @@
       <p>Access: {{ trailheads.access }}</p>
       <p>Bathroom: {{ trailheads.bathroom_type }} | <span>{{ trailheads.bathroom_status }}</span></p> 
       <h4>Popularity</h4>
-      <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ trail.get_region_display }}</p>
+      <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ trail.region.get_name_display }}</p>
     </div>
     {% endif %}
   </body>

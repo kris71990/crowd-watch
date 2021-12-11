@@ -5,25 +5,20 @@ from django.forms import ModelChoiceField
 from django.utils import timezone
 from django.shortcuts import redirect
 
-from .models import Trail, Trailhead, Report
+import datetime
+from .models import Region, Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTimeForm
 from .utils import *
 
 def regions(request):
-  regions_list = Trail.REGION_CHOICES
-  region_trail_count = []
-  for i in regions_list:
-    trail_count = len(Trail.objects.filter(region=i[0]).values('name'))
-    region_trail_count.append({
-      'abbr': i[0],
-      'region': i[1],
-      'trail_count': trail_count,
-    })
-
-  sorted_trails = sorted(region_trail_count, key=lambda x: x['trail_count'], reverse=True)
+  trail_count = Count('trail', distinct=True)
+  report_count = Count('report', distinct=True)
+  trailhead_count = Count('trailhead', distinct=True)
+  
+  regions_list = Region.objects.annotate(trails=trail_count, trailheads=trailhead_count, reports=report_count).order_by('-trails')
 
   context = { 
-    'regions_table': sorted_trails,
+    'regions_table': regions_list,
   }
   return render(request, 'trails/regions.html', context)
 
@@ -63,7 +58,7 @@ def trails(request, region):
   return render(request, 'trails/trails.html', context)
 
 def trailheads(request, region, trail):
-  trailheads_list = Trailhead.objects.filter(trail=trail).annotate(Count('report')).order_by('-modified')
+  trailheads_list = Trailhead.objects.filter(trails__id=trail).annotate(Count('report')).order_by('-modified')
   trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':
@@ -73,8 +68,8 @@ def trailheads(request, region, trail):
       formTh.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
+    TrailheadForm.base_fields['trails'] = ModelChoiceField(queryset=trail_obj)
+    formTh = TrailheadForm(initial={ 'trails': trail }, label_suffix='')
 
   formDayFilter = SelectDayForm()
   formTimeFilter = SelectTimeForm()
@@ -227,17 +222,19 @@ def reports_filter(request, region, trail):
         return redirect('reports_trail_day', region=region, trail=trail, day=day)
 
 def reports_day(request, day):
-  reports = Report.objects.filter(day_hiked=day).order_by('-date_hiked')
+  formatted_day = abbreviate_day(day)
+  reports = Report.objects.filter(day_hiked=formatted_day).order_by('-date_hiked')
   context = { 
     'reports_list': reports, 
-    'day': day,
+    'day': day.capitalize(),
     'date': timezone.localdate(),
   }
   return render(request, 'trails/reports_day.html', context)
 
 def reports_trail_day(request, region, trail, day):
+  formatted_day = abbreviate_day(day)
   reports_total_trail = Report.objects.filter(trail=trail)
-  reports_filter = reports_total_trail.filter(day_hiked=day).order_by('-day_hiked')
+  reports_filter = reports_total_trail.filter(day_hiked=formatted_day).order_by('-day_hiked')
   
   if not reports_filter:
     trail_obj = Trail.objects.get(pk=trail)
@@ -245,7 +242,7 @@ def reports_trail_day(request, region, trail, day):
     context = {
       'region': region,
       'trail_day_empty': trail_obj,
-      'day': day,
+      'day': day.capitalize(),
       'reports_total': total,
     }
   else:
@@ -266,7 +263,7 @@ def reports_trail_day(request, region, trail, day):
 def reports_time(request, period):
   range = parse_time(period)
   reports = Report.objects.filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
-  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
+  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'].strftime('%H:%M'), range['max'].strftime('%H:%M'))
   context = { 
     'reports_list': reports,
     'period': period_print,
@@ -277,7 +274,7 @@ def reports_trail_time(request, region, trail, period):
   range = parse_time(period)
   reports_total_trail = Report.objects.filter(trail=trail)
   reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max']).order_by('-date_hiked')
-  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'], range['max'])
+  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'].strftime('%H:%M'), range['max'].strftime('%H:%M'))
 
   if not reports_filter:
     trail_obj = Trail.objects.get(pk=trail)

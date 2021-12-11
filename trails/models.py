@@ -3,12 +3,9 @@ from django.db import models
 import uuid
 from django.core.validators import MinValueValidator
 
-class Trail(models.Model):
+class Region(models.Model):
   def __str__(self):
     return self.name
-
-  def get_id(self):
-    return self.id
 
   REGION_CHOICES = [
     ('OP', 'Olympic Peninsula'),
@@ -23,26 +20,34 @@ class Trail(models.Model):
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  name = models.CharField(
+    choices=REGION_CHOICES,
+    max_length=2, 
+    unique=True, 
+    help_text='Region Name'
+  )
+
+class Trail(models.Model):
+  def __str__(self):
+    return self.name
+
+  def get_id(self):
+    return self.id
+
+  region = models.ForeignKey(Region, on_delete=models.CASCADE)
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   modified = models.DateTimeField('time modified', auto_now=True)
 
   name = models.CharField(max_length=100, unique=True, help_text='Trail Name')
-  region = models.CharField(
-    max_length=2,
-    choices=REGION_CHOICES,
-    help_text='Geographic region in Washington where trail is located'
-  )
   coordinates = models.CharField(
     max_length=25,
     help_text='Geographic coordinates searchable via Google Maps'
   )
-  length = models.DecimalField(
-    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
-    validators=[MinValueValidator(0.1)]
+  length_json = models.JSONField('Trail length', blank=True, null=True,
+    help_text='From 0.1 to 999.9 miles'
   )
-  elevation_gain = models.IntegerField('Elevation Gain', 
-    blank=True, null=True,
+  elevation_gain_json = models.JSONField('Elevation Gain', blank=True, null=True,
     help_text='From trailhead to highest point of trail',
-    validators=[MinValueValidator(1)]
   )
 
 class Trailhead(models.Model):
@@ -73,7 +78,8 @@ class Trailhead(models.Model):
   ]
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
+  region = models.ForeignKey(Region, on_delete=models.CASCADE)
+  trails = models.ManyToManyField(Trail, related_name='trailheads')
   modified = models.DateTimeField('time modified', auto_now=True)
 
   name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
@@ -193,9 +199,20 @@ class Report(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
   trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE)
+  region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
   created = models.DateTimeField('time created', auto_now_add=True)
   modified = models.DateTimeField('time modified', auto_now=True)
+
+  length = models.DecimalField(
+    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
+    validators=[MinValueValidator(0.1)]
+  )
+  elevation_gain = models.IntegerField('Elevation Gain', 
+    blank=True, null=True,
+    help_text='From trailhead to highest point of trail',
+    validators=[MinValueValidator(0)]
+  )
 
   date_hiked = models.DateField(help_text='What date was the hike?')
   day_hiked = models.CharField(

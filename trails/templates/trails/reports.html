@@ -14,25 +14,25 @@
     <div class="subheader">
     {% if trail %}
       <h2>
-        <a href="{% url 'trails' trail.region %}">{{ trail.get_region_display }}</a> | 
+        <a href="{% url 'trails' trail.region %}">{{ trail.region.get_name_display }}</a> | 
         {{ trail.name }}
       </h2>
     {% elif trailhead %}
       <h2>
-        <a href="{% url 'trails' trailhead.trail.region %}">{{ trailhead.trail.get_region_display }}</a> | 
+        <a href="{% url 'trails' trailhead.trail.region %}">{{ trailhead.region }}</a> | 
         <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a> | 
         {{ trailhead.name }}
       </h2>
     {% elif day %}
       {% if advice %}
       <h2>
-        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.trail.get_region_display }}</a> |
+        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.region.get_name_display }}</a> |
          <a href="{% url 'trailheads' region=reports_list.0.trail.region trail=reports_list.0.trail.id %}">{{ reports_list.0.trail.name }}</a> | 
         {{ reports_list.0.get_day_hiked_display }}
       </h2>
       {% else %}
       <h2>
-        <a href="{% url 'trails' region %}">{{ trail_day_empty.get_region_display }}</a> | 
+        <a href="{% url 'trails' region %}">{{ trail_day_empty.region.get_name_display }}</a> | 
         <a href="{% url 'trailheads' region=region trail=trail_day_empty.id %}">{{ trail_day_empty.name }}</a> | 
         {{ day }}
       </h2>
@@ -40,13 +40,13 @@
     {% elif period %}
       {% if advice %}
       <h2>
-        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.trail.get_region_display }}</a> | 
+        <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.region.get_name_display }}</a> | 
         <a href="{% url 'trailheads' region=reports_list.0.trail.region trail=reports_list.0.trail.id %}">{{ reports_list.0.trail.name }}</a> | 
         {{ period }}
       </h2>
       {% else %}
       <h2>
-        <a href="{% url 'trails' region %}">{{ trail_time_empty.get_region_display }}</a> | 
+        <a href="{% url 'trails' region %}">{{ trail_time_empty.region.get_name_display }}</a> | 
         <a href="{% url 'trailheads' region=region trail=trail_time_empty.id %}">{{ trail_time_empty.name }}</a> | 
         {{ period }}
       </h2>
