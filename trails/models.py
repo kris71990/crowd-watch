@@ -43,14 +43,11 @@ class Trail(models.Model):
     max_length=25,
     help_text='Geographic coordinates searchable via Google Maps'
   )
-  length = models.DecimalField(
-    max_digits=4, decimal_places=1, help_text='From 0.1 to 999.9 miles', blank=True, null=True,
-    validators=[MinValueValidator(0.1)]
+  length_json = models.JSONField('Trail length', blank=True, null=True,
+    help_text='From 0.1 to 999.9 miles'
   )
-  elevation_gain = models.IntegerField('Elevation Gain', 
-    blank=True, null=True,
+  elevation_gain_json = models.JSONField('Elevation Gain', blank=True, null=True,
     help_text='From trailhead to highest point of trail',
-    validators=[MinValueValidator(0)]
   )
 
 class Trailhead(models.Model):

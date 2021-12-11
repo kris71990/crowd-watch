@@ -41,7 +41,7 @@ class TrailAdmin(admin.ModelAdmin):
   get_trailheads.short_description = 'Trailheads'
   get_reports.short_description = 'Reports'
 
-  readonly_fields = ['id', 'modified', 'get_trailheads', 'length', 'elevation_gain']
+  readonly_fields = ['id', 'modified', 'get_trailheads', 'length_json', 'elevation_gain_json']
   fieldsets = (
     (None, {
       'fields': ('name', 'region', 'coordinates')
@@ -54,12 +54,19 @@ class TrailAdmin(admin.ModelAdmin):
   list_filter = ['region']
 
 class TrailheadAdmin(admin.ModelAdmin):
+  def get_queryset(self, request):
+    return Trailhead.objects.annotate(report_count=Count('report'))
+
+  def get_reports(self, obj):
+    return obj.report_count
+
   def get_trails(self, obj):
     trails = []
     for trail in obj.trails.all():
       trails.append(trail.name)
     return trails
   get_trails.short_description = 'Trails'
+  get_reports.short_description = 'Reports'
 
   readonly_fields = ['id', 'modified', 'get_trails']
   fieldsets = (
@@ -73,7 +80,7 @@ class TrailheadAdmin(admin.ModelAdmin):
       'fields': readonly_fields
     })
   )
-  list_display = ('name', 'get_trails')
+  list_display = ('name', 'get_trails', 'get_reports')
   list_filter = ['region', 'trails']
 
 class ReportAdmin(admin.ModelAdmin):

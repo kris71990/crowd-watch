@@ -5,7 +5,7 @@ from datetime import datetime
 class TrailForm(ModelForm):
   class Meta:
     model = Trail
-    fields = ['name', 'region', 'coordinates', 'length', 'elevation_gain']
+    fields = ['name', 'region', 'coordinates', 'length_json', 'elevation_gain_json']
 
 class TrailheadForm(ModelForm):
   class Meta:
