@@ -1,0 +1,78 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/forms.css' %}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Reports</title>
+  </head>
+  <body>
+    {% include "./header.html" %}
+    <div class="subheader">
+      <h2>
+        <a href="{% url 'trails' trailhead.region.id %}">{{ trailhead.region.get_name_display }}</a> |  
+        {{ trailhead.name }}
+      </h2>
+    </div>
+
+    <div class="report">
+    {% if reports_list %}
+      {% if reports_total %}
+      <div id="advice" class="{{ caution }}">
+        <p>{{ reports_list_total }} out of {{ reports_total }} total submitted</p>
+        <p>{{ advice }}</p>
+      </div>
+      {% endif %}
+      <div class="trail-table">
+        <h3>Reports ({{ reports_list.count }})</h3>
+        <table>
+          <thead>
+            <tr>
+              <td>Trail</td>
+              <td>Date Hiked</td>
+              <td>Day Hiked</td>
+              {% if period %}<td>Time Hiked</td>{% endif %}
+              <td>Details</td>
+            </tr>
+          </thead>
+          <tbody>
+          {% for report in reports_list %}
+            <tr>
+              <td>
+                <a href="{% url 'reports_trail' region=report.trail.region trail=report.trail.id %}">{{ report.trail.name }}</a>
+              </td>
+
+              {% if date == report.date_hiked %}
+                <td>Today</td>
+              {% else %}
+                <td>{{ report.date_hiked }}</td>
+              {% endif %}
+              <td>{{ report.get_day_hiked_display }}</td>
+
+              {% if period %}
+                <td>{{ report.trail_begin }} - {{ report.trail_end }}</td> 
+              {% endif %}
+
+              <td>
+                <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+              </td>
+            </div>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>No reports found</p>
+      {% if reports_total %}
+        <p><span>Note</span> - There have been <span>{{ reports_total }}</span> submitted for this trail. If there have not been many reports, there may not be enough data to determine popularity.</p>
+      {% endif %}
+    {% endif %}
+    <div class="report-footer">
+      <p>To add a report, select a <a href="{% url 'trails' trailhead.region.id %}">trail</a></p>
+    </div>
+    </div>
+  </body>
+</html>

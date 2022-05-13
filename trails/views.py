@@ -68,8 +68,9 @@ def trailheads(request, region, trail):
       formTh.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    TrailheadForm.base_fields['trails'] = ModelChoiceField(queryset=trail_obj)
-    formTh = TrailheadForm(initial={ 'trails': trail }, label_suffix='')
+    TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
+    TrailheadForm.base_fields['trail'].disabled = True
+    formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
 
   formDayFilter = SelectDayForm()
   formTimeFilter = SelectTimeForm()
@@ -86,7 +87,7 @@ def trailheads(request, region, trail):
 
 def trail_summary(request, region, trail):
   trail_obj = Trail.objects.get(pk=trail)
-  trailheads_obj = Trailhead.objects.filter(trail=trail)
+  trailheads_obj = Trailhead.objects.filter(trails=trail)
 
   trailheads_access_values = trailheads_obj.values('access').distinct().exclude(access=None)
   trailheads_bathroom_type_values = trailheads_obj.values('bathroom_type').distinct().exclude(bathroom_type=None)
@@ -141,7 +142,7 @@ def trail_summary(request, region, trail):
   return render(request, 'trails/trail-summary.html', context)
 
 def trailheads_filter_bathroom(request, region):
-  trailheads_list = Trailhead.objects.filter(trail__region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
+  trailheads_list = Trailhead.objects.filter(region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
   context = {
     'date': timezone.localdate(),
     'trailheads_list': trailheads_list,
@@ -151,7 +152,7 @@ def trailheads_filter_bathroom(request, region):
   return render(request, 'trails/trailheads_filter.html', context)
 
 def trailheads_filter_access(request, region):
-  trailheads_list = Trailhead.objects.filter(trail__region=region).filter(access='P').annotate(Count('report')).order_by('-modified')
+  trailheads_list = Trailhead.objects.filter(region=region).filter(access='P').annotate(Count('report')).order_by('-modified')
   context = {
     'date': timezone.localdate(),
     'trailheads_list': trailheads_list,
@@ -160,9 +161,21 @@ def trailheads_filter_access(request, region):
   }
   return render(request, 'trails/trailheads_filter.html', context)
 
-def reports_trailhead(request, region, trail, trailhead):
+def reports_trailhead(request, region, trailhead):
   reports = Report.objects.filter(trailhead=trailhead).order_by('-date_hiked')
   trailhead_obj = Trailhead.objects.get(pk=trailhead)
+
+  context = {
+    'date': timezone.localdate(),
+    'reports_list': reports,
+    'region': region,
+    'trailhead': trailhead_obj,
+  }
+  return render(request, 'trails/reports_trailhead.html', context)
+
+def reports_trail_trailhead(request, region, trail, trailhead):
+  reports = Report.objects.filter(trailhead=trailhead).order_by('-date_hiked')
+  trailhead_obj = Trailhead.objects.filter(pk=trailhead)
   trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':
@@ -174,19 +187,22 @@ def reports_trailhead(request, region, trail, trailhead):
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    trailhead_choices = Trailhead.objects.filter(trail=trail)
     ReportForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead_choices)
+    ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead_obj)
+    ReportForm.base_fields['trail'].disabled = True
+    ReportForm.base_fields['trailhead'].disabled = True
     form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead }, label_suffix='')
 
   context = {
     'date': timezone.localdate(),
     'reports_list': reports,
     'region': region, 
-    'trailhead': trailhead_obj,
+    'trail_obj': trail_obj[0],
+    'trailhead': trailhead_obj[0],
     'form': form
   }
-  return render(request, 'trails/reports.html', context)
+  print(context)
+  return render(request, 'trails/reports_trail_trailhead.html', context)
 
 def reports_trail(request, region, trail):
   reports = Report.objects.filter(trail=trail).order_by('-modified')
@@ -198,7 +214,7 @@ def reports_trail(request, region, trail):
     'region': region,
     'trail': trail_obj,
   }
-  return render(request, 'trails/reports.html', context)
+  return render(request, 'trails/reports_trail.html', context)
 
 def report(request, region, trail, trailhead, report):
   report = Report.objects.get(pk=report)

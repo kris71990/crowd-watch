@@ -19,8 +19,8 @@
       </h2>
     {% elif trailhead %}
       <h2>
-        <a href="{% url 'trails' trailhead.trail.region %}">{{ trailhead.region }}</a> | 
-        <a href="{% url 'trailheads' region=trailhead.trail.region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a> | 
+        <a href="{% url 'trails' trailhead.region.id %}">{{ trailhead.region.get_name_display }}</a> | 
+        <a href="{% url 'trailheads' region=trailhead.region.id trail=trail_obj.id %}">{{ trail_obj.name }}</a> | 
         {{ trailhead.name }}
       </h2>
     {% elif day %}
@@ -100,7 +100,7 @@
               </td>
               {% elif trailhead %}
               <td>
-                <a href="{% url 'report' region=region trail=trailhead.trail.id trailhead=trailhead.id report=report.id %}">More</a>
+                <a href="{% url 'report' region=region trail=trail_obj.id trailhead=trailhead.id report=report.id %}">More</a>
               </td>
               {% else %}
               <td>
@@ -128,7 +128,7 @@
     {% if trailhead %}
     <div class="form-box">
       <h4>Add Report</h4>
-      <form action="{% url 'reports_trailhead' region trailhead.trail.id trailhead.id %}" method="post">
+      <form action="{% url 'reports_trail_trailhead' region trail_obj.id trailhead.id %}" method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% for field in form %}
