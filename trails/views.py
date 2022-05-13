@@ -68,8 +68,8 @@ def trailheads(request, region, trail):
       formTh.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    TrailheadForm.base_fields['trails'] = ModelChoiceField(queryset=trail_obj)
-    formTh = TrailheadForm(initial={ 'trails': trail }, label_suffix='')
+    TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
+    formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
 
   formDayFilter = SelectDayForm()
   formTimeFilter = SelectTimeForm()
@@ -82,11 +82,12 @@ def trailheads(request, region, trail):
     'formDayFilter': formDayFilter,
     'formTimeFilter': formTimeFilter,
   }
+  print(context)
   return render(request, 'trails/trailheads.html', context)
 
 def trail_summary(request, region, trail):
   trail_obj = Trail.objects.get(pk=trail)
-  trailheads_obj = Trailhead.objects.filter(trail=trail)
+  trailheads_obj = Trailhead.objects.filter(trails=trail)
 
   trailheads_access_values = trailheads_obj.values('access').distinct().exclude(access=None)
   trailheads_bathroom_type_values = trailheads_obj.values('bathroom_type').distinct().exclude(bathroom_type=None)
@@ -162,7 +163,7 @@ def trailheads_filter_access(request, region):
 
 def reports_trailhead(request, region, trail, trailhead):
   reports = Report.objects.filter(trailhead=trailhead).order_by('-date_hiked')
-  trailhead_obj = Trailhead.objects.get(pk=trailhead)
+  trailhead_obj = Trailhead.objects.filter(pk=trailhead)
   trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':
@@ -174,18 +175,19 @@ def reports_trailhead(request, region, trail, trailhead):
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    trailhead_choices = Trailhead.objects.filter(trail=trail)
     ReportForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead_choices)
+    ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead_obj)
     form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead }, label_suffix='')
 
   context = {
     'date': timezone.localdate(),
     'reports_list': reports,
     'region': region, 
-    'trailhead': trailhead_obj,
+    'trail_obj': trail_obj[0],
+    'trailhead': trailhead_obj[0],
     'form': form
   }
+  print(context)
   return render(request, 'trails/reports.html', context)
 
 def reports_trail(request, region, trail):
