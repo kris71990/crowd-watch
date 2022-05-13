@@ -26,6 +26,7 @@
       <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ trail.region.get_name_display }}</p>
     </div>
     {% endif %}
-    <div id="back-button"><a href="{% url 'trailheads' region=trail.region.id trail=trail.id %}"><-Back to trail</a></div>
+    {% url 'trailheads' region=trail.region.id trail=trail.id as link %}
+    {% include "./button.html" with link=link %}
   </body>
 </html>

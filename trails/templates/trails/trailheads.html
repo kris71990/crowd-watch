@@ -45,7 +45,7 @@
           {% for trailhead in trailheads_list %}
             <tr>
               <td>
-                <a href="{% url 'reports_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a>
+                <a href="{% url 'reports_trail_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a>
               </td>
               <td>{{ trailhead.coordinates }}</td>
 

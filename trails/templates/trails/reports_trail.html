@@ -13,7 +13,7 @@
     {% include "./header.html" %}
     <div class="subheader">
       <h2>
-        <a href="{% url 'trails' trail.region %}">{{ trail.region.get_name_display }}</a> | 
+        <a href="{% url 'trails' trail.region.id %}">{{ trail.region.get_name_display }}</a> | 
         {{ trail.name }}
       </h2>
     </div>

@@ -19,9 +19,10 @@ urlpatterns = [
 
   path('<str:region>/trailheads/bathroom/', views.trailheads_filter_bathroom, name='trailheads_filter_bathroom'),
   path('<str:region>/trailheads/access/', views.trailheads_filter_access, name='trailheads_filter_access'),
-
+  
+  path('<str:region>/<str:trailhead>/reports', views.reports_trailhead, name='reports_trailhead'),
   path('<str:region>/<str:trail>/reports/', views.reports_trail, name='reports_trail'),
-  path('<str:region>/<str:trailhead>/region-reports/', views.reports_trailhead, name='reports_trailhead'),
+  path('<str:region>/<str:trail>/<str:trailhead>/reports/', views.reports_trail_trailhead, name='reports_trail_trailhead'),
 
   path('<str:region>/<str:trail>/<str:trailhead>/<str:report>/', views.report, name='report'),
 
