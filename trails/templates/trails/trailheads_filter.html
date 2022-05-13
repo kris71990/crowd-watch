@@ -38,7 +38,7 @@
         <thead>
           <tr>
             <td>Trailhead</td>
-            <td>Trail</td>
+            <td>Trails</td>
             <td>Location</td>
             {% if type == 'bathroom' %}
               <td>Bathroom</td>
@@ -53,10 +53,12 @@
           {% for trailhead in trailheads_list %}
             <tr>
               <td>
-                <a href="{% url 'reports_trailhead' region=region trail=trailhead.trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a>
+                <a href="{% url 'reports_trailhead' region=region trailhead=trailhead.id %}">{{ trailhead.name }}</a>
               </td>
               <td>
-                <a href="{% url 'reports_trail' region=region trail=trailhead.trail.id %}">{{ trailhead.trail.name }}</a>
+                {% for trail_trailhead in trailhead.trails.all %}
+                  <a href="{% url 'reports_trail' region=region trail=trail_trailhead.id %}">{{ trail_trailhead.name }}</a>
+                {% endfor %}
               </td>
               <td>{{ trailhead.coordinates }}</td>
               {% if type == 'bathroom' %}<td>{{ trailhead.get_bathroom_type_display }}</td>
@@ -69,7 +71,7 @@
               {% endif %}
               <td>{{ trailhead.report__count }}</td>
             </li>
-          {% endfor%}
+          {% endfor %}
         </tbody>
       </table>
     </div>

@@ -142,7 +142,7 @@ def trail_summary(request, region, trail):
   return render(request, 'trails/trail-summary.html', context)
 
 def trailheads_filter_bathroom(request, region):
-  trailheads_list = Trailhead.objects.filter(trail__region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
+  trailheads_list = Trailhead.objects.filter(region=region).filter(bathroom_status='O').annotate(Count('report')).order_by('-modified')
   context = {
     'date': timezone.localdate(),
     'trailheads_list': trailheads_list,
@@ -161,7 +161,7 @@ def trailheads_filter_access(request, region):
   }
   return render(request, 'trails/trailheads_filter.html', context)
 
-def reports_trailhead(request, region, trail, trailhead):
+def reports_trailhead(request, region, trailhead):
   reports = Report.objects.filter(trailhead=trailhead).order_by('-date_hiked')
   trailhead_obj = Trailhead.objects.filter(pk=trailhead)
   trail_obj = Trail.objects.filter(pk=trail)
@@ -188,7 +188,7 @@ def reports_trailhead(request, region, trail, trailhead):
     'form': form
   }
   print(context)
-  return render(request, 'trails/reports.html', context)
+  return render(request, 'trails/reports_trailhead.html', context)
 
 def reports_trail(request, region, trail):
   reports = Report.objects.filter(trail=trail).order_by('-modified')
@@ -200,7 +200,7 @@ def reports_trail(request, region, trail):
     'region': region,
     'trail': trail_obj,
   }
-  return render(request, 'trails/reports.html', context)
+  return render(request, 'trails/reports_trail.html', context)
 
 def report(request, region, trail, trailhead, report):
   report = Report.objects.get(pk=report)
