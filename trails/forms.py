@@ -1,16 +1,16 @@
-from django.forms import ModelForm, SelectDateWidget, Form, ChoiceField
+from django.forms import ModelForm, SelectDateWidget, Form, ChoiceField, TextInput
 from .models import Trail, Trailhead, Report
 from datetime import datetime
 
 class TrailForm(ModelForm):
   class Meta:
     model = Trail
-    fields = ['name', 'region', 'coordinates', 'length_json', 'elevation_gain_json']
+    fields = ['region', 'name', 'coordinates', 'length_json', 'elevation_gain_json']
 
 class TrailheadForm(ModelForm):
   class Meta:
     model = Trailhead
-    fields = ('name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
+    fields = ('region', 'trails', 'name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
 
 class TrailheadAssociationForm(ModelForm):
   class Meta:

@@ -10,7 +10,7 @@ urlpatterns = [
   path('reports/day/<str:day>', views.reports_day, name='reports_day'),
   path('reports/time/<str:period>', views.reports_time, name='reports_time'),
 
-  path('<str:region>/', views.trails, name='trails'),
+  path('<slug:region_slug>/', views.trails, name='trails'),
   path('<str:region>/<str:trail>/', views.trailheads, name='trailheads'),
 
   #TODO

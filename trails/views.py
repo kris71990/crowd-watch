@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.db.models import Count, Q
-from django.forms import ModelChoiceField
+from django.forms import ModelChoiceField, CharField
 from django.utils import timezone
 from django.shortcuts import redirect
 
@@ -48,7 +48,6 @@ def trails(request, region):
       return HttpResponseRedirect(request.path_info)
   else:
     form = TrailForm(initial={ 'region': region }, label_suffix='')
-    TrailForm.base_fields['region'].disabled = True
 
   context = { 
     'trails_list': trails_list,
@@ -69,8 +68,7 @@ def trailheads(request, region, trail):
       formTh.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
+    formTh = TrailheadForm(initial={ 'trail': trail_obj, 'region': region }, label_suffix='')
 
   formDayFilter = SelectDayForm()
   formTimeFilter = SelectTimeForm()
