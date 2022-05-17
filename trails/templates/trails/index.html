@@ -25,10 +25,12 @@
     <div>
       <p>Or see reports by time:</p>
       <ul>
-        <li><a href="{% url 'reports_time' period='morning'%}">Morning</a></li>
+        <li><a href="{% url 'reports_time' period='early morning'%}">Early morning</a></li>
+        <li><a href="{% url 'reports_time' period='mid morning'%}">Mid-morning</a></li>
+        <li><a href="{% url 'reports_time' period='late morning'%}">Late morning</a></li>
         <li><a href="{% url 'reports_time' period='afternoon'%}">Afternoon</a></li>
         <li><a href="{% url 'reports_time' period='evening'%}">Evening</a></li>
-        <li><a href="{% url 'reports_time' period='night'%}">Night</a></li>
+        <li><a href="{% url 'reports_time' period='overnight'%}">Overnight</a></li>
       <ul>
     </div>
   </body>

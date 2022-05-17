@@ -57,7 +57,7 @@
               {% endif %}
 
               <td>
-                <a href="{% url 'report' region=region trail=trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+                <a href="{% url 'report' region=region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
               </td>
             </div>
           {% endfor %}
@@ -68,8 +68,10 @@
       <p>No reports found</p>
     {% endif %}
     <div class="report-footer">
-      <p>To add a report, select a <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">trailhead</a></p>
+      <p>To add a report, select a <a href="{% url 'trailheads' region=region trail=trail.id %}">trailhead</a></p>
     </div>
+    {% url 'trailheads' region=trail.region.id trail=trail.id as link %}
+    {% include "./button.html" with link=link %}
     </div>
   </body>
 </html>

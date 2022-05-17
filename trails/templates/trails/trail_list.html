@@ -33,7 +33,7 @@
                 {% if date == trail.modified.date %}
                   <td>Today</td>
                 {% else %}
-                  <td>{{ trail.modified|date:"m/d/y" }}</td>
+                  <td>{{ trail.modified|date:"n/j/y" }}</td>
                 {% endif %}
                 <td>
                   <a href="{% url 'reports_trail' region=trail.region trail=trail.id %}">{{ trail.report__count }}

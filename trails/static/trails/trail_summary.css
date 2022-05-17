@@ -1,3 +1,11 @@
+li {
+  font-style: italic;
+}
+
 span {
+  font-style: normal;
+}
+
+#bathroom_status {
   color: #0A8954;
 }

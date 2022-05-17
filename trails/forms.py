@@ -12,6 +12,11 @@ class TrailheadForm(ModelForm):
     model = Trailhead
     fields = ('name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
 
+class TrailheadAssociationForm(ModelForm):
+  class Meta:
+    model = Trailhead
+    fields = ('name',)
+
 class ReportForm(ModelForm):
   class Meta:
     year_choices = []
@@ -45,10 +50,12 @@ class SelectDayForm(Form):
 class SelectTimeForm(Form):
   TIME = [
     ('', 'Time'),
-    ('morning', 'Morning'),
+    ('early morning', 'Early morning'),
+    ('mid morning', 'Mid-morning'),
+    ('late morning', 'Late morning'),
     ('afternoon', 'Afternoon'),
     ('evening', 'Evening'),
-    ('night', 'Night')
+    ('overnight', 'Overnight')
   ]
 
   time_field = ChoiceField(choices = TIME, label='')

@@ -38,9 +38,9 @@
                 <a href="{% url 'trailheads' region=report.trail.region trail=report.trail.id %}">{{ report.trail.name }}</a>
               </td>
               <td>
-                <a href="{% url 'reports_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
+                <a href="{% url 'reports_trail_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
               </td>
-              <td>{{ report.get_day_hiked_display }}</td>
+              <td>{{ report.date_hiked|date:"n/j/y" }} ({{ report.get_day_hiked_display }})</td>
               <td>{{ report.trail_begin }} - {{ report.trail_end }}</td> 
               <td>
                 <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>

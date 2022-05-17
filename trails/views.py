@@ -1,13 +1,13 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.forms import ModelChoiceField
 from django.utils import timezone
 from django.shortcuts import redirect
 
 import datetime
 from .models import Region, Trail, Trailhead, Report
-from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTimeForm
+from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTimeForm, TrailheadAssociationForm
 from .utils import *
 
 def regions(request):
@@ -48,6 +48,7 @@ def trails(request, region):
       return HttpResponseRedirect(request.path_info)
   else:
     form = TrailForm(initial={ 'region': region }, label_suffix='')
+    TrailForm.base_fields['region'].disabled = True
 
   context = { 
     'trails_list': trails_list,
@@ -58,7 +59,7 @@ def trails(request, region):
   return render(request, 'trails/trails.html', context)
 
 def trailheads(request, region, trail):
-  trailheads_list = Trailhead.objects.filter(trails__id=trail).annotate(Count('report')).order_by('-modified')
+  trailheads_list = Trailhead.objects.filter(trails__id=trail).annotate(report_count=Count('report', filter=Q(report__trail=trail))).order_by('-modified')
   trail_obj = Trail.objects.filter(pk=trail)
 
   if request.method == 'POST':
@@ -69,7 +70,6 @@ def trailheads(request, region, trail):
       return HttpResponseRedirect(request.path_info)
   else:
     TrailheadForm.base_fields['trail'] = ModelChoiceField(queryset=trail_obj)
-    TrailheadForm.base_fields['trail'].disabled = True
     formTh = TrailheadForm(initial={ 'trail': trail }, label_suffix='')
 
   formDayFilter = SelectDayForm()
@@ -89,50 +89,19 @@ def trail_summary(request, region, trail):
   trail_obj = Trail.objects.get(pk=trail)
   trailheads_obj = Trailhead.objects.filter(trails=trail)
 
-  trailheads_access_values = trailheads_obj.values('access').distinct().exclude(access=None)
-  trailheads_bathroom_type_values = trailheads_obj.values('bathroom_type').distinct().exclude(bathroom_type=None)
-  trailheads_bathroom_open = trailheads_obj.filter(bathroom_status='O').values('name')
+  trailheads_access_values = trailheads_obj.values('name','access').exclude(access=None)
+  trailheads_bathroom_values = trailheads_obj.filter(bathroom_status='O').values('name', 'bathroom_type')
 
   reports_all_region = Report.objects.filter(trail__region=region).count()
   reports_all_trail = Report.objects.filter(trail=trail).count()
-
-  trailheads_bathroom_status_str = ''
-  if len(trailheads_bathroom_open) > 0:
-    trailheads_bathroom_status_str += 'Open ('
-    for trailhead in trailheads_bathroom_open:
-      trailheads_bathroom_status_str += trailhead['name']
-    trailheads_bathroom_status_str += ')'
-  else:
-    trailheads_bathroom_status_str = 'Closed'
-
-  trailheads_access_str = 'via '
-  if len(trailheads_access_values) == 0:
-    trailheads_access_str = 'Unknown'
-  if len(trailheads_access_values) == 1:
-    trailheads_access_str += find_tuple_display_value(Trailhead.ACCESS_TYPES, trailheads_access_values[0]['access'])
-  else:
-    for access in trailheads_access_values:
-      val = find_tuple_display_value(Trailhead.ACCESS_TYPES, access['access'])
-      trailheads_access_str += val
-
-  trailheads_bathroom_type_str = ''
-  if len(trailheads_bathroom_type_values) == 0:
-    trailheads_bathroom_type_str = 'Unknown'
-  elif len(trailheads_bathroom_type_values) == 1:
-    trailheads_bathroom_type_str += find_tuple_display_value(Trailhead.BATHROOM_TYPE, trailheads_bathroom_type_values[0]['bathroom_type'])
-  else:
-    for type in trailheads_bathroom_type_values:
-      val = find_tuple_display_value(Trailhead.BATHROOM_TYPE, type['bathroom_type'])
-      trailheads_bathroom_type_str += val
 
   context = {
     'region': region,
     'trail': trail_obj,
     'trailheads': {
       'obj': trailheads_obj,
-      'access': trailheads_access_str,
-      'bathroom_type': trailheads_bathroom_type_str,
-      'bathroom_status': trailheads_bathroom_status_str
+      'access': trailheads_access_values,
+      'bathroom': trailheads_bathroom_values,
     },
     'summary': {
       'reports_region_count': reports_all_region,
@@ -249,15 +218,16 @@ def reports_day(request, day):
 
 def reports_trail_day(request, region, trail, day):
   formatted_day = abbreviate_day(day)
+  print(formatted_day)
   reports_total_trail = Report.objects.filter(trail=trail)
-  reports_filter = reports_total_trail.filter(day_hiked=formatted_day).order_by('-day_hiked')
+  reports_filter = reports_total_trail.filter(day_hiked=formatted_day).order_by('-date_hiked')
+  trail_obj = Trail.objects.get(pk=trail)
   
   if not reports_filter:
-    trail_obj = Trail.objects.get(pk=trail)
     total = len(reports_total_trail)
     context = {
       'region': region,
-      'trail_day_empty': trail_obj,
+      'trail': trail_obj,
       'day': day.capitalize(),
       'reports_total': total,
     }
@@ -269,17 +239,19 @@ def reports_trail_day(request, region, trail, day):
       'reports_list': reports_filter,
       'reports_total': total_trail_report_count,
       'reports_list_total': filter_report_count,
+      'trail': trail_obj,
+      'region': region,
       'day': day,
       'date': timezone.localdate(),
       'advice': advice['advice'],
       'caution': advice['caution']
     }
-  return render(request, 'trails/reports.html', context)
+  return render(request, 'trails/reports_trail.html', context)
 
 def reports_time(request, period):
   range = parse_time(period)
-  reports = Report.objects.filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max'])
-  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'].strftime('%H:%M'), range['max'].strftime('%H:%M'))
+  reports = Report.objects.filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max']).order_by('-date_hiked')
+  period_print = '%s (%s - %s)' % (period.capitalize(), range['min'].strftime('%I:%M %p').lstrip('0'), range['max'].strftime('%I:%M %p').lstrip('0'))
   context = { 
     'reports_list': reports,
     'period': period_print,
@@ -291,14 +263,14 @@ def reports_trail_time(request, region, trail, period):
   reports_total_trail = Report.objects.filter(trail=trail)
   reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max']).order_by('-date_hiked')
   period_print = '%s (%s-%s)' % (period.capitalize(), range['min'].strftime('%H:%M'), range['max'].strftime('%H:%M'))
+  trail_obj = Trail.objects.get(pk=trail)
 
   if not reports_filter:
-    trail_obj = Trail.objects.get(pk=trail)
     total = len(reports_total_trail)
     context = {
       'date': timezone.localdate(),
       'region': region,
-      'trail_time_empty': trail_obj,
+      'trail': trail_obj,
       'period': period_print,
       'reports_total': total,
     }
@@ -308,6 +280,8 @@ def reports_trail_time(request, region, trail, period):
     advice = create_advice('time', filter_report_count, total_trail_report_count)
     context = { 
       'date': timezone.localdate(),
+      'region': region,
+      'trail': trail_obj,
       'reports_list': reports_filter,
       'reports_total': total_trail_report_count,
       'reports_list_total': filter_report_count,
@@ -316,7 +290,7 @@ def reports_trail_time(request, region, trail, period):
       'caution': advice['caution']
     }
     
-  return render(request, 'trails/reports.html', context)
+  return render(request, 'trails/reports_trail.html', context)
 
 def index(request):
   return render(request, 'trails/index.html')

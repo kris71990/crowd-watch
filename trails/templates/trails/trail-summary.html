@@ -20,8 +20,15 @@
     <div>
       <h4>Facilities and Access</h4>
       <p>Trailheads: {{ trailheads.obj.count }}</p>
-      <p>Access: {{ trailheads.access }}</p>
-      <p>Bathroom: {{ trailheads.bathroom_type }} | <span>{{ trailheads.bathroom_status }}</span></p> 
+
+      <ul>
+      {% for trailhead in trailheads.obj %}
+        <li>{{ trailhead.name }} - <span>via {{ trailhead.get_access_display }}</span> |
+          <span>{{ trailhead.get_bathroom_type_display }} - <span id="bathroom_status">{{ trailhead.get_bathroom_status_display }}</span></span>
+        </li>
+      {% endfor %}
+      </ul>
+
       <h4>Popularity</h4>
       <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ trail.region.get_name_display }}</p>
     </div>

@@ -1,14 +1,20 @@
 from datetime import time
 
 def parse_time(period):
-  if period == 'morning':
+  if period == 'early morning':
     min = time(4, 00)
+    max = time(6, 59)
+  elif period == 'mid morning':
+    min = time(7, 00)
+    max = time(9, 59)
+  elif period == 'late morning':
+    min = time(10, 00)
     max = time(11, 59)
   elif period == 'afternoon':
     min = time(12, 00)
-    max = time(17, 59)
+    max = time(16, 59)
   elif period == 'evening':
-    min = time(18, 00)
+    min = time(17, 00)
     max = time(21, 59)
   else:
     min = time(22, 00)
