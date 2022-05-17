@@ -54,5 +54,7 @@
       <p>No reports found</p>
     {% endif %}
     </div>
+    {% url 'index' as link %}
+    {% include "./button.html" with link=link %}
   </body>
 </html>
