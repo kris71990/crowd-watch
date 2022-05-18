@@ -23,7 +23,8 @@ class RegionAdmin(admin.ModelAdmin):
   get_reports.short_description = 'Reports'
 
   readonly_fields = ['id']
-  list_display = ('name', 'get_trails', 'get_trailheads', 'get_reports')
+  list_display = ('name', 'region_slug', 'get_trails', 'get_trailheads', 'get_reports')
+  prepopulated_fields = { 'region_slug': ('name',) }
 
 class TrailAdmin(admin.ModelAdmin):
   def get_queryset(self, request):
@@ -44,7 +45,7 @@ class TrailAdmin(admin.ModelAdmin):
   readonly_fields = ['id', 'modified', 'get_trailheads', 'length_json', 'elevation_gain_json']
   fieldsets = (
     (None, {
-      'fields': ('name', 'region', 'coordinates')
+      'fields': ('name', 'trail_slug', 'region', 'coordinates',)
     }),
     ('Metadata', {
       'fields': readonly_fields
@@ -52,6 +53,7 @@ class TrailAdmin(admin.ModelAdmin):
   )
   list_display = ('name', 'region', 'get_trailheads', 'get_reports')
   list_filter = ['region']
+  prepopulated_fields = { 'trail_slug': ('name',) }
 
 class TrailheadAdmin(admin.ModelAdmin):
   def get_queryset(self, request):
@@ -74,7 +76,7 @@ class TrailheadAdmin(admin.ModelAdmin):
       'fields': ['region', 'trails']
     }),
     ('Trailhead Data', {
-      'fields': ('name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
+      'fields': ('name', 'trailhead_slug', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
     }),
     ('Metadata', {
       'fields': readonly_fields
@@ -82,6 +84,7 @@ class TrailheadAdmin(admin.ModelAdmin):
   )
   list_display = ('name', 'get_trails', 'get_reports')
   list_filter = ['region', 'trails']
+  prepopulated_fields = { 'trailhead_slug': ('name',) }
 
 class ReportAdmin(admin.ModelAdmin):
   readonly_fields = ('id', 'modified')

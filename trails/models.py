@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 import uuid
 from django.core.validators import MinValueValidator
+from django.utils.text import slugify
 
 class Region(models.Model):
   def __str__(self):
@@ -27,7 +28,11 @@ class Region(models.Model):
     unique=True, 
     help_text='Region Name'
   )
-  region_slug = models.SlugField(null=True)
+  region_slug = models.SlugField(null=True, verbose_name="Slug")
+
+  def save(self, *args, **kwargs):
+    self.region_slug or slugify(self.name)
+    super().save(*args, **kwargs)
 
 class Trail(models.Model):
   def __str__(self):
@@ -39,7 +44,7 @@ class Trail(models.Model):
   region = models.ForeignKey(Region, on_delete=models.CASCADE)
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   modified = models.DateTimeField('time modified', auto_now=True)
-  trail_slug = models.SlugField(null=True)
+  trail_slug = models.SlugField(null=True, verbose_name="Slug")
 
   name = models.CharField(max_length=100, unique=True, help_text='Trail Name')
   coordinates = models.CharField(
@@ -52,6 +57,10 @@ class Trail(models.Model):
   elevation_gain_json = models.JSONField('Elevation Gain', blank=True, null=True,
     help_text='From trailhead to highest point of trail',
   )
+
+  def save(self, *args, **kwargs):
+    self.trail_slug or slugify(self.name)
+    super().save(*args, **kwargs)
 
 class Trailhead(models.Model):
   def __str__(self):
@@ -84,7 +93,8 @@ class Trailhead(models.Model):
   region = models.ForeignKey(Region, on_delete=models.CASCADE)
   trails = models.ManyToManyField(Trail, related_name='trailheads')
   modified = models.DateTimeField('time modified', auto_now=True)
-  trailhead_slug = models.SlugField(null=True)
+  trailhead_slug = models.SlugField(null=True, verbose_name="Slug")
+
 
   name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
   coordinates = models.CharField(
@@ -124,6 +134,10 @@ class Trailhead(models.Model):
     choices=BATHROOM_STATUS,
     help_text='Is the bathroom open?'
   )
+
+  def save(self, *args, **kwargs):
+    self.trailhead_slug or slugify(self.name)
+    super().save(*args, **kwargs)
 
 class Report(models.Model):
   def __str__(self):

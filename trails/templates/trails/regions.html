@@ -23,7 +23,7 @@
         <tbody>
         {% for region in regions_table %}
           <tr>
-            <td class="region_name"><a href="{% url 'trails' region.id %}">{{ region.get_name_display }}</a></td>
+            <td class="region_name"><a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a></td>
 
             {% if region.trails > 0 %}
               <td class="trail_count"><p>{{ region.trails }}</p></td>

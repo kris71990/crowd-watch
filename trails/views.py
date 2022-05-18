@@ -38,8 +38,9 @@ def reports_list(request):
   }
   return render(request, 'trails/report_list.html', context)
 
-def trails(request, region):
-  trails_list = Trail.objects.annotate(Count('report')).filter(region=region).order_by('-modified')
+def trails(request, region_slug):
+  region = Region.objects.get(region_slug=region_slug)
+  trails_list = Trail.objects.annotate(Count('report')).filter(region=region.id).order_by('-modified')
   
   if request.method == 'POST':
     form = TrailForm(request.POST)
