@@ -31,7 +31,7 @@ class Region(models.Model):
   region_slug = models.SlugField(null=True, verbose_name="Slug")
 
   def save(self, *args, **kwargs):
-    self.region_slug or slugify(self.name)
+    self.region_slug = self.region_slug or slugify(self.name)
     super().save(*args, **kwargs)
 
 class Trail(models.Model):
@@ -59,7 +59,7 @@ class Trail(models.Model):
   )
 
   def save(self, *args, **kwargs):
-    self.trail_slug or slugify(self.name)
+    self.trail_slug = self.trail_slug or slugify(self.name)
     super().save(*args, **kwargs)
 
 class Trailhead(models.Model):
@@ -136,7 +136,7 @@ class Trailhead(models.Model):
   )
 
   def save(self, *args, **kwargs):
-    self.trailhead_slug or slugify(self.name)
+    self.trailhead_slug = self.trailhead_slug or slugify(self.name)
     super().save(*args, **kwargs)
 
 class Report(models.Model):

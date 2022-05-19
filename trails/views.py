@@ -60,17 +60,18 @@ def trails(request, region_slug):
 
 def trailheads(request, region_slug, trail_slug):
   region = Region.objects.get(region_slug=region_slug)
-  trail = Trail.objects.filter(trail_slug=trail_slug)
-  trailheads_list = Trailhead.objects.filter(trails__id=trail[0].id).annotate(report_count=Count('report', filter=Q(report__trail=trail[0].id))).order_by('-modified')
+  trail = Trail.objects.get(trail_slug=trail_slug)
+  trailheads_list = Trailhead.objects.filter(trails__id=trail.id).annotate(report_count=Count('report', filter=Q(report__trail=trail.id))).order_by('-modified')
 
   if request.method == 'POST':
     formTh = TrailheadForm(request.POST)
     if formTh.is_valid():
-      trail_obj.update(modified=timezone.now())
+      trail.modified = timezone.now()
+      trail.save(update_fields=['modified'])
       formTh.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    formTh = TrailheadForm(initial={ 'trail': trail, 'region': region }, label_suffix='')
+    formTh = TrailheadForm(initial={ 'trails': trail, 'region': region }, label_suffix='')
 
   formDayFilter = SelectDayForm()
   formTimeFilter = SelectTimeForm()
@@ -78,7 +79,7 @@ def trailheads(request, region_slug, trail_slug):
     'date': timezone.localdate(),
     'trailheads_list': trailheads_list,
     'region': region,
-    'trail': trail[0],
+    'trail': trail,
     'formTh': formTh,
     'formDayFilter': formDayFilter,
     'formTimeFilter': formTimeFilter,
@@ -90,8 +91,8 @@ def trail_summary(request, region_slug, trail_slug):
   trail = Trail.objects.get(trail_slug=trail_slug)
   trailheads = Trailhead.objects.filter(trails=trail.id)
 
-  trailheads_access_values = trailheads_obj.values('name','access').exclude(access=None)
-  trailheads_bathroom_values = trailheads_obj.filter(bathroom_status='O').values('name', 'bathroom_type')
+  trailheads_access_values = trailheads.values('name','access').exclude(access=None)
+  trailheads_bathroom_values = trailheads.filter(bathroom_status='O').values('name', 'bathroom_type')
 
   reports_all_region = Report.objects.filter(trail__region=region).count()
   reports_all_trail = Report.objects.filter(trail=trail).count()
@@ -149,34 +150,41 @@ def reports_trailhead(request, region_slug, trailhead_slug):
 
 def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
   region = Region.objects.get(region_slug=region_slug)
-  trailhead = Trailhead.objects.filter(trailhead_slug=trailhead_slug)
-  trail = Trail.objects.filter(trail_slug=trail_slug)
-  reports = Report.objects.filter(trailhead=trailhead[0].id).order_by('-date_hiked')
+  trailhead = Trailhead.objects.get(trailhead_slug=trailhead_slug)
+  trail = Trail.objects.get(trail_slug=trail_slug)
+  reports = Report.objects.filter(trailhead=trailhead.id).order_by('-date_hiked')
 
   if request.method == 'POST':
     form = ReportForm(request.POST)
     if form.is_valid():
-      trail[0].update(modified=timezone.now())
+      clean = form.cleaned_data
+      if trail.length_json is None:
+        trail.length_json = { trailhead.name: str(clean['length']) }
+      else:
+        trail.length_json[trailhead.name] = str(clean['length'])
+
+      if trail.elevation_gain is None:
+        trail.elevation_gain_json = { trailhead.name: str(clean['elevation_gain']) }
+      else:
+        trail.elevation_gain_json[trailhead.name] = str(clean['elevation_gain'])
+        
+      trail.modified = timezone.now(), 
       trailhead.modified = timezone.now()
       trailhead.save(update_fields=['modified'])
+      trail.save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
-    ReportForm.base_fields['trail'] = ModelChoiceField(queryset=trail)
-    ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead)
-    ReportForm.base_fields['trail'].disabled = True
-    ReportForm.base_fields['trailhead'].disabled = True
-    form = ReportForm(initial={ 'trail': trail[0], 'trailhead': trailhead[0] }, label_suffix='')
+    form = ReportForm(initial={ 'region': region, 'trail': trail, 'trailhead': trailhead }, label_suffix='')
 
   context = {
     'date': timezone.localdate(),
     'reports_list': reports,
     'region': region, 
-    'trail': trail[0],
-    'trailhead': trailhead[0],
+    'trail': trail,
+    'trailhead': trailhead,
     'form': form
   }
-  print(context)
   return render(request, 'trails/reports_trail_trailhead.html', context)
 
 def reports_trail(request, region_slug, trail_slug):

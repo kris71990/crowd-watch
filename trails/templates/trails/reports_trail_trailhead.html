@@ -112,11 +112,6 @@
         <p><span>Note</span> - There have been <span>{{ reports_total }}</span> submitted for this trail. If there have not been many reports, there may not be enough data to determine popularity.</p>
       {% endif %}
     {% endif %}
-    {% if trail %}
-    <div class="report-footer">
-      <p>To add a report, select a <a href="{% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug %}">trailhead</a></p>
-    </div>
-    {% endif %}
     </div>
 
     {% if trailhead %}
