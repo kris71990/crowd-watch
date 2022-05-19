@@ -13,19 +13,19 @@
     {% include "./header.html" %}
     <div class="subheader">
       <h2>
-        <a href="{% url 'trails' trail.region.id %}">{{ trail.region.get_name_display }}</a> | 
+        <a href="{% url 'trails' region.region_slug %}">{{ trail.region.get_name_display }}</a> | 
         {{ trail.name }}
       </h2>
-      <p><a href="{% url 'trail_summary' region=trail.region.id trail=trail.id %}">(Trail Summary)</a></p>
+      <p><a href="{% url 'trail_summary' region_slug=region.region_slug trail_slug=trail.trail_slug %}">(Trail Summary)</a></p>
     </div>
     {% if trailheads_list.count > 0 %}
     <div class="filters">
-      <form action="{% url 'reports_filter' region=trailheads_list.0.region.id trail=trail.id %}" method="post">
+      <form action="{% url 'reports_filter' region_slug=region.region_slug trail_slug=trail.trail_slug %}" method="post">
         {% csrf_token %}
         {{ formDayFilter }}
         <input class="button" type="submit" value="Filter">
       </form>
-      <form action="{% url 'reports_filter' region=trailheads_list.0.region.id trail=trail.id %}" method="post">
+      <form action="{% url 'reports_filter' region_slug=region.region_slug trail_slug=trail.trail_slug %}" method="post">
         {% csrf_token %}
         {{ formTimeFilter }}
         <input class="button" type="submit" value="Filter">
@@ -45,7 +45,7 @@
           {% for trailhead in trailheads_list %}
             <tr>
               <td>
-                <a href="{% url 'reports_trail_trailhead' region=region trail=trail.id trailhead=trailhead.id %}">{{ trailhead.name }}</a>
+                <a href="{% url 'reports_trail_trailhead' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=trailhead.trailhead_slug %}">{{ trailhead.name }}</a>
               </td>
               <td>{{ trailhead.coordinates }}</td>
 
@@ -67,7 +67,7 @@
 
     <div class="form-box">
       <h4>Add Trailhead</h4>
-      <form action="{% url 'trailheads' region trail.id %}" method="post">
+      <form action="{% url 'trailheads' region.region_slug trail.trail_slug %}" method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% for field in formTh %}

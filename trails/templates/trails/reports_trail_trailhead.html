@@ -12,18 +12,12 @@
   <body>
     {% include "./header.html" %}
     <div class="subheader">
-    {% if trail %}
-      <h2>
-        <a href="{% url 'trails' trail.region %}">{{ trail.region.get_name_display }}</a> | 
-        {{ trail.name }}
-      </h2>
-    {% elif trailhead %}
-      <h2>
-        <a href="{% url 'trails' trailhead.region.id %}">{{ trailhead.region.get_name_display }}</a> | 
-        <a href="{% url 'trailheads' region=trailhead.region.id trail=trail_obj.id %}">{{ trail_obj.name }}</a> | 
-        {{ trailhead.name }}
-      </h2>
-    {% elif day %}
+    <h2>
+      <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
+      <a href="{% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug %}">{{ trail.name }}</a> | 
+      {{ trailhead.name }}
+    </h2>
+    {% comment %} {% if day %}
       {% if advice %}
       <h2>
         <a href="{% url 'trails' reports_list.0.trail.region %}">{{ reports_list.0.region.get_name_display }}</a> |
@@ -51,7 +45,7 @@
         {{ period }}
       </h2>
       {% endif %}
-    {% endif %}
+    {% endif %} {% endcomment %}
     </div>
 
     <div class="report">
@@ -96,15 +90,15 @@
 
               {% if trail %}
               <td>
-                <a href="{% url 'report' region=region trail=trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">More</a>
               </td>
               {% elif trailhead %}
               <td>
-                <a href="{% url 'report' region=region trail=trail_obj.id trailhead=trailhead.id report=report.id %}">More</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=trailhead.trailhead_slug report=report.id %}">More</a>
               </td>
               {% else %}
               <td>
-                <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">More</a>
               </td>
               {% endif %}
             </div>
@@ -120,7 +114,7 @@
     {% endif %}
     {% if trail %}
     <div class="report-footer">
-      <p>To add a report, select a <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">trailhead</a></p>
+      <p>To add a report, select a <a href="{% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug %}">trailhead</a></p>
     </div>
     {% endif %}
     </div>
@@ -128,7 +122,7 @@
     {% if trailhead %}
     <div class="form-box">
       <h4>Add Report</h4>
-      <form action="{% url 'reports_trail_trailhead' region trail_obj.id trailhead.id %}" method="post">
+      <form action="{% url 'reports_trail_trailhead' region.region_slug trail.trail_slug trailhead.trailhead_slug %}" method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% for field in form %}

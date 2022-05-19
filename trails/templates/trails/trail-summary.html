@@ -12,7 +12,7 @@
     {% include "./header.html" %}
     <div class="subheader">
       <h2>
-        <a href="{% url 'trails' trail.region.id %}">{{ trail.region.get_name_display }}</a> | 
+        <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
         {{ trail.name }} - Report of Reports
       </h2>
     </div>
@@ -30,10 +30,10 @@
       </ul>
 
       <h4>Popularity</h4>
-      <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ trail.region.get_name_display }}</p>
+      <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ region.get_name_display }}</p>
     </div>
     {% endif %}
-    {% url 'trailheads' region=trail.region.id trail=trail.id as link %}
+    {% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug as link %}
     {% include "./button.html" with link=link %}
   </body>
 </html>

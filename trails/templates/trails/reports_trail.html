@@ -13,7 +13,7 @@
     {% include "./header.html" %}
     <div class="subheader">
       <h2>
-        <a href="{% url 'trails' trail.region.id %}">{{ trail.region.get_name_display }}</a> | 
+        <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
         {{ trail.name }}
       </h2>
     </div>
@@ -42,7 +42,7 @@
           {% for report in reports_list %}
             <tr>
               <td>
-                <a href="{% url 'reports_trailhead' region=report.trail.region trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
+                <a href="{% url 'reports_trailhead' region_slug=report.trail.region.region_slug trailhead_slug=report.trailhead.trailhead_slug %}">{{ report.trailhead.name }}</a>
               </td>
 
               {% if date == report.date_hiked %}
@@ -57,7 +57,7 @@
               {% endif %}
 
               <td>
-                <a href="{% url 'report' region=region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=report.trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">More</a>
               </td>
             </div>
           {% endfor %}
@@ -68,9 +68,9 @@
       <p>No reports found</p>
     {% endif %}
     <div class="report-footer">
-      <p>To add a report, select a <a href="{% url 'trailheads' region=region trail=trail.id %}">trailhead</a></p>
+      <p>To add a report, select a <a href="{% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug %}">trailhead</a></p>
     </div>
-    {% url 'trailheads' region=trail.region.id trail=trail.id as link %}
+    {% url 'trailheads' region_slug=trail.region.region_slug trail_slug=trail.trail_slug as link %}
     {% include "./button.html" with link=link %}
     </div>
   </body>
