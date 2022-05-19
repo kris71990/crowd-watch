@@ -156,7 +156,7 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
   if request.method == 'POST':
     form = ReportForm(request.POST)
     if form.is_valid():
-      trail_obj.update(modified=timezone.now())
+      trail[0].update(modified=timezone.now())
       trailhead.modified = timezone.now()
       trailhead.save(update_fields=['modified'])
       form.save()
@@ -166,7 +166,7 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
     ReportForm.base_fields['trailhead'] = ModelChoiceField(queryset=trailhead)
     ReportForm.base_fields['trail'].disabled = True
     ReportForm.base_fields['trailhead'].disabled = True
-    form = ReportForm(initial={ 'trail': trail, 'trailhead': trailhead }, label_suffix='')
+    form = ReportForm(initial={ 'trail': trail[0], 'trailhead': trailhead[0] }, label_suffix='')
 
   context = {
     'date': timezone.localdate(),
