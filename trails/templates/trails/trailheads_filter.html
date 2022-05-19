@@ -15,20 +15,20 @@
       {% if trailheads_list %}
         {% if type == 'bathroom' %}
           <h2>
-            <a href="{% url 'trails' region %}">{{ trailheads_list.0.region.get_name_display }}</a> | 
+            <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
             Trailheads - Open Bathrooms
           </h2>
         {% elif type == 'access' %}
           <h2>
-            <a href="{% url 'trails' region %}">{{ trailheads_list.0.region.get_name_display }}</a> | 
+            <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
             Trailheads - Paved Access
           </h2>
         {% endif %}
       {% else %}
         {% if type == 'bathroom' %}
-          <h2><a href="{% url 'trails' region %}">{{ region }}</a> | Trailheads - Open Bathrooms</h2>
+          <h2><a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | Trailheads - Open Bathrooms</h2>
         {% else %}
-          <h2><a href="{% url 'trails' region %}">{{ region }}</a> | Trailheads - Paved Access</h2>
+          <h2><a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | Trailheads - Paved Access</h2>
         {% endif %}
       {% endif %}
     </div>
@@ -53,11 +53,11 @@
           {% for trailhead in trailheads_list %}
             <tr>
               <td>
-                <a href="{% url 'reports_trailhead' region=region trailhead=trailhead.id %}">{{ trailhead.name }}</a>
+                <a href="{% url 'reports_trailhead' region_slug=region.region_slug trailhead_slug=trailhead.trailhead_slug %}">{{ trailhead.name }}</a>
               </td>
               <td>
                 {% for trail_trailhead in trailhead.trails.all %}
-                  <a href="{% url 'reports_trail' region=region trail=trail_trailhead.id %}">{{ trail_trailhead.name }}</a>
+                  <a href="{% url 'reports_trail' region_slug=region.region_slug trail_slug=trail_trailhead.trail_slug %}">{{ trail_trailhead.name }}</a>
                 {% endfor %}
               </td>
               <td>{{ trailhead.coordinates }}</td>
@@ -78,7 +78,7 @@
     {% else %}
       <p>No trailheads found</p>
     {% endif %}
-    {% url 'trails' region as link %}
+    {% url 'trails' region.region_slug as link %}
     {% include "./button.html" with link=link %}
   </body>
 </html>

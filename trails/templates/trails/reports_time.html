@@ -32,18 +32,18 @@
           {% for report in reports_list %}
             <tr>
               <td>
-                <a href="{% url 'trails' report.trail.region %}">{{ report.region.get_name_display }}</a>
+                <a href="{% url 'trails' report.trail.region.region_slug %}">{{ report.region.get_name_display }}</a>
               </td>
               <td>
-                <a href="{% url 'trailheads' region=report.trail.region trail=report.trail.id %}">{{ report.trail.name }}</a>
+                <a href="{% url 'trailheads' region_slug=report.trail.region.region_slug trail_slug=report.trail.trail_slug %}">{{ report.trail.name }}</a>
               </td>
               <td>
-                <a href="{% url 'reports_trail_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
+                <a href="{% url 'reports_trail_trailhead' region_slug=report.trail.region.region_slug trail_slug=report.trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug %}">{{ report.trailhead.name }}</a>
               </td>
               <td>{{ report.date_hiked|date:"n/j/y" }} ({{ report.get_day_hiked_display }})</td>
               <td>{{ report.trail_begin }} - {{ report.trail_end }}</td> 
               <td>
-                <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More</a>
+                <a href="{% url 'report' region_slug=report.trail.region.region_slug trail_slug=report.trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">More</a>
               </td>
             </div>
           {% endfor %}

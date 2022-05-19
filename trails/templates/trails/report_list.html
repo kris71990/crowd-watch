@@ -26,11 +26,11 @@
             {% for report in reports_list %}
               <tr>
                 <td>
-                  <a href="{% url 'trailheads' region=report.trail.region trail=report.trail.id %}">{{ report.trail.name }}
+                  <a href="{% url 'trailheads' region_slug=report.region.region_slug trail_slug=report.trail.trail_slug %}">{{ report.trail.name }}
                   </a>
                 </td>
                 <td>
-                  <a href="{% url 'reports_trail_trailhead' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id %}">{{ report.trailhead.name }}</a>
+                  <a href="{% url 'reports_trail_trailhead' region_slug=report.region.region_slug trail_slug=report.trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug %}">{{ report.trailhead.name }}</a>
                 </td>
                 {% if date == report.date_hiked %}
                   <td>Today</td>
@@ -38,7 +38,7 @@
                   <td>{{ report.date_hiked|date:"n/j/y" }} ({{ report.get_day_hiked_display }})</td>
                 {% endif %}
                 <td>
-                  <a href="{% url 'report' region=report.trail.region trail=report.trail.id trailhead=report.trailhead.id report=report.id %}">More
+                  <a href="{% url 'report' region_slug=report.region.region_slug trail_slug=report.trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">More
                   </a>
                 </td>
               </tr>

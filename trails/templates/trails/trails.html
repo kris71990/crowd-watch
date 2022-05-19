@@ -13,13 +13,13 @@
     {% include "./header.html" %}
     {% if trails_list %}
     <div class="subheader">
-      <h2>{{ trails_list.0.region.get_name_display }} Trails</h2>
+      <h2>{{ region.get_name_display }} Trails</h2>
     </div>
     {% if trails_list %}
     <div class="filters">
       <p>Find trailheads with:
-        <a href="{% url 'trailheads_filter_bathroom' region=region %}">open bathrooms </a>or
-        <a href="{% url 'trailheads_filter_access' region=region %}">paved access</a>
+        <a href="{% url 'trailheads_filter_bathroom' region.region_slug %}">open bathrooms </a>or
+        <a href="{% url 'trailheads_filter_access' region.region_slug %}">paved access</a>
       </p>
     </div>
     {% endif %}
@@ -36,7 +36,7 @@
           {% for trail in trails_list %}
             <tr>
               <td>
-                <a href="{% url 'trailheads' region=trail.region trail=trail.id %}">{{ trail.name }}</a>
+                <a href="{% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug %}">{{ trail.name }}</a>
               </td>
 
               {% if date == trail.modified.date %}
@@ -46,7 +46,7 @@
               {% endif %}
               
               <td>
-                <a href="{% url 'reports_trail' region=trail.region trail=trail.id %}">{{ trail.report__count }}</a>
+                <a href="{% url 'reports_trail' region_slug=region.region_slug trail_slug=trail.trail_slug %}">{{ trail.report__count }}</a>
               </td>
             </tr>
           {% endfor%}
@@ -59,7 +59,7 @@
 
     <div class="form-box">
       <h4>Add Trail</h4>
-      <form action="{% url 'trails' region %}" method="post">
+      <form action="{% url 'trails' region.region_slug %}" method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% for field in form %}
