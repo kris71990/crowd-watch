@@ -95,7 +95,6 @@ class Trailhead(models.Model):
   modified = models.DateTimeField('time modified', auto_now=True)
   trailhead_slug = models.SlugField(null=True, verbose_name="Slug")
 
-
   name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
   coordinates = models.CharField(
     max_length=25,

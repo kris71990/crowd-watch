@@ -1,23 +1,35 @@
-from ..models import Trail, Trailhead, Report
+from ..models import Region, Trail, Trailhead, Report
 from random import randint
 from faker import Faker
 
 fake = Faker()
 
-def create_trail(name, region, coordinates):
+def create_region(name):
+  return Region.objects.create(name=name)
+
+def create_trail(region, name):
+  coordinates = fake.word()
   return Trail.objects.create(name=name, region=region, coordinates=coordinates)
 
-def create_trailhead(trail, name, coordinates, filters):
+def create_trailhead(region, trail, name, filters):
+  coordinates = fake.word()
   if filters is None:
-    return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates)
+    trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates)
+    trailhead.trails.add(trail)
+    return trailhead
   elif 'br' in filters:
-    return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates, bathroom_status=filters['br'])
+    trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, bathroom_status=filters['br'])
+    trailhead.trails.add(trail)
+    return trailhead
   elif 'access' in filters:
-    return Trailhead.objects.create(trail=trail, name=name, coordinates=coordinates, access=filters['access'])
+    trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, access=filters['access'])
+    trailhead.trails.add(trail)
+    return trailhead
 
-def create_trail_and_trailhead(name, region, coordinates, filters):
-  trail = create_trail(name, region, coordinates)
-  return create_trailhead(trail, fake.name(), coordinates, filters)
+def create_trail_and_trailhead(region, name, filters):
+  coordinates = fake.word()
+  trail = create_trail(name, region)
+  return create_trailhead(trail, region, fake.name(), filters)
 
 def generate_random_choices():
   day_hiked = Report.DAYS[randint(0, len(Report.DAYS) - 1)][0]
@@ -30,7 +42,8 @@ def generate_random_choices():
   access_condition = Report.ACCESS_CONDITIONS[randint(0, len(Report.ACCESS_CONDITIONS) - 1)][0]
   pkg_location = Report.PARKING_TYPES[randint(0, len(Report.PARKING_TYPES) - 1)][0]
   return {
-    'access': access, 'day_hiked': day_hiked, 'car_type': car_type, 'weather_type': weather_type, 'temperature': temperature, 'bathroom_status': bathroom_status, 'bathroom_type': bathroom_type, 'access_condition': access_condition, 'pkg_location': pkg_location
+    'access': access, 'day_hiked': day_hiked, 'car_type': car_type, 'weather_type': weather_type, 'temperature': temperature, 
+    'bathroom_status': bathroom_status, 'bathroom_type': bathroom_type, 'access_condition': access_condition, 'pkg_location': pkg_location
   }
 
 def create_report(report):
@@ -43,6 +56,7 @@ def create_report(report):
   day_hiked = report['day_hiked'] if 'day_hiked' in report else random_choices['day_hiked']
 
   return Report.objects.create(
+    region=report['region'],
     trail=report['trail'], 
     trailhead=report['trailhead'], 
     date_hiked=report['date_hiked'], 
@@ -67,7 +81,7 @@ def create_report(report):
   )
 
 def create_bulk_reports(region, total):
-  trailhead = create_trail_and_trailhead(name=fake.name(), region=region, coordinates=fake.word(), filters=None)
+  trailhead = create_trail_and_trailhead(name=fake.name(), region=region, filters=None)
 
   for i in range(total):
     random_choices = generate_random_choices()
