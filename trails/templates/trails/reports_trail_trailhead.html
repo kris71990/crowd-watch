@@ -1,4 +1,5 @@
 {% load static %}
+{% load trail_extras %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'trails/forms.css' %}">
@@ -12,11 +13,12 @@
   <body>
     {% include "./header.html" %}
     <div class="subheader">
-    <h2>
-      <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
-      <a href="{% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug %}">{{ trail.name }}</a> | 
-      {{ trailhead.name }}
-    </h2>
+      <h2>
+        <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
+        <a href="{% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug %}">{{ trail.name }}</a> | 
+        {{ trailhead.name }}
+      </h2>
+      <h3>{{ trail.length_json|get_item:trailhead.name }} miles / {{ trail.elevation_gain_json|get_item:trailhead.name }} ft.</h3>
     {% comment %} {% if day %}
       {% if advice %}
       <h2>

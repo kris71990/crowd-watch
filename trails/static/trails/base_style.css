@@ -11,6 +11,11 @@ ul {
   display: inline-block;
 }
 
+.subheader h3 {
+  float: inline-end;
+  font-style: italic;
+}
+
 .subheader p a {
   color: blue;
   font-weight: bold;
