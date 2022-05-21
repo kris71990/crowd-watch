@@ -3,7 +3,7 @@ from django.urls import reverse
 from faker import Faker
 
 from ...models import Trail, Trailhead
-from ..mocks import create_trail, create_trail_and_trailhead, create_trailhead
+from ..mocks import create_region, create_trail, create_trail_and_trailhead, create_trailhead
 
 fake = Faker()
 
@@ -11,23 +11,25 @@ fake = Faker()
 class TrailheadViewTests(TestCase):
   # returns empty list if no trailheads
   def test_trailhead_list_empty(self):
-    region = 'CC'
-    trail = create_trail(name=fake.name(), region=region, coordinates=fake.word())
-    response = self.client.get(reverse('trailheads', args=(region, trail.id,)))
+    region = create_region('CC')
+    trail = create_trail(region=region, name=fake.name())
+    response = self.client.get(reverse('trailheads', args=(region.region_slug, trail.trail_slug,)))
+
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads.html')
     self.assertContains(response, 'No trailheads found')
     self.assertEqual(response.context['trail'], trail)
+    self.assertEqual(response.context['region'], region)
     self.assertQuerysetEqual(response.context['trailheads_list'], [])
 
   # returns all trailheads for trail, ordered by most recently modified
   def test_trailhead_list(self):
-    region = 'CC'
-    trail = create_trail(name=fake.name(), region=region, coordinates=fake.word())
+    region = create_region('CC')
+    trail = create_trail(region=region, name=fake.name())
     for i in range(2):
-      create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word(), filters=None)
+      create_trailhead(region=region, trail=trail, name=fake.name(), filters=None)
 
-    response = self.client.get(reverse('trailheads', args=(region, trail.id,)))
+    response = self.client.get(reverse('trailheads', args=(region.region_slug, trail.trail_slug,)))
     trailheads = response.context['trailheads_list']
 
     self.assertEqual(response.status_code, 200)
@@ -39,17 +41,22 @@ class TrailheadViewTests(TestCase):
 
   # create trailhead, return new list of trailheads for trail, in order
   def test_create_trailhead_view(self):
-    region = 'CC'
+    region = create_region('CC')
     trail_name = 'test_trail'
-    trail = create_trail(name=trail_name, region=region, coordinates=fake.word())
+    trail = create_trail(region=region, name=trail_name)
     for i in range(2):
-      create_trailhead(trail=trail, name=fake.name(), coordinates=fake.word(), filters=None)
+      create_trailhead(region=region, trail=trail, name=fake.name(), filters=None)
 
-    path = reverse('trailheads', args=(region, trail.id,))
-    post_response = self.client.post(path, { 'trail': trail.id, 'name': 'abcd', 'coordinates': 'sffsd' })
+    path = reverse('trailheads', args=(region.region_slug, trail.trail_slug,))
+    post_response = self.client.post(path, { 
+      'region': region.id, 
+      'trails': trail.id, 
+      'name': 'abcd', 
+      'coordinates': 'sffsd' 
+    })
     self.assertRedirects(post_response, path)
 
-    get_response = self.client.get(path, args=(region, trail.id,))
+    get_response = self.client.get(path, args=(region.region_slug, trail.trail_slug,))
     trailheads = get_response.context['trailheads_list']
 
     self.assertEqual(get_response.status_code, 200)
@@ -60,13 +67,15 @@ class TrailheadViewTests(TestCase):
     self.assertEqual(trailheads[0].name, 'abcd')
 
   def test_create_trailhead_error_access_distance(self):
-    region = 'CC'
+    region = create_region('CC')
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(name=trail_name, region=region, coordinates=fake.word(), filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('trailheads', args=(region, trailhead.trail.id,))
+    path = reverse('trailheads', args=(region.region_slug, trailhead_trails[0].trail_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trails': trailhead_trails[0].id, 
       'name': 'abcd', 
       'coordinates': 'sffsd',
       'access_distance': 0,
@@ -82,9 +91,9 @@ class TrailheadViewTests(TestCase):
 class TrailheadFilterTests(TestCase):
   # returns trailheads in region with open bathroom
   def test_filter_trailheads_open_bathroom(self):
-    region = 'NC'
-    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'br': 'O' }) # set bathroom to open
-    response = self.client.get(reverse('trailheads_filter_bathroom', args=(region,)))
+    region = create_region('CC')
+    trailhead = create_trail_and_trailhead(region=region, name='test', filters={ 'br': 'O' }) # set bathroom to open
+    response = self.client.get(reverse('trailheads_filter_bathroom', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads_filter.html')
@@ -94,9 +103,9 @@ class TrailheadFilterTests(TestCase):
 
   # returns empty set if no trailheads in region have open bathrooms
   def test_filter_trailheads_open_bathroom_empty(self):
-    region = 'NC'
-    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'br': 'C' }) # set bathroom to closed
-    response = self.client.get(reverse('trailheads_filter_bathroom', args=(region,)))
+    region = create_region('CC')
+    trailhead = create_trail_and_trailhead(region=region, name='test', filters={ 'br': 'C' }) # set bathroom to closed
+    response = self.client.get(reverse('trailheads_filter_bathroom', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads_filter.html')
@@ -106,9 +115,9 @@ class TrailheadFilterTests(TestCase):
 
   # returns trailheads in region with paved road access
   def test_filter_trailheads_paved_access(self):
-    region = 'NC'
-    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'access': 'P' }) # set access to paved
-    response = self.client.get(reverse('trailheads_filter_access', args=(region,)))
+    region = create_region('CC')
+    trailhead = create_trail_and_trailhead(region=region, name='test', filters={ 'access': 'P' }) # set access to paved
+    response = self.client.get(reverse('trailheads_filter_access', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads_filter.html')
@@ -118,9 +127,9 @@ class TrailheadFilterTests(TestCase):
 
   # return empty set if no trailheads in region have paved access
   def test_filter_trailheads_paved_access_empty(self):
-    region = 'NC'
-    trailhead = create_trail_and_trailhead(name='test', region=region, coordinates=fake.word(), filters={ 'access': 'FS' }) # set access to service road
-    response = self.client.get(reverse('trailheads_filter_access', args=(region,)))
+    region = create_region('CC')
+    trailhead = create_trail_and_trailhead(region=region, name='test', filters={ 'access': 'FS' }) # set access to service road
+    response = self.client.get(reverse('trailheads_filter_access', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('trailheads_filter.html')

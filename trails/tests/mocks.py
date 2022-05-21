@@ -28,8 +28,8 @@ def create_trailhead(region, trail, name, filters):
 
 def create_trail_and_trailhead(region, name, filters):
   coordinates = fake.word()
-  trail = create_trail(name, region)
-  return create_trailhead(trail, region, fake.name(), filters)
+  trail = create_trail(region, name)
+  return create_trailhead(region, trail, fake.name(), filters)
 
 def generate_random_choices():
   day_hiked = Report.DAYS[randint(0, len(Report.DAYS) - 1)][0]
