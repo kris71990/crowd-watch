@@ -153,29 +153,19 @@ class ReportViewTests(TestCase):
       'region': region.id,
       'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'length': '5.4',
-      'elevation_gain': '500',
-      'date_hiked_day': '1',
-      'date_hiked_month': '1',
-      'date_hiked_year': '2020',
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'M',
-      'trail_begin': fake.time(),
-      'trail_end': fake.time(),
-      'car_type': 'Suv',
-      'weather_type': 'S',
-      'temperature': 'C',
-      'bathroom_status': 'C',
-      'bathroom_type': 'FP',
-      'access': 'FS',
-      'access_distance': '5.0',
-      'access_condition': 'P+',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
       'pkg_location': 'P',
       'pkg_estimate_begin': 29,
       'pkg_estimate_end': 34,
       'cars_seen': 34,
       'people_seen': 344,
-      'horses_seen': False,
-      'dogs_seen': True
     })
 
     self.assertRedirects(post_response, path)
@@ -191,15 +181,20 @@ class ReportViewTests(TestCase):
   # test access distance error when value is below 0.1
   def test_create_report_error_access_distance(self):
     region = create_region('CC')
-    trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'date_hiked': time.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': time.time(),
@@ -218,15 +213,20 @@ class ReportViewTests(TestCase):
   # test error when begin time is invalid
   def test_create_report_error_time_begin(self):
     region = create_region('CC')
-    trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'date_hiked': time.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'Th',
       'trail_begin': '2345',
       'trail_end': time.time(),
@@ -245,14 +245,20 @@ class ReportViewTests(TestCase):
   def test_create_report_error_time_end(self):
     region = create_region('CC')
     trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'date_hiked': time.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': '1235',
@@ -270,15 +276,20 @@ class ReportViewTests(TestCase):
   # test parking capacity start error when value is below 0
   def test_create_report_error_parking_capacity_start(self):
     region = create_region('CC')
-    trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'date_hiked': time.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': time.time(),
@@ -297,15 +308,20 @@ class ReportViewTests(TestCase):
   # test parking capacity end error when value is below 0
   def test_create_report_error_parking_capacity_end(self):
     region = create_region('CC')
-    trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'date_hiked': time.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': time.time(),
@@ -323,15 +339,20 @@ class ReportViewTests(TestCase):
   # test cars seen error when value is below 0
   def test_create_report_error_cars_seen(self):
     region = create_region('CC')
-    trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'date_hiked': time.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': time.time(),
@@ -349,15 +370,20 @@ class ReportViewTests(TestCase):
   # test people seen error when value is below 0
   def test_create_report_error_people_seen(self):
     region = create_region('CC')
-    trail_name = 'test_trail'
-    trailhead = create_trail_and_trailhead(region=region, name=trail_name, filters=None)
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     response = self.client.post(path, { 
-      'trail': trailhead.trail.id, 
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
       'trailhead': trailhead.id,
-      'date_hiked': time.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
       'day_hiked': 'Th',
       'trail_begin': time.time(),
       'trail_end': time.time(),
@@ -379,21 +405,28 @@ class SingleReportViewTests(TestCase):
     region = create_region('CC')
     trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
+    trailhead_trails = trailhead.trails.all()
+
     report = create_report(report={
-      'trail': trailhead.trail, 
+      'region': region,
+      'trail': trailhead_trails[0], 
       'trailhead': trailhead,
-      'date_hiked': fake.date(),
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked': time.date(),
+      'day_hiked': 'Th',
       'trail_begin': time.time(),
-      'trail_end': fake.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
       'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
       'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
       'cars_seen': fake.pyint(),
       'people_seen': fake.pyint(),
+      'dogs_seen': fake.boolean(),
       'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean()
     })
 
-    response = self.client.get(reverse('report', args=(region, trailhead.trail.id, trailhead.id, report.id,)))
+    response = self.client.get(reverse('report', args=(region, trailhead_trails[0].trail_slug, trailhead.trailhead_slug, report.id,)))
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed('report.html')
     self.assertEqual(response.context['report'].trail_begin, time.time())
@@ -405,8 +438,8 @@ class SingleReportViewTests(TestCase):
 class ReportFilterViews(TestCase):
   # returns reports from all trails/regions for a specific day
   def test_filter_by_day(self):
-    create_bulk_reports('CC', 3)
-    create_bulk_reports('NC', 3)
+    region = create_region('NC')
+    create_bulk_reports(region, 3)
     day = 'S'
 
     response = self.client.get(reverse('reports_day', args=(day,)))
@@ -423,11 +456,17 @@ class ReportFilterViews(TestCase):
 
   # returns reports from a trail for a specific day
   def test_filter_by_day_trail(self):
-    create_bulk_reports('CC', 2)
-    trailhead = create_trail_and_trailhead('sfdsf', 'NC', '342323', None)
+    north = create_region('NC')
+    central = create_region('CC')
+    create_bulk_reports(central, 3)
+    trailhead = create_trail_and_trailhead(region=central, name=fake.name(), filters=None)
+
     create_report(report={
-      'trail': trailhead.trail, 
+      'region': north,
+      'trail': trailhead.trails.all()[0], 
       'trailhead': trailhead,
+      'length': 5.4,
+      'elevation_gain': 500,
       'date_hiked': fake.date(),
       'trail_begin': fake.time(),
       'trail_end': fake.time(),
@@ -440,19 +479,24 @@ class ReportFilterViews(TestCase):
       'day_hiked': 'S'
     })
 
-    response = self.client.get(reverse('reports_trail_day', args=('NC', trailhead.trail.id, 'S',)))
+    response = self.client.get(reverse('reports_trail_day', args=(north.region_slug, trailhead.trails.all()[0].trail_slug, 'S',)))
 
     reports_day = response.context['reports_list']
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail.html')
     self.assertEqual(len(reports_day), 1)
     self.assertEqual(reports_day[0].day_hiked, 'S')
 
   def test_filter_by_day_trail_empty(self):
-    trailhead = create_trail_and_trailhead('test', 'NC', '34223', None)
+    region = create_region('CC')
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+    trailhead_trail = trailhead.trails.all()[0]
     create_report(report={
-      'trail': trailhead.trail, 
+      'region': region,
+      'trail': trailhead.trails.all()[0], 
       'trailhead': trailhead,
+      'length': 5.4,
+      'elevation_gain': 500,
       'date_hiked': fake.date(),
       'trail_begin': fake.time(),
       'trail_end': fake.time(),
@@ -465,27 +509,29 @@ class ReportFilterViews(TestCase):
       'day_hiked': 'Th'
     })
 
-    response = self.client.get(reverse('reports_trail_day', args=('NC', trailhead.trail.id, 'S',)))
+    response = self.client.get(reverse('reports_trail_day', args=(region.region_slug, trailhead_trail.trail_slug, 'S',)))
 
-    trail = response.context['trail_day_empty']
+    trail = response.context['trail']
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports.html')
-    self.assertEqual(trail.name, trailhead.trail.name)
+    self.assertTemplateUsed(response, 'trails/reports_trail.html')
+    self.assertEqual(trail.name, trailhead_trail.name)
     self.assertContains(response, 'No reports found')
 
   # returns reports from all trails/regions for a time range
   def test_filter_by_time(self):
-    create_bulk_reports('CC', 3)
-    create_bulk_reports('NC', 3)
-    period = 'morning'
-    time_end = time(12, 00)
-    time_begin = time(0, 00)
+    central = create_region('CC')
+    north = create_region('NC')
+    create_bulk_reports(central, 3)
+    create_bulk_reports(north, 3)
+    period = 'early morning'
+    time_begin = time(4, 00)
+    time_end = time(6, 59)
 
     response = self.client.get(reverse('reports_time', args=(period,)))
 
     reports_time = response.context['reports_list']
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_time.html')
+    self.assertTemplateUsed(response, 'trails/reports_time.html')
 
     if reports_time:
       for i in range(len(reports_time)):
@@ -496,55 +542,82 @@ class ReportFilterViews(TestCase):
 
   # returns reports from a trail for a specific time
   def test_filter_by_time_trail(self):
-    trailhead = create_trail_and_trailhead('test', 'NC', '342323', None)
+    region = create_region('CC')
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+    trailhead_trail = trailhead.trails.all()[0]
+
     create_report(report={
-      'trail': trailhead.trail, 
+      'region': region,
+      'trail': trailhead_trail, 
       'trailhead': trailhead,
+      'length': 5.4,
+      'elevation_gain': 500,
       'date_hiked': fake.date(),
-      'trail_begin': fake.time(),
-      'trail_end': fake.time(),
       'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
       'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
       'cars_seen': fake.pyint(),
       'people_seen': fake.pyint(),
       'horses_seen': fake.boolean(),
       'dogs_seen': fake.boolean(),
+      'day_hiked': 'Th',
       'trail_begin': time(6, 00),
       'trail_end': time(10, 00)
     })
 
-    response = self.client.get(reverse('reports_trail_time', args=('NC', trailhead.trail.id, 'morning',)))
-
-    reports_time = response.context['reports_list']
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports.html')
-    self.assertEqual(len(reports_time), 1)
-    self.assertGreater(reports_time[0].trail_begin, time(0, 00))
-    self.assertLess(reports_time[0].trail_begin, time(12, 00))
-
-  def test_filter_by_time_trail_empty(self):
-    trailhead = create_trail_and_trailhead('test', 'NC', '34223', None)
     create_report(report={
-      'trail': trailhead.trail, 
+      'region': region,
+      'trail': trailhead_trail, 
       'trailhead': trailhead,
+      'length': 5.4,
+      'elevation_gain': 500,
       'date_hiked': fake.date(),
-      'trail_begin': fake.time(),
-      'trail_end': fake.time(),
       'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
       'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
       'cars_seen': fake.pyint(),
       'people_seen': fake.pyint(),
       'horses_seen': fake.boolean(),
       'dogs_seen': fake.boolean(),
+      'day_hiked': 'Th',
+      'trail_begin': time(7, 00),
+      'trail_end': time(10, 00)
+    })
+
+    response = self.client.get(reverse('reports_trail_time', args=(region.region_slug, trailhead_trail.trail_slug, 'early morning',)))
+
+    reports_time = response.context['reports_list']
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'trails/reports_trail.html')
+    self.assertEqual(len(reports_time), 1)
+    self.assertEqual(reports_time[0].trail, trailhead_trail)
+    self.assertGreater(reports_time[0].trail_begin, time(4, 00))
+    self.assertLess(reports_time[0].trail_begin, time(6, 59))
+
+  def test_filter_by_time_trail_empty(self):
+    region = create_region('CC')
+    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+    create_report(report={
+      'region': region,
+      'trail': trailhead.trails.all()[0], 
+      'trailhead': trailhead,
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked': fake.date(),
+      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
+      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
+      'cars_seen': fake.pyint(),
+      'people_seen': fake.pyint(),
+      'horses_seen': fake.boolean(),
+      'dogs_seen': fake.boolean(),
+      'day_hiked': 'Th',
       'trail_begin': time(13, 00),
       'trail_end': time(16, 00)
     })
 
-    response = self.client.get(reverse('reports_trail_time', args=('NC', trailhead.trail.id, 'morning',)))
+    response = self.client.get(reverse('reports_trail_time', args=(region.region_slug, trailhead.trails.all()[0].trail_slug, 'early morning',)))
 
-    trail = response.context['trail_time_empty']
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports.html')
-    self.assertEqual(trail.name, trailhead.trail.name)
+    self.assertTemplateUsed(response, 'trails/reports_trail.html')
+    self.assertEqual(response.context['trail'].name, trailhead.trails.all()[0].name)
+    self.assertEqual(response.context['reports_total'], 1)
     self.assertContains(response, 'No reports found')
   

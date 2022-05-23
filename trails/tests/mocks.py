@@ -81,12 +81,14 @@ def create_report(report):
   )
 
 def create_bulk_reports(region, total):
-  trailhead = create_trail_and_trailhead(name=fake.name(), region=region, filters=None)
+  trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+  trailhead_trail = trailhead.trails.all()[0]
 
   for i in range(total):
     random_choices = generate_random_choices()
     create_report(report={
-      'trail': trailhead.trail, 
+      'region': region,
+      'trail': trailhead_trail, 
       'trailhead': trailhead,
       'date_hiked': fake.date(),
       'trail_begin': fake.time(),

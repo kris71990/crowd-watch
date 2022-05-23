@@ -279,9 +279,9 @@ def reports_trail_day(request, region_slug, trail_slug, day):
   return render(request, 'trails/reports_trail.html', context)
 
 def reports_time(request, period):
-  range = parse_time(period)
-  reports = Report.objects.filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max']).order_by('-date_hiked')
-  period_print = '%s (%s - %s)' % (period.capitalize(), range['min'].strftime('%I:%M %p').lstrip('0'), range['max'].strftime('%I:%M %p').lstrip('0'))
+  time_range = parse_time(period)
+  reports = Report.objects.filter(trail_begin__gte=time_range['min']).filter(trail_begin__lte=time_range['max']).order_by('-date_hiked')
+  period_print = '%s (%s - %s)' % (period.capitalize(), time_range['min'].strftime('%I:%M %p').lstrip('0'), time_range['max'].strftime('%I:%M %p').lstrip('0'))
   context = { 
     'reports_list': reports,
     'period': period_print,
@@ -289,12 +289,12 @@ def reports_time(request, period):
   return render(request, 'trails/reports_time.html', context)
 
 def reports_trail_time(request, region_slug, trail_slug, period):
-  range = parse_time(period)
+  time_range = parse_time(period)
   region = Region.objects.get(region_slug=region_slug)
   trail = Trail.objects.get(trail_slug=trail_slug)
   reports_total_trail = Report.objects.filter(trail=trail.id)
-  reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=range['min']).filter(trail_begin__lte=range['max']).order_by('-date_hiked')
-  period_print = '%s (%s-%s)' % (period.capitalize(), range['min'].strftime('%H:%M'), range['max'].strftime('%H:%M'))
+  reports_filter = Report.objects.filter(trail=trail).filter(trail_begin__gte=time_range['min']).filter(trail_begin__lte=time_range['max']).order_by('-date_hiked')
+  period_print = '%s (%s-%s)' % (period.capitalize(), time_range['min'].strftime('%H:%M'), time_range['max'].strftime('%H:%M'))
 
   if not reports_filter:
     total = len(reports_total_trail)
