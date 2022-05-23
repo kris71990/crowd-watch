@@ -137,7 +137,6 @@ def trailheads_filter_access(request, region_slug):
 
 def reports_trailhead(request, region_slug, trailhead_slug):
   region = Region.objects.get(region_slug=region_slug)
-  trail = Trail.objects.get(trail_slug=trail_slug)
   trailhead = Trailhead.objects.get(trailhead_slug=trailhead_slug)
   reports = Report.objects.filter(trailhead=trailhead.id).order_by('-date_hiked')
 
@@ -203,7 +202,7 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
 def reports_trail(request, region_slug, trail_slug):
   region = Region.objects.get(region_slug=region_slug)
   trail = Trail.objects.get(trail_slug=trail_slug)
-  reports = Report.objects.filter(trail=trail.id).order_by('-modified')
+  reports = Report.objects.filter(trail=trail.id).order_by('-date_hiked')
 
   context = {
     'date': timezone.localdate(),
