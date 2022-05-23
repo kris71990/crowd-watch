@@ -159,26 +159,28 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
     if form.is_valid():
       clean = form.cleaned_data
       # if no lengths exist, assign to length given in first report
-      if trail.length_json is None:
-        trail.length_json = { trailhead.name: str(clean['length']) }
-      # if difference between input and existing lengths is close, find average and reassign
-      elif abs(Decimal(trail.length_json[trailhead.name]) - clean['length']) < 1:
-        existing_length = Decimal(trail.length_json[trailhead.name])
-        input_length = clean['length']
-        if existing_length > input_length:
-          trail.length_json[trailhead.name] = str(Decimal((existing_length + input_length) / 2).quantize(Decimal('1.0')))
-        else:
-          trail.length_json[trailhead.name] = str(Decimal((input_length + existing_length) / 2).quantize(Decimal('1.0')))
+      if (clean['length'] is not None):
+        if trail.length_json is None:
+          trail.length_json = { trailhead.name: str(clean['length']) }
+        # if difference between input and existing lengths is close, find average and reassign
+        elif abs(Decimal(trail.length_json[trailhead.name]) - clean['length']) < 1:
+          existing_length = Decimal(trail.length_json[trailhead.name])
+          input_length = clean['length']
+          if existing_length > input_length:
+            trail.length_json[trailhead.name] = str(Decimal((existing_length + input_length) / 2).quantize(Decimal('1.0')))
+          else:
+            trail.length_json[trailhead.name] = str(Decimal((input_length + existing_length) / 2).quantize(Decimal('1.0')))
         
-      if trail.elevation_gain_json is None:
-        trail.elevation_gain_json = { trailhead.name: clean['elevation_gain'] }
-      elif abs(trail.elevation_gain_json[trailhead.name] - clean['elevation_gain']) < 100:
-        existing_elevation_gain = trail.elevation_gain_json[trailhead.name]
-        input_elevation_gain = clean['elevation_gain']
-        if existing_elevation_gain > input_elevation_gain:
-          trail.elevation_gain_json[trailhead.name] = int((existing_elevation_gain + input_elevation_gain) / 2)
-        else:
-          trail.elevation_gain_json[trailhead.name] = int((input_elevation_gain + existing_elevation_gain) / 2)
+      if (clean['elevation_gain'] is not None):  
+        if trail.elevation_gain_json is None:
+          trail.elevation_gain_json = { trailhead.name: clean['elevation_gain'] }
+        elif abs(trail.elevation_gain_json[trailhead.name] - clean['elevation_gain']) < 100:
+          existing_elevation_gain = trail.elevation_gain_json[trailhead.name]
+          input_elevation_gain = clean['elevation_gain']
+          if existing_elevation_gain > input_elevation_gain:
+            trail.elevation_gain_json[trailhead.name] = int((existing_elevation_gain + input_elevation_gain) / 2)
+          else:
+            trail.elevation_gain_json[trailhead.name] = int((input_elevation_gain + existing_elevation_gain) / 2)
         
       trail.modified = timezone.now(), 
       trailhead.modified = timezone.now()

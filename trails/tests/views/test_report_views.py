@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from faker import Faker
 from datetime import datetime, time
+from decimal import Decimal
 
 from ..mocks import *
 
@@ -121,6 +122,7 @@ class ReportViewTests(TestCase):
         'day_hiked': days[i],
         'trail_begin': fake.time(),
         'trail_end': fake.time(),
+        'pkg_location': 'S',
         'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
         'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
         'cars_seen': fake.pyint(),
@@ -141,27 +143,31 @@ class ReportViewTests(TestCase):
 
   # creates a report and returns updated list of reports
   def test_create_report_view(self):
-    region = create_region('CC')
+    region = create_region('NC')
     trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
     trailhead_trails = trailhead.trails.all()
 
     path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     post_response = self.client.post(path, { 
-      'region': region,
-      'trail': trailhead_trails[0], 
-      'trailhead': trailhead,
-      'date_hiked': time.date(),
-      'day_hiked': 'Th',
-      'trail_begin': time.time(),
-      'trail_end': time.time(),
+      'region': region.id,
+      'trail': trailhead_trails[0].id, 
+      'trailhead': trailhead.id,
+      'length': '5.4',
+      'elevation_gain': '500',
+      'date_hiked_day': '1',
+      'date_hiked_month': '1',
+      'date_hiked_year': '2020',
+      'day_hiked': 'M',
+      'trail_begin': fake.time(),
+      'trail_end': fake.time(),
       'car_type': 'Suv',
       'weather_type': 'S',
       'temperature': 'C',
       'bathroom_status': 'C',
       'bathroom_type': 'FP',
       'access': 'FS',
-      'access_distance': 5.0,
+      'access_distance': '5.0',
       'access_condition': 'P+',
       'pkg_location': 'P',
       'pkg_estimate_begin': 29,
@@ -173,7 +179,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertRedirects(post_response, path)
-    get_response = self.client.get(path, args=(region.region_slug, trailhead.trail.id, trailhead.id,))
+    get_response = self.client.get(path, args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
     reports = get_response.context['reports_list']
 
     self.assertEqual(get_response.status_code, 200)
