@@ -92,26 +92,21 @@ def trail_summary(request, region_slug, trail_slug):
   trail = Trail.objects.get(trail_slug=trail_slug)
   trailheads = Trailhead.objects.filter(trails=trail.id)
 
-  trailheads_access_values = trailheads.values('name','access').exclude(access=None)
-  trailheads_bathroom_values = trailheads.filter(bathroom_status='O').values('name', 'bathroom_type')
-
   reports_all_region = Report.objects.filter(trail__region=region).count()
   reports_all_trail = Report.objects.filter(trail=trail).count()
+  advice = create_advice('trail', reports_all_trail, reports_all_region)
 
   context = {
     'region': region,
     'trail': trail,
-    'trailheads': {
-      'obj': trailheads,
-      'access': trailheads_access_values,
-      'bathroom': trailheads_bathroom_values,
-    },
+    'trailheads': trailheads,
     'summary': {
       'reports_region_count': reports_all_region,
-      'reports_trail_count': reports_all_trail
+      'reports_trail_count': reports_all_trail,
+      'advice': advice
     }
   }
-  return render(request, 'trails/trail-summary.html', context)
+  return render(request, 'trails/trail_summary.html', context)
 
 def trailheads_filter_bathroom(request, region_slug):
   region = Region.objects.get(region_slug=region_slug)

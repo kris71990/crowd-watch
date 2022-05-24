@@ -16,7 +16,7 @@ class TrailheadViewTests(TestCase):
     response = self.client.get(reverse('trailheads', args=(region.region_slug, trail.trail_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trailheads.html')
+    self.assertTemplateUsed(response, 'trails/trailheads.html')
     self.assertContains(response, 'No trailheads found')
     self.assertEqual(response.context['trail'], trail)
     self.assertEqual(response.context['region'], region)
@@ -33,7 +33,7 @@ class TrailheadViewTests(TestCase):
     trailheads = response.context['trailheads_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trailheads.html')
+    self.assertTemplateUsed(response, 'trails/trailheads.html')
     self.assertContains(response, 'Trailhead')
     self.assertEqual(response.context['trail'], trail)
     self.assertEqual(len(trailheads), 2)
@@ -60,7 +60,7 @@ class TrailheadViewTests(TestCase):
     trailheads = get_response.context['trailheads_list']
 
     self.assertEqual(get_response.status_code, 200)
-    self.assertTemplateUsed('trailheads.html')
+    self.assertTemplateUsed(get_response, 'trails/trailheads.html')
     self.assertContains(get_response, 'Trailhead')
     self.assertEqual(len(trailheads), 3)
     self.assertGreater(trailheads[0].modified, trailheads[1].modified)
@@ -82,7 +82,7 @@ class TrailheadViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trailheads.html')
+    self.assertTemplateUsed(response, 'trails/trailheads.html')
     self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')
 
 
@@ -96,7 +96,7 @@ class TrailheadFilterTests(TestCase):
     response = self.client.get(reverse('trailheads_filter_bathroom', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertTemplateUsed(response, 'trails/trailheads_filter.html')
     self.assertEqual(response.context['type'], 'bathroom')
     self.assertEqual(len(response.context['trailheads_list']), 1)
     self.assertEqual(response.context['trailheads_list'][0].name, trailhead.name)
@@ -108,7 +108,7 @@ class TrailheadFilterTests(TestCase):
     response = self.client.get(reverse('trailheads_filter_bathroom', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertTemplateUsed(response, 'trails/trailheads_filter.html')
     self.assertEqual(response.context['type'], 'bathroom')
     self.assertQuerysetEqual(response.context['trailheads_list'], [])
     self.assertContains(response, 'No trailheads found')
@@ -120,7 +120,7 @@ class TrailheadFilterTests(TestCase):
     response = self.client.get(reverse('trailheads_filter_access', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertTemplateUsed(response, 'trails/trailheads_filter.html')
     self.assertEqual(response.context['type'], 'access')
     self.assertEqual(len(response.context['trailheads_list']), 1)
     self.assertEqual(response.context['trailheads_list'][0].name, trailhead.name)
@@ -132,7 +132,7 @@ class TrailheadFilterTests(TestCase):
     response = self.client.get(reverse('trailheads_filter_access', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trailheads_filter.html')
+    self.assertTemplateUsed(response, 'trails/trailheads_filter.html')
     self.assertEqual(response.context['type'], 'access')
     self.assertQuerysetEqual(response.context['trailheads_list'], [])
     self.assertContains(response, 'No trailheads found')

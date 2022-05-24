@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 from faker import Faker
 from datetime import datetime, time
-from decimal import Decimal
 
 from ..mocks import *
 
@@ -37,7 +36,7 @@ class ReportViewTests(TestCase):
     reports = response.context['reports_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('report_list.html')
+    self.assertTemplateUsed(response, 'trails/report_list.html')
     self.assertContains(response, 'Report Feed')
 
     self.assertEqual(len(reports), 3)
@@ -52,7 +51,7 @@ class ReportViewTests(TestCase):
     response = self.client.get(reverse('reports_trail', args=(region.region_slug, trailhead_trails[0].trail_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail.html')
     self.assertContains(response, 'No reports found')
     self.assertEqual(response.context['trail'], trailhead_trails[0])
     self.assertQuerysetEqual(response.context['reports_list'], [])
@@ -65,7 +64,7 @@ class ReportViewTests(TestCase):
     response = self.client.get(reverse('reports_trailhead', args=(region.region_slug, trailhead.trailhead_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trailhead.html')
     self.assertContains(response, 'No reports found')
     self.assertEqual(response.context['trailhead'], trailhead)
     self.assertQuerysetEqual(response.context['reports_list'], [])
@@ -98,7 +97,7 @@ class ReportViewTests(TestCase):
     reports = response.context['reports_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trailhead.html')
     self.assertContains(response, 'Reports (5)')
     self.assertEqual(len(reports), 5)
     self.assertEqual(response.context['trailhead'], trailhead)
@@ -135,7 +134,7 @@ class ReportViewTests(TestCase):
     reports = response.context['reports_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail.html')
     self.assertContains(response, 'Reports (2)')
     self.assertEqual(len(reports), 2)
     self.assertNotEqual(reports[0].trailhead.name, reports[1].trailhead.name)
@@ -173,7 +172,7 @@ class ReportViewTests(TestCase):
     reports = get_response.context['reports_list']
 
     self.assertEqual(get_response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(get_response, 'trails/reports_trail_trailhead.html')
     self.assertContains(get_response, 'Reports (1)')
     self.assertEqual(len(reports), 1)
     self.assertEqual(reports[0].trail.name, trailhead_trails[0].name)
@@ -207,7 +206,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail_trailhead.html')
     self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')
   
   # test error when begin time is invalid
@@ -238,7 +237,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail_trailhead.html')
     self.assertContains(response, 'Enter a valid time.')
   
   # test error when end time is invalid
@@ -270,7 +269,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail_trailhead.html')
     self.assertContains(response, 'Enter a valid time.')
 
   # test parking capacity start error when value is below 0
@@ -302,7 +301,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail_trailhead.html')
     self.assertContains(response, 'Ensure this value is greater than or equal to 0')
 
   # test parking capacity end error when value is below 0
@@ -333,7 +332,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail_trailhead.html')
     self.assertContains(response, 'Ensure this value is greater than or equal to 0')
 
   # test cars seen error when value is below 0
@@ -364,7 +363,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail_trailhead.html')
     self.assertContains(response, 'Ensure this value is greater than or equal to 0')
 
   # test people seen error when value is below 0
@@ -395,7 +394,7 @@ class ReportViewTests(TestCase):
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('reports_trail_trailhead.html')
+    self.assertTemplateUsed(response, 'trails/reports_trail_trailhead.html')
     self.assertContains(response, 'Ensure this value is greater than or equal to 0')
 
 # <str:region>/<str:trail>/<str:trailhead>/<str:report>/
@@ -405,11 +404,11 @@ class SingleReportViewTests(TestCase):
     region = create_region('CC')
     trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
     time = datetime.now()
-    trailhead_trails = trailhead.trails.all()
+    trailhead_trail = trailhead.trails.all()[0]
 
     report = create_report(report={
       'region': region,
-      'trail': trailhead_trails[0], 
+      'trail': trailhead_trail, 
       'trailhead': trailhead,
       'length': 5.4,
       'elevation_gain': 500,
@@ -426,10 +425,15 @@ class SingleReportViewTests(TestCase):
       'horses_seen': fake.boolean(),
     })
 
-    response = self.client.get(reverse('report', args=(region, trailhead_trails[0].trail_slug, trailhead.trailhead_slug, report.id,)))
+    response = self.client.get(reverse('report', args=(region, trailhead_trail.trail_slug, trailhead.trailhead_slug, report.id,)))
+    report_post = response.context['report']
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('report.html')
-    self.assertEqual(response.context['report'].trail_begin, time.time())
+    self.assertTemplateUsed(response, 'trails/report.html')
+    self.assertEqual(report_post.trail.id, report.trail.id)
+    self.assertTrue(report_post.trail_begin)
+    self.assertTrue(report_post.trail_end)
+    self.assertTrue(report_post.pkg_estimate_begin)
+    self.assertTrue(report_post.pkg_estimate_end)
 
 # reports/<str:day>
 # reports/<str:time>
@@ -486,6 +490,8 @@ class ReportFilterViews(TestCase):
     self.assertTemplateUsed(response, 'trails/reports_trail.html')
     self.assertEqual(len(reports_day), 1)
     self.assertEqual(reports_day[0].day_hiked, 'S')
+    self.assertTrue(response.context['advice'])
+    self.assertTrue(response.context['caution'])
 
   def test_filter_by_day_trail_empty(self):
     region = create_region('CC')
@@ -515,6 +521,7 @@ class ReportFilterViews(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'trails/reports_trail.html')
     self.assertEqual(trail.name, trailhead_trail.name)
+    self.assertEqual(response.context['reports_total'], 1)
     self.assertContains(response, 'No reports found')
 
   # returns reports from all trails/regions for a time range
@@ -591,6 +598,8 @@ class ReportFilterViews(TestCase):
     self.assertEqual(reports_time[0].trail, trailhead_trail)
     self.assertGreater(reports_time[0].trail_begin, time(4, 00))
     self.assertLess(reports_time[0].trail_begin, time(6, 59))
+    self.assertTrue(response.context['caution'])
+    self.assertTrue(response.context['advice'])
 
   def test_filter_by_time_trail_empty(self):
     region = create_region('CC')

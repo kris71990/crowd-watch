@@ -1,6 +1,7 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'trails/base_style.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'trails/trail_summary.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'trails/feeds.css' %}">
 
 <!DOCTYPE html>
 <html>
@@ -19,10 +20,10 @@
     {% if summary %}
     <div>
       <h4>Facilities and Access</h4>
-      <p>Trailheads: {{ trailheads.obj.count }}</p>
+      <p>Trailheads: {{ trailheads.count }}</p>
 
       <ul>
-      {% for trailhead in trailheads.obj %}
+      {% for trailhead in trailheads %}
         <li>{{ trailhead.name }} - <span>via {{ trailhead.get_access_display }}</span> |
           <span>{{ trailhead.get_bathroom_type_display }} - <span id="bathroom_status">{{ trailhead.get_bathroom_status_display }}</span></span>
         </li>
@@ -31,6 +32,11 @@
 
       <h4>Popularity</h4>
       <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ region.get_name_display }}</p>
+      {% if summary.advice %}
+        <div class="{{ summary.advice.caution }}">
+          <p>{{ summary.advice.advice}}</p>
+        </div>
+      {% endif %}
     </div>
     {% endif %}
     {% url 'trailheads' region_slug=region.region_slug trail_slug=trail.trail_slug as link %}

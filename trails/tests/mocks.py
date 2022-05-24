@@ -110,3 +110,5 @@ def create_bulk_reports(region, total):
       'temperature': random_choices['temperature'],
       'weather_type': random_choices['weather_type']
     })
+  
+  return { 'trail': trailhead_trail, 'trailhead': trailhead }

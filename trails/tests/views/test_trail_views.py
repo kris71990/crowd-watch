@@ -14,7 +14,7 @@ class TrailListViewTests(TestCase):
     response = self.client.get(reverse('trail_list'))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trail_list.html')
+    self.assertTemplateUsed(response, 'trails/trail_list.html')
     self.assertContains(response, 'No trails found')
     self.assertQuerysetEqual(response.context['trails_list'], [])
     self.assertTrue(response.context['date'])
@@ -30,7 +30,7 @@ class TrailListViewTests(TestCase):
     trails = response.context['trails_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trail_list.html')
+    self.assertTemplateUsed(response, 'trails/trail_list.html')
     self.assertContains(response, 'Trail Feed')
     self.assertEqual(len(trails), 3)
     self.assertGreater(trails[0].modified, trails[1].modified)
@@ -44,7 +44,7 @@ class TrailListByRegionViewTests(TestCase):
     response = self.client.get(reverse('trails', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
+    self.assertTemplateUsed(response, 'trails/trails.html')
     self.assertContains(response, 'No trails found')
     self.assertQuerysetEqual(response.context['trails_list'], [])
     self.assertEqual(response.context['region'].name, region.name)
@@ -61,7 +61,7 @@ class TrailListByRegionViewTests(TestCase):
     trails = response.context['trails_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
+    self.assertTemplateUsed(response, 'trails/trails.html')
     self.assertContains(response, 'Central Cascades Trails')
 
     self.assertEqual(len(trails), 3)
@@ -85,7 +85,7 @@ class TrailListByRegionViewTests(TestCase):
     trails = get_response.context['trails_list']
 
     self.assertEqual(get_response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
+    self.assertTemplateUsed(get_response, 'trails/trails.html')
     self.assertContains(get_response, 'Central Cascades Trails')
     self.assertEqual(len(trails), 4)
     self.assertGreater(trails[0].modified, trails[1].modified)
