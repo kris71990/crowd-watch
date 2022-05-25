@@ -6,10 +6,10 @@ from django.utils import timezone
 from django.shortcuts import redirect
 
 import datetime
-from decimal import Decimal
 from .models import Region, Trail, Trailhead, Report
 from .forms import TrailForm, TrailheadForm, ReportForm, SelectDayForm, SelectTimeForm, TrailheadAssociationForm
 from .utils import *
+from .update_utils import *
 
 def regions(request):
   trail_count = Count('trail', distinct=True)
@@ -147,40 +147,14 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
   region = Region.objects.get(region_slug=region_slug)
   trailhead = Trailhead.objects.get(trailhead_slug=trailhead_slug)
   trail = Trail.objects.get(trail_slug=trail_slug)
-  reports = Report.objects.filter(trailhead=trailhead.id).order_by('-date_hiked')
+  reports = Report.objects.filter(trail=trail.id, trailhead=trailhead.id).order_by('-date_hiked')
 
   if request.method == 'POST':
     form = ReportForm(request.POST)
     if form.is_valid():
       clean = form.cleaned_data
-      # if no lengths exist, assign to length given in first report
-      if (clean['length'] is not None):
-        if trail.length_json is None:
-          trail.length_json = { trailhead.name: str(clean['length']) }
-        # if difference between input and existing lengths is close, find average and reassign
-        elif abs(Decimal(trail.length_json[trailhead.name]) - clean['length']) < 1:
-          existing_length = Decimal(trail.length_json[trailhead.name])
-          input_length = clean['length']
-          if existing_length > input_length:
-            trail.length_json[trailhead.name] = str(Decimal((existing_length + input_length) / 2).quantize(Decimal('1.0')))
-          else:
-            trail.length_json[trailhead.name] = str(Decimal((input_length + existing_length) / 2).quantize(Decimal('1.0')))
-        
-      if (clean['elevation_gain'] is not None):  
-        if trail.elevation_gain_json is None:
-          trail.elevation_gain_json = { trailhead.name: clean['elevation_gain'] }
-        elif abs(trail.elevation_gain_json[trailhead.name] - clean['elevation_gain']) < 100:
-          existing_elevation_gain = trail.elevation_gain_json[trailhead.name]
-          input_elevation_gain = clean['elevation_gain']
-          if existing_elevation_gain > input_elevation_gain:
-            trail.elevation_gain_json[trailhead.name] = int((existing_elevation_gain + input_elevation_gain) / 2)
-          else:
-            trail.elevation_gain_json[trailhead.name] = int((input_elevation_gain + existing_elevation_gain) / 2)
-        
-      trail.modified = timezone.now(), 
-      trailhead.modified = timezone.now()
-      trailhead.save(update_fields=['modified'])
-      trail.save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
+      update_trail_length(clean)
+      update_trail_elevation(clean)
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
