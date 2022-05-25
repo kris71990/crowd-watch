@@ -1,6 +1,7 @@
 from ..models import Region, Trail, Trailhead, Report
 from random import randint
 from faker import Faker
+from datetime import time
 
 fake = Faker()
 
@@ -54,22 +55,26 @@ def create_report(report):
     access_distance = 0.1
 
   day_hiked = report['day_hiked'] if 'day_hiked' in report else random_choices['day_hiked']
+  trail_begin = report['trail_begin'] if 'trail_begin' in report else fake.time()
+  trail_end = report['trail_end'] if 'trail_end' in report else fake.time()
 
   return Report.objects.create(
     region=report['region'],
     trail=report['trail'], 
     trailhead=report['trailhead'], 
-    date_hiked=report['date_hiked'], 
-    trail_begin=report['trail_begin'], 
-    trail_end=report['trail_end'], 
-    access_distance=access_distance, 
-    pkg_estimate_begin=report['pkg_estimate_begin'], 
-    pkg_estimate_end=report['pkg_estimate_end'], 
-    cars_seen=report['cars_seen'], 
-    people_seen=report['people_seen'], 
-    horses_seen=report['horses_seen'], 
-    dogs_seen=report['dogs_seen'],
+    length=fake.pydecimal(positive=True, max_value=10.0, right_digits=2),
+    elevation_gain=fake.pyint(min_value=1, max_value=1000),
     day_hiked=day_hiked, 
+    date_hiked=fake.date(), 
+    trail_begin=trail_begin, 
+    trail_end=trail_end,
+    access_distance=access_distance, 
+    pkg_estimate_begin=fake.pyint(min_value=0, max_value=100), 
+    pkg_estimate_end=fake.pyint(min_value=0, max_value=100), 
+    cars_seen=fake.pyint(), 
+    people_seen=fake.pyint(), 
+    horses_seen=fake.boolean(), 
+    dogs_seen=fake.boolean(),
     bathroom_status=random_choices['bathroom_status'], 
     bathroom_type=random_choices['bathroom_type'], 
     access=random_choices['access'], 
@@ -85,30 +90,10 @@ def create_bulk_reports(region, total):
   trailhead_trail = trailhead.trails.all()[0]
 
   for i in range(total):
-    random_choices = generate_random_choices()
     create_report(report={
       'region': region,
       'trail': trailhead_trail, 
       'trailhead': trailhead,
-      'date_hiked': fake.date(),
-      'trail_begin': fake.time(),
-      'trail_end': fake.time(),
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean(),
-      'access_distance': randint(0, 20),
-      'access': random_choices['access'],
-      'access_condition': random_choices['access_condition'],
-      'day_hiked': random_choices['day_hiked'],
-      'bathroom_status': random_choices['bathroom_status'],
-      'bathroom_type': random_choices['bathroom_type'],
-      'pkg_location': random_choices['pkg_location'],
-      'car_type': random_choices['car_type'],
-      'temperature': random_choices['temperature'],
-      'weather_type': random_choices['weather_type']
     })
   
   return { 'trail': trailhead_trail, 'trailhead': trailhead }

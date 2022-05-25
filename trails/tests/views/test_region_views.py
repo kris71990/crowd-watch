@@ -34,16 +34,6 @@ class RegionViewTests(TestCase):
       'region': region_two,
       'trail': trailhead.trails.all()[0], 
       'trailhead': trailhead,
-      'date_hiked': fake.date(),
-      'day_hiked': 'W',
-      'trail_begin': fake.time(),
-      'trail_end': fake.time(),
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean()
     })
 
     response = self.client.get('/trails/regions/')

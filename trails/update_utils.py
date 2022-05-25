@@ -22,7 +22,9 @@ def update_trail_length(clean_form):
     clean_form['trailhead'].save(update_fields=['modified'])
     clean_form['trail'].save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
   
-
+# called on report submission
+# if report has an elevation gain, clean_form['elevation_gain'] is updated with data if none exists
+# or algorithmically adjusts elevation based on consensus of previous reported values
 def update_trail_elevation(clean_form):      
   if (clean_form['elevation_gain'] is not None):  
     if clean_form['trail'].elevation_gain_json is None or clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] is None or clean_form['trail'].length_json[clean_form['trailhead'].name] is 'None':

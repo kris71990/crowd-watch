@@ -48,16 +48,12 @@ class ReportModelTests(TestCase):
     time = datetime.now()
 
     report = create_report(report={ 
-      'region': region, 'trail': trail, 'trailhead': trailhead, 'date_hiked': time.date(), 'day_hiked': 'Th', 
-      'trail_begin': time.time(), 'trail_end': time.time(), 'car_type': 'Suv', 'temperature': 'W', 'weather_type': 'S', 
-      'access': 'P', 'access_distance': 5.0, 'access_condition': 'P+', 'bathroom_status': 'O', 'bathroom_type': 'FP', 
-      'pkg_location': 'P', 'pkg_estimate_begin': 15, 'pkg_estimate_end': 50, 
-      'cars_seen': 30, 'people_seen': 100, 'horses_seen': False, 'dogs_seen': True
+      'region': region, 'trail': trail, 'trailhead': trailhead
     })
 
     self.assertEqual(report.trailhead.name, trailhead.name)
     self.assertEqual(report.region.name, region.name)
     self.assertEqual(report.trail.name, trail.name)
-    self.assertIs(report.cars_seen, 30)
+    self.assertGreater(report.cars_seen, 0)
     self.assertIs(report.trail.name, 'test_name')
     self.assertIs(report.trailhead.name, 'th')

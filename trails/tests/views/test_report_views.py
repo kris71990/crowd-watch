@@ -20,16 +20,6 @@ class ReportViewTests(TestCase):
         'region': region,
         'trail': trailhead.trails.all()[0], 
         'trailhead': trailhead,
-        'date_hiked': fake.date(),
-        'day_hiked': days[i],
-        'trail_begin': fake.time(),
-        'trail_end': fake.time(),
-        'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-        'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-        'cars_seen': fake.pyint(),
-        'people_seen': fake.pyint(),
-        'horses_seen': fake.boolean(),
-        'dogs_seen': fake.boolean()
       })
       
     response = self.client.get(reverse('reports_list'))
@@ -410,30 +400,23 @@ class SingleReportViewTests(TestCase):
       'region': region,
       'trail': trailhead_trail, 
       'trailhead': trailhead,
-      'length': 5.4,
-      'elevation_gain': 500,
-      'date_hiked': time.date(),
-      'day_hiked': 'Th',
-      'trail_begin': time.time(),
-      'trail_end': time.time(),
-      'pkg_location': 'P',
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'dogs_seen': fake.boolean(),
-      'horses_seen': fake.boolean(),
     })
 
     response = self.client.get(reverse('report', args=(region, trailhead_trail.trail_slug, trailhead.trailhead_slug, report.id,)))
     report_post = response.context['report']
+
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'trails/report.html')
     self.assertEqual(report_post.trail.id, report.trail.id)
     self.assertTrue(report_post.trail_begin)
     self.assertTrue(report_post.trail_end)
-    self.assertTrue(report_post.pkg_estimate_begin)
-    self.assertTrue(report_post.pkg_estimate_end)
+    self.assertGreaterEqual(report_post.pkg_estimate_begin, 0)
+    self.assertLessEqual(report_post.pkg_estimate_begin, 100)
+    self.assertGreaterEqual(report_post.pkg_estimate_end, 0)
+    self.assertLessEqual(report_post.pkg_estimate_end, 100)
+    self.assertTrue(response.context['slugs']['region'])
+    self.assertTrue(response.context['slugs']['trail'])
+    self.assertTrue(response.context['slugs']['trailhead'])
 
 # reports/<str:day>
 # reports/<str:time>
@@ -469,17 +452,6 @@ class ReportFilterViews(TestCase):
       'region': north,
       'trail': trailhead.trails.all()[0], 
       'trailhead': trailhead,
-      'length': 5.4,
-      'elevation_gain': 500,
-      'date_hiked': fake.date(),
-      'trail_begin': fake.time(),
-      'trail_end': fake.time(),
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean(),
       'day_hiked': 'S'
     })
 
@@ -501,17 +473,6 @@ class ReportFilterViews(TestCase):
       'region': region,
       'trail': trailhead.trails.all()[0], 
       'trailhead': trailhead,
-      'length': 5.4,
-      'elevation_gain': 500,
-      'date_hiked': fake.date(),
-      'trail_begin': fake.time(),
-      'trail_end': fake.time(),
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean(),
       'day_hiked': 'Th'
     })
 
@@ -542,8 +503,8 @@ class ReportFilterViews(TestCase):
 
     if reports_time:
       for i in range(len(reports_time)):
-        self.assertLess(reports_time[i].trail_begin, time_end)
-        self.assertGreater(reports_time[i].trail_begin, time_begin)
+        self.assertLessEqual(reports_time[i].trail_begin, time_end)
+        self.assertGreaterEqual(reports_time[i].trail_begin, time_begin)
     else:
       self.assertContains(response, 'No reports found')
 
@@ -557,16 +518,6 @@ class ReportFilterViews(TestCase):
       'region': region,
       'trail': trailhead_trail, 
       'trailhead': trailhead,
-      'length': 5.4,
-      'elevation_gain': 500,
-      'date_hiked': fake.date(),
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean(),
-      'day_hiked': 'Th',
       'trail_begin': time(6, 00),
       'trail_end': time(10, 00)
     })
@@ -575,16 +526,6 @@ class ReportFilterViews(TestCase):
       'region': region,
       'trail': trailhead_trail, 
       'trailhead': trailhead,
-      'length': 5.4,
-      'elevation_gain': 500,
-      'date_hiked': fake.date(),
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean(),
-      'day_hiked': 'Th',
       'trail_begin': time(7, 00),
       'trail_end': time(10, 00)
     })
@@ -596,8 +537,8 @@ class ReportFilterViews(TestCase):
     self.assertTemplateUsed(response, 'trails/reports_trail.html')
     self.assertEqual(len(reports_time), 1)
     self.assertEqual(reports_time[0].trail, trailhead_trail)
-    self.assertGreater(reports_time[0].trail_begin, time(4, 00))
-    self.assertLess(reports_time[0].trail_begin, time(6, 59))
+    self.assertGreaterEqual(reports_time[0].trail_begin, time(4, 00))
+    self.assertLessEqual(reports_time[0].trail_begin, time(6, 59))
     self.assertTrue(response.context['caution'])
     self.assertTrue(response.context['advice'])
 
@@ -608,16 +549,6 @@ class ReportFilterViews(TestCase):
       'region': region,
       'trail': trailhead.trails.all()[0], 
       'trailhead': trailhead,
-      'length': 5.4,
-      'elevation_gain': 500,
-      'date_hiked': fake.date(),
-      'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-      'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-      'cars_seen': fake.pyint(),
-      'people_seen': fake.pyint(),
-      'horses_seen': fake.boolean(),
-      'dogs_seen': fake.boolean(),
-      'day_hiked': 'Th',
       'trail_begin': time(13, 00),
       'trail_end': time(16, 00)
     })
