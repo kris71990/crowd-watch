@@ -1,9 +1,7 @@
 from django.test import TestCase
-from faker import Faker
 
 from ...models import Region
 from ..mocks import create_region, create_trail_and_trailhead, create_report
-fake = Faker()
 
 class IndexViewTests(TestCase):
   def test_index_view(self):
@@ -29,7 +27,7 @@ class RegionViewTests(TestCase):
   def test_region_list_multiple_regions_with_data(self):
     region_one = create_region('NC')
     region_two = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region_two, name=fake.name(), filters=None)
+    trailhead = create_trail_and_trailhead(region=region_two, filters=None)
     create_report(report={
       'region': region_two,
       'trail': trailhead.trails.all()[0], 

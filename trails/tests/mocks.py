@@ -8,12 +8,14 @@ fake = Faker()
 def create_region(name):
   return Region.objects.create(name=name)
 
-def create_trail(region, name):
+def create_trail(region):
   coordinates = fake.word()
-  return Trail.objects.create(name=name, region=region, coordinates=coordinates)
+  name = fake.name()
+  return Trail.objects.create(region=region, name=name, coordinates=coordinates)
 
-def create_trailhead(region, trail, name, filters):
+def create_trailhead(region, trail, filters):
   coordinates = fake.word()
+  name = fake.name()
   if filters is None:
     trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates)
     trailhead.trails.add(trail)
@@ -27,10 +29,9 @@ def create_trailhead(region, trail, name, filters):
     trailhead.trails.add(trail)
     return trailhead
 
-def create_trail_and_trailhead(region, name, filters):
-  coordinates = fake.word()
-  trail = create_trail(region, name)
-  return create_trailhead(region, trail, fake.name(), filters)
+def create_trail_and_trailhead(region, filters):
+  trail = create_trail(region)
+  return create_trailhead(region, trail, filters)
 
 def generate_random_choices():
   day_hiked = Report.DAYS[randint(0, len(Report.DAYS) - 1)][0]
@@ -65,10 +66,10 @@ def create_report(report):
     length=fake.pydecimal(positive=True, max_value=10.0, right_digits=2),
     elevation_gain=fake.pyint(min_value=1, max_value=1000),
     day_hiked=day_hiked, 
-    date_hiked=fake.date(), 
     trail_begin=trail_begin, 
     trail_end=trail_end,
     access_distance=access_distance, 
+    date_hiked=fake.date(), 
     pkg_estimate_begin=fake.pyint(min_value=0, max_value=100), 
     pkg_estimate_end=fake.pyint(min_value=0, max_value=100), 
     cars_seen=fake.pyint(), 
@@ -86,7 +87,7 @@ def create_report(report):
   )
 
 def create_bulk_reports(region, total):
-  trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+  trailhead = create_trail_and_trailhead(region=region, filters=None)
   trailhead_trail = trailhead.trails.all()[0]
 
   for i in range(total):

@@ -1,11 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
-from faker import Faker
 
 from ...models import Trail
 from ..mocks import create_trail, create_region
-
-fake = Faker()
 
 # /list
 class TrailListViewTests(TestCase):
@@ -24,7 +21,7 @@ class TrailListViewTests(TestCase):
     regions = ['CC', 'WW', 'NC']
     for i in range(3):
       region = create_region(i)
-      create_trail(region=region, name=fake.name())
+      create_trail(region=region)
       
     response = self.client.get(reverse('trail_list'))
     trails = response.context['trails_list']
@@ -55,7 +52,7 @@ class TrailListByRegionViewTests(TestCase):
   def test_trail_list_by_region(self):
     region = create_region('CC')
     for i in range(3):
-      create_trail(region=region, name=fake.name())
+      create_trail(region=region)
 
     response = self.client.get(reverse('trails', args=(region.region_slug,)))
     trails = response.context['trails_list']
@@ -63,11 +60,11 @@ class TrailListByRegionViewTests(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'trails/trails.html')
     self.assertContains(response, 'Central Cascades Trails')
-
     self.assertEqual(len(trails), 3)
     self.assertGreater(trails[0].modified, trails[1].modified)
     self.assertGreater(trails[1].modified, trails[2].modified)
     self.assertEqual(response.context['region'].name, region.name)
+    self.assertEqual(trails[0].report__count, 0)
     self.assertTrue(response.context['form'])
     self.assertTrue(response.context['date'])
 
@@ -75,10 +72,10 @@ class TrailListByRegionViewTests(TestCase):
   def test_create_trail(self):
     region = create_region('CC')
     for i in range(3):
-      create_trail(region=region, name=fake.name())
+      create_trail(region=region)
 
     path = reverse('trails', args=(region.region_slug,))
-    post_response = self.client.post(path, { 'name': 'dssf', 'region': region.id, 'coordinates': 'sffsd' })
+    post_response = self.client.post(path, { 'name': 'dssf xyz', 'region': region.id, 'coordinates': 'sffsd' })
     self.assertRedirects(post_response, path)
 
     get_response = self.client.get(path, args=(region.region_slug,))
@@ -89,6 +86,10 @@ class TrailListByRegionViewTests(TestCase):
     self.assertContains(get_response, 'Central Cascades Trails')
     self.assertEqual(len(trails), 4)
     self.assertGreater(trails[0].modified, trails[1].modified)
-    self.assertEqual(trails[0].name, 'dssf')
+    self.assertEqual(trails[0].name, 'dssf xyz')
+    self.assertEqual(trails[0].trail_slug, 'dssf-xyz')
     self.assertIsNone(trails[0].elevation_gain_json)
     self.assertIsNone(trails[0].length_json)
+    self.assertTrue(response.context['form'])
+    self.assertEqual(response.context['region'].name, region.name)
+    self.assertEqual(trails[0].report__count, 0)

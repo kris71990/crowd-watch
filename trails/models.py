@@ -2,7 +2,7 @@ from django.core import validators
 from django.db import models
 from django.urls import reverse
 import uuid
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
 
 class Region(models.Model):
@@ -119,7 +119,7 @@ class Trailhead(models.Model):
   pkg_capacity = models.IntegerField('Parking capacity', 
     blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
-    validators=[MinValueValidator(0)]
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   bathroom_type = models.CharField(
     blank=True, null=True,

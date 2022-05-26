@@ -12,10 +12,9 @@ fake = Faker()
 class ReportViewTests(TestCase):
   def test_report_feed(self):
     regions = ['CC', 'WW', 'NC']
-    days = ['M', 'T', 'W']
     for i in range(3):
       region = create_region(regions[i])
-      trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+      trailhead = create_trail_and_trailhead(region=region, filters=None)
       create_report(report={
         'region': region,
         'trail': trailhead.trails.all()[0], 
@@ -36,7 +35,7 @@ class ReportViewTests(TestCase):
   # returns empty list of reports for a trail
   def test_report_list_trail_empty(self):
     region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
     trailhead_trails = trailhead.trails.all()
     response = self.client.get(reverse('reports_trail', args=(region.region_slug, trailhead_trails[0].trail_slug,)))
 
@@ -49,7 +48,7 @@ class ReportViewTests(TestCase):
   # returns empty list of reports for a trailhead
   def test_report_list_trailhead_empty(self):
     region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
     trailhead_trails = trailhead.trails.all()
     response = self.client.get(reverse('reports_trailhead', args=(region.region_slug, trailhead.trailhead_slug,)))
 
@@ -71,16 +70,7 @@ class ReportViewTests(TestCase):
         'region': region,
         'trail': trailhead_trails[0], 
         'trailhead': trailhead,
-        'date_hiked': fake.date(),
         'day_hiked': days[i],
-        'trail_begin': fake.time(),
-        'trail_end': fake.time(),
-        'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-        'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-        'cars_seen': fake.pyint(),
-        'people_seen': fake.pyint(),
-        'horses_seen': fake.boolean(),
-        'dogs_seen': fake.boolean()
       })
 
     response = self.client.get(reverse('reports_trailhead', args=(region.region_slug, trailhead.trailhead_slug,)))
@@ -107,17 +97,7 @@ class ReportViewTests(TestCase):
         'region': region,
         'trail': trailhead.trails.all()[0], 
         'trailhead': trailhead,
-        'date_hiked': fake.date(),
         'day_hiked': days[i],
-        'trail_begin': fake.time(),
-        'trail_end': fake.time(),
-        'pkg_location': 'S',
-        'pkg_estimate_begin': fake.pyint(min_value=0, max_value=100),
-        'pkg_estimate_end': fake.pyint(min_value=0, max_value=100),
-        'cars_seen': fake.pyint(),
-        'people_seen': fake.pyint(),
-        'horses_seen': fake.boolean(),
-        'dogs_seen': fake.boolean()
       })
 
     response = self.client.get(reverse('reports_trail', args=(region.region_slug, trail.trail_slug,)))
@@ -446,7 +426,7 @@ class ReportFilterViews(TestCase):
     north = create_region('NC')
     central = create_region('CC')
     create_bulk_reports(central, 3)
-    trailhead = create_trail_and_trailhead(region=central, name=fake.name(), filters=None)
+    trailhead = create_trail_and_trailhead(region=central, filters=None)
 
     create_report(report={
       'region': north,
@@ -467,7 +447,7 @@ class ReportFilterViews(TestCase):
 
   def test_filter_by_day_trail_empty(self):
     region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
     trailhead_trail = trailhead.trails.all()[0]
     create_report(report={
       'region': region,
