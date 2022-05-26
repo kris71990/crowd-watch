@@ -141,8 +141,8 @@ class TrailheadFilterTests(TestCase):
   # returns trailheads in region with open bathroom
   def test_filter_trailheads_open_bathroom(self):
     region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, filters={ 'br': 'O' }) # set bathroom to open
-    trailhead_closed = create_trailhead(region=region, trail=trailhead.trails.all()[0], filters={ 'br': 'C' })
+    trailhead = create_trail_and_trailhead(region=region, filters={ 'bathroom_status': 'O' }) # set bathroom to open
+    trailhead_closed = create_trailhead(region=region, trail=trailhead.trails.all()[0], filters={ 'bathroom_status': 'C' })
     response = self.client.get(reverse('trailheads_filter_bathroom', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)
@@ -157,7 +157,7 @@ class TrailheadFilterTests(TestCase):
   # returns empty set if no trailheads in region have open bathrooms
   def test_filter_trailheads_open_bathroom_empty(self):
     region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, filters={ 'br': 'C' }) # set bathroom to closed
+    trailhead = create_trail_and_trailhead(region=region, filters={ 'bathroom_status': 'C' }) # set bathroom to closed
     response = self.client.get(reverse('trailheads_filter_bathroom', args=(region.region_slug,)))
 
     self.assertEqual(response.status_code, 200)

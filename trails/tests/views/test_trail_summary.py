@@ -29,10 +29,11 @@ class TrailSummaryViewTests(TestCase):
 
   def test_trail_summary_with_reports(self):
     region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, filters=None)
-    reports = create_bulk_reports(region, trailhead.trail, trailhead, 10)
+    trailhead = create_trail_and_trailhead(region=region, filters={ 'bathroom_status': 'O', 'bathroom_type': 'P', 'access': 'FS' })
+    trail = trailhead.trails.all()[0]
+    reports = create_bulk_reports(region, trail, trailhead, 10)
 
-    response = self.client.get(reverse('trail_summary', args=(region.region_slug, reports['trail'].trail_slug,)))
+    response = self.client.get(reverse('trail_summary', args=(region.region_slug, trail.trail_slug,)))
     summary = response.context['summary']
     trailheads = response.context['trailheads'].all()
 
@@ -44,7 +45,9 @@ class TrailSummaryViewTests(TestCase):
     self.assertEqual(summary['reports_region_count'], 10)
     self.assertEqual(summary['reports_trail_count'], 10)
 
+    self.assertEqual(len(trailheads), 1)
+    self.assertContains(response, trailheads[0].name)
     self.assertEqual(trailheads[0], reports['trailhead'])
-    self.assertTrue(trailheads[0].access)
-    self.assertTrue(trailheads[0].bathroom_type)
-    self.assertTrue(trailheads[0].bathroom_status)
+    self.assertEqual(trailheads[0].access, 'FS')
+    self.assertEqual(trailheads[0].bathroom_type, 'P')
+    self.assertEqual(trailheads[0].bathroom_status, 'O')

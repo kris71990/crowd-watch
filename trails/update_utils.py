@@ -5,11 +5,12 @@ from django.utils import timezone
 # if report has a length, clean_form['trail'] is updated with length if none exists
 # or algorithmically adjusts length based on consensus of previous reported values
 def update_trail_length(clean_form):
-  if (clean_form['length'] is not None):
-    if clean_form['trail'].length_json is None or clean_form['trail'].length_json[clean_form['trailhead'].name] is None or clean_form['trail'].length_json[clean_form['trailhead'].name] is 'None':
+  if clean_form['length'] is not None:
+    if (clean_form['trail'].length_json is None or clean_form['trail'].length_json[clean_form['trailhead'].name] is None or 
+        clean_form['trail'].length_json[clean_form['trailhead'].name] == 'None'):
       clean_form['trail'].length_json = { clean_form['trailhead'].name: str(clean_form['length']) }
     # if difference between input and existing lengths is close, find average and reassign
-    elif abs(Decimal(clean_form['trail'].length_json[clean_form['trailhead'].name]) - clean_form['length']) < 1:
+    elif abs(Decimal(clean_form['trail'].length_json[clean_form['trailhead'].name]) - clean_form['length']) <= 1:
       existing_length = Decimal(clean_form['trail'].length_json[clean_form['trailhead'].name])
       input_length = clean_form['length']
       if existing_length > input_length:
@@ -27,9 +28,10 @@ def update_trail_length(clean_form):
 # or algorithmically adjusts elevation based on consensus of previous reported values
 def update_trail_elevation(clean_form):      
   if (clean_form['elevation_gain'] is not None):  
-    if clean_form['trail'].elevation_gain_json is None or clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] is None or clean_form['trail'].length_json[clean_form['trailhead'].name] is 'None':
+    if (clean_form['trail'].elevation_gain_json is None or clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] is None or 
+        clean_form['trail'].length_json[clean_form['trailhead'].name] == 'None'):
       clean_form['trail'].elevation_gain_json = { clean_form['trailhead'].name: clean_form['elevation_gain'] }
-    elif abs(clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] - clean_form['elevation_gain']) < 100:
+    elif abs(clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] - clean_form['elevation_gain']) <= 100:
       existing_elevation_gain = clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name]
       input_elevation_gain = clean_form['elevation_gain']
       if existing_elevation_gain > input_elevation_gain:

@@ -108,17 +108,22 @@ class ReportViewTests(TestCase):
     self.assertGreater(reports[0].date_hiked, reports[1].date_hiked)
 
   # creates a report and returns updated list of reports
+  # also tests update of trail length and elevation gain via update functions upon trail post
   def test_create_report_view(self):
     region = create_region('NC')
     trailhead = create_trail_and_trailhead(region=region, filters=None)
     time = datetime.now()
-    trailhead_trails = trailhead.trails.all()
-    create_bulk_reports(region, trailhead.trails.all()[0], trailhead, 3)
+    trail = trailhead.trails.all()[0]
 
-    path = reverse('reports_trail_trailhead', args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
+    self.assertIsNone(trail.length_json)
+    self.assertIsNone(trail.elevation_gain_json)
+
+    create_bulk_reports(region, trail, trailhead, 3)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
     post_response = self.client.post(path, { 
       'region': region.id,
-      'trail': trailhead_trails[0].id, 
+      'trail': trail.id, 
       'trailhead': trailhead.id,
       'length': 5.4,
       'elevation_gain': 500,
@@ -136,18 +141,392 @@ class ReportViewTests(TestCase):
     })
 
     self.assertRedirects(post_response, path)
-    get_response = self.client.get(path, args=(region.region_slug, trailhead_trails[0].trail_slug, trailhead.trailhead_slug,))
+    get_response = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
     reports = get_response.context['reports_list']
 
     self.assertEqual(get_response.status_code, 200)
     self.assertTemplateUsed(get_response, 'trails/reports_trail_trailhead.html')
     self.assertContains(get_response, 'Reports (4)')
     self.assertEqual(len(reports), 4)
-    self.assertEqual(reports[0].trail.name, trailhead_trails[0].name)
+    self.assertEqual(reports[0].trail.name, trail.name)
     self.assertGreaterEqual(reports[0].date_hiked, reports[1].date_hiked)
     self.assertGreaterEqual(reports[1].date_hiked, reports[2].date_hiked)
+    self.assertEqual(get_response.context['trail'].length_json[get_response.context['trailhead'].name], '5.4')
+    self.assertEqual(get_response.context['trail'].elevation_gain_json[get_response.context['trailhead'].name], 500)
 
-  # test access distance error when value is below 0.1
+class ReportViewUpdateTrailTests(TestCase):
+  # test that trail update function correctly updates trail and elevation data upwards when new data is within reasonable margin
+  def test_create_report_view_update_trail_increase(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertIsNone(trail.length_json)
+    self.assertIsNone(trail.elevation_gain_json)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response_one = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_one, path)
+    get_response_one = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    self.assertEqual(get_response_one.context['trail'].length_json[get_response_one.context['trailhead'].name], '5.4')
+    self.assertEqual(get_response_one.context['trail'].elevation_gain_json[get_response_one.context['trailhead'].name], 500)
+
+    post_response_two = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 6.4,
+      'elevation_gain': 600,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_two, path)
+    get_response_two = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response_two.status_code, 200)
+    self.assertTemplateUsed(get_response_two, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response_two.context['reports_list']), 2)
+    self.assertEqual(get_response_two.context['trail'].length_json[get_response_two.context['trailhead'].name], '5.9')
+    self.assertEqual(get_response_two.context['trail'].elevation_gain_json[get_response_two.context['trailhead'].name], 550)
+
+  # test that trail update function correctly updates trail and elevation data downwards when new data is within reasonable margin  
+  def test_create_report_view_update_trail_decrease(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertIsNone(trail.length_json)
+    self.assertIsNone(trail.elevation_gain_json)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response_one = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_one, path)
+    get_response_one = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    self.assertEqual(get_response_one.context['trail'].length_json[get_response_one.context['trailhead'].name], '5.4')
+    self.assertEqual(get_response_one.context['trail'].elevation_gain_json[get_response_one.context['trailhead'].name], 500)
+
+    post_response_two = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 4.4,
+      'elevation_gain': 400,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_two, path)
+    get_response_two = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response_two.status_code, 200)
+    self.assertTemplateUsed(get_response_two, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response_two.context['reports_list']), 2)
+    self.assertEqual(get_response_two.context['trail'].length_json[get_response_two.context['trailhead'].name], '4.9')
+    self.assertEqual(get_response_two.context['trail'].elevation_gain_json[get_response_two.context['trailhead'].name], 450)
+  
+  # update function ignores length from new report if it is an outlier (too high)
+  def test_create_report_view_update_trail_increase_length_exceeds(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertIsNone(trail.length_json)
+    self.assertIsNone(trail.elevation_gain_json)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response_one = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_one, path)
+    get_response_one = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    self.assertEqual(get_response_one.context['trail'].length_json[get_response_one.context['trailhead'].name], '5.4')
+
+    post_response_two = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 6.5,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_two, path)
+    get_response_two = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response_two.status_code, 200)
+    self.assertTemplateUsed(get_response_two, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response_two.context['reports_list']), 2)
+    self.assertEqual(get_response_two.context['trail'].length_json[get_response_two.context['trailhead'].name], '5.4')
+  
+  # update function ignores length from new report if it is an outlier (too low)
+  def test_create_report_view_update_trail_decrease_length_exceeds(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertIsNone(trail.length_json)
+    self.assertIsNone(trail.elevation_gain_json)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response_one = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_one, path)
+    get_response_one = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    self.assertEqual(get_response_one.context['trail'].length_json[get_response_one.context['trailhead'].name], '5.4')
+
+    post_response_two = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 4.3,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_two, path)
+    get_response_two = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response_two.status_code, 200)
+    self.assertTemplateUsed(get_response_two, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response_two.context['reports_list']), 2)
+    self.assertEqual(get_response_two.context['trail'].length_json[get_response_two.context['trailhead'].name], '5.4')
+
+  # update function ignores elevation gain from new report if it is an outlier (too high)
+  def test_create_report_view_update_trail_increase_elevation_exceeds(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertIsNone(trail.length_json)
+    self.assertIsNone(trail.elevation_gain_json)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response_one = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_one, path)
+    get_response_one = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    self.assertEqual(get_response_one.context['trail'].elevation_gain_json[get_response_one.context['trailhead'].name], 500)
+
+    post_response_two = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 601,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_two, path)
+    get_response_two = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response_two.status_code, 200)
+    self.assertTemplateUsed(get_response_two, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response_two.context['reports_list']), 2)
+    self.assertEqual(get_response_two.context['trail'].elevation_gain_json[get_response_two.context['trailhead'].name], 500)
+
+  # update function ignores elevation gain from new report if it is an outlier (too low)
+  def test_create_report_view_update_trail_decrease_elevation_exceeds(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertIsNone(trail.length_json)
+    self.assertIsNone(trail.elevation_gain_json)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response_one = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 500,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_one, path)
+    get_response_one = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    self.assertEqual(get_response_one.context['trail'].length_json[get_response_one.context['trailhead'].name], '5.4')
+    self.assertEqual(get_response_one.context['trail'].elevation_gain_json[get_response_one.context['trailhead'].name], 500)
+
+    post_response_two = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'length': 5.4,
+      'elevation_gain': 399,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+    })
+
+    self.assertRedirects(post_response_two, path)
+    get_response_two = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response_two.status_code, 200)
+    self.assertTemplateUsed(get_response_two, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response_two.context['reports_list']), 2)
+    self.assertEqual(get_response_one.context['trail'].elevation_gain_json[get_response_one.context['trailhead'].name], 500)
+
+class ReportViewErrorTests(TestCase):
   def test_create_report_error_access_distance(self):
     region = create_region('CC')
     trailhead = create_trail_and_trailhead(region=region, filters=None)

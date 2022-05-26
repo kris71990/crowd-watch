@@ -20,14 +20,23 @@ def create_trailhead(region, trail, filters):
     trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates)
     trailhead.trails.add(trail)
     return trailhead
-  elif 'br' in filters:
-    trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, bathroom_status=filters['br'])
+  else:
+    trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, **filters)
     trailhead.trails.add(trail)
     return trailhead
-  elif 'access' in filters:
-    trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, access=filters['access'])
-    trailhead.trails.add(trail)
-    return trailhead
+
+  # elif 'br' in filters:
+  #   trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, bathroom_status=filters['br'])
+  #   trailhead.trails.add(trail)
+  #   return trailhead
+  # elif 'access' in filters:
+  #   trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, access=filters['access'])
+  #   trailhead.trails.add(trail)
+  #   return trailhead
+  # elif 'type' in filters:
+  #   trailhead = Trailhead.objects.create(region=region, name=name, coordinates=coordinates, bathroom_status=filters['br'])
+  #   trailhead.trails.add(trail)
+  #   return trailhead
 
 def create_trail_and_trailhead(region, filters):
   trail = create_trail(region)
