@@ -60,25 +60,24 @@ class TrailheadViewTests(TestCase):
     self.assertRedirects(post_response, path)
 
     get_response = self.client.get(path, args=(region.region_slug, trail.trail_slug,))
-    trailheads = get_response.context['trailheads_list']
+    context = get_response.context
 
     self.assertEqual(get_response.status_code, 200)
     self.assertTemplateUsed(get_response, 'trails/trailheads.html')
     self.assertContains(get_response, 'Trailhead')
-    self.assertEqual(response.context['region'], region)
-    self.assertEqual(response.context['trail'], trail)
-    self.assertEqual(len(trailheads), 3)
-    self.assertGreater(trailheads[0].modified, trailheads[1].modified)
-    self.assertEqual(trailheads[0].name, 'abcd xyz')
-    self.assertEqual(trailheads[0].trailhead_slug, 'abcd-xyz')
-    self.assertEqual(response.context['region'], region)
-    self.assertTrue(response.context['formTh'])
-    self.assertTrue(response.context['formDayFilter'])
-    self.assertTrue(response.context['formTimeFilter'])
+    self.assertEqual(context['region'], region)
+    self.assertEqual(context['trail'], trail)
+    self.assertEqual(len(context['trailheads_list']), 3)
+    self.assertGreater(context['trailheads_list'][0].modified, context['trailheads_list'][1].modified)
+    self.assertEqual(context['trailheads_list'][0].name, 'abcd xyz')
+    self.assertEqual(context['trailheads_list'][0].trailhead_slug, 'abcd-xyz')
+    self.assertEqual(context['region'], region)
+    self.assertTrue(context['formTh'])
+    self.assertTrue(context['formDayFilter'])
+    self.assertTrue(context['formTimeFilter'])
 
   def test_create_trailhead_error_access_distance(self):
     region = create_region('CC')
-    trail_name = 'test_trail'
     trailhead = create_trail_and_trailhead(region=region, filters=None)
     trailhead_trails = trailhead.trails.all()
 

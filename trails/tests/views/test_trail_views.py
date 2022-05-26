@@ -90,6 +90,6 @@ class TrailListByRegionViewTests(TestCase):
     self.assertEqual(trails[0].trail_slug, 'dssf-xyz')
     self.assertIsNone(trails[0].elevation_gain_json)
     self.assertIsNone(trails[0].length_json)
-    self.assertTrue(response.context['form'])
-    self.assertEqual(response.context['region'].name, region.name)
+    self.assertTrue(get_response.context['form'])
+    self.assertEqual(get_response.context['region'].name, region.name)
     self.assertEqual(trails[0].report__count, 0)

@@ -292,12 +292,12 @@ class Report(models.Model):
   pkg_estimate_begin = models.IntegerField(
     'Percentage Capacity Start',
     help_text='Approximate parking capacity full at trailhead arrival',
-    validators=[MinValueValidator(0)]
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   pkg_estimate_end = models.IntegerField(
     'Percentage Capacity End',
     help_text='Approximate parking capacity full at trailhead departure',
-    validators=[MinValueValidator(0)]
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   cars_seen = models.IntegerField(
     'Cars seen', help_text='Most cars seen at arrival/departure',

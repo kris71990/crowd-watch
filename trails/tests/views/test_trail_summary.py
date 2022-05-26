@@ -12,7 +12,7 @@ class TrailSummaryViewTests(TestCase):
   # returns summary of trail data
   def test_trail_summary_no_reports(self):
     region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, name=fake.name(), filters=None)
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
     trailhead_trails = trailhead.trails.all()
 
     response = self.client.get(reverse('trail_summary', args=(region.region_slug, trailhead_trails[0].trail_slug,)))
@@ -29,7 +29,8 @@ class TrailSummaryViewTests(TestCase):
 
   def test_trail_summary_with_reports(self):
     region = create_region('CC')
-    reports = create_bulk_reports(region, 10)
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    reports = create_bulk_reports(region, trailhead.trail, trailhead, 10)
 
     response = self.client.get(reverse('trail_summary', args=(region.region_slug, reports['trail'].trail_slug,)))
     summary = response.context['summary']

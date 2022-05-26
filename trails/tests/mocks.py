@@ -86,15 +86,12 @@ def create_report(report):
     pkg_location=random_choices['pkg_location'], 
   )
 
-def create_bulk_reports(region, total):
-  trailhead = create_trail_and_trailhead(region=region, filters=None)
-  trailhead_trail = trailhead.trails.all()[0]
-
+def create_bulk_reports(region, trail, trailhead, total):
   for i in range(total):
     create_report(report={
       'region': region,
-      'trail': trailhead_trail, 
+      'trail': trail, 
       'trailhead': trailhead,
     })
   
-  return { 'trail': trailhead_trail, 'trailhead': trailhead }
+  return { 'trail': trail, 'trailhead': trailhead }
