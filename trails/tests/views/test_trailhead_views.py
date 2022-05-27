@@ -97,26 +97,7 @@ class TrailheadViewTests(TestCase):
     self.assertTrue(response.context['formDayFilter'])
     self.assertTrue(response.context['formTimeFilter'])
 
-  def test_create_trailhead_error_pkg_capacity_high(self):
-    region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, filters=None)
-    trailhead_trails = trailhead.trails.all()
-
-    path = reverse('trailheads', args=(region.region_slug, trailhead_trails[0].trail_slug,))
-    response = self.client.post(path, { 
-      'region': region.id,
-      'trails': trailhead_trails[0].id, 
-      'name': 'abcd', 
-      'coordinates': 'sffsd',
-      'pkg_capacity': 101
-    })
-
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed(response, 'trails/trailheads.html')
-    self.assertContains(response, 'Ensure this value is less than or equal to 100.')
-    self.assertTrue(response.context['formTh'])
-
-  def test_create_trailhead_error_pkg_capacity_high(self):
+  def test_create_trailhead_error_pkg_capacity(self):
     region = create_region('CC')
     trailhead = create_trail_and_trailhead(region=region, filters=None)
     trailhead_trails = trailhead.trails.all()

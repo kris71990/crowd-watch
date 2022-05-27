@@ -526,6 +526,38 @@ class ReportViewUpdateTrailTests(TestCase):
     self.assertEqual(len(get_response_two.context['reports_list']), 2)
     self.assertEqual(get_response_one.context['trail'].elevation_gain_json[get_response_one.context['trailhead'].name], 500)
 
+  def test_create_report_update_dogs_allowed(self):
+    return True
+
+  def test_create_report_update_horses_allowed(self):
+    return True
+
+
+class ReportViewUpdateTrailheadTests(TestCase):
+  def test_create_report_update_bathroom_status(self):
+    return True
+
+  def test_create_report_update_bathroom_type(self):
+    return True
+
+  def test_create_report_update_access_type(self):
+    return True
+  
+  def test_create_report_update_access_distance(self):
+    return True
+
+  def test_create_report_update_pkg_type(self):
+    return True
+
+  def test_create_report_update_pkg_capacity(self):
+    return True
+
+  def test_create_report_update_access_condition(self):
+    return True
+
+
+
+
 class ReportViewErrorTests(TestCase):
   def test_create_report_error_access_distance(self):
     region = create_region('CC')

@@ -57,6 +57,8 @@ class Trail(models.Model):
   elevation_gain_json = models.JSONField('Elevation Gain', blank=True, null=True,
     help_text='From trailhead to highest point of trail',
   )
+  dogs_allowed = models.BooleanField(blank=True, null=True)
+  horses_allowed = models.BooleanField(blank=True, null=True)
 
   def save(self, *args, **kwargs):
     self.trail_slug = self.trail_slug or slugify(self.name)
@@ -89,6 +91,14 @@ class Trailhead(models.Model):
     ('FR', 'Fixed Building with plumbing')
   ]
 
+  ACCESS_CONDITIONS = [
+    ('I', 'Impassable'),
+    ('P+', 'Many potholes'),
+    ('P', 'Potholes'),
+    ('P-', 'Occasional potholes'),
+    ('G', 'Good')
+  ]
+
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   region = models.ForeignKey(Region, on_delete=models.CASCADE)
   trails = models.ManyToManyField(Trail, related_name='trailheads')
@@ -111,6 +121,11 @@ class Trailhead(models.Model):
     help_text='If accessed via service road, length of service road from paved road to trailhead',
     validators=[MinValueValidator(0.1)]
   )
+  access_condition = models.CharField('Road access condition',
+    max_length=2, blank=True, null=True,
+    choices=ACCESS_CONDITIONS,
+    help_text='Condition of road to trailhead'
+  )
   pkg_type = models.CharField('Parking type',
     max_length=2, blank=True, null=True,
     choices=PARKING_TYPES,
@@ -119,7 +134,7 @@ class Trailhead(models.Model):
   pkg_capacity = models.IntegerField('Parking capacity', 
     blank=True, null=True,
     help_text='Approximate number of cars capable of parking at trailhead lot',
-    validators=[MinValueValidator(0), MaxValueValidator(100)]
+    validators=[MinValueValidator(0)]
   )
   bathroom_type = models.CharField(
     blank=True, null=True,
