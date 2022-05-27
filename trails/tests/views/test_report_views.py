@@ -534,8 +534,75 @@ class ReportViewUpdateTrailTests(TestCase):
 
 
 class ReportViewUpdateTrailheadTests(TestCase):
-  def test_create_report_update_bathroom_status(self):
-    return True
+  def test_create_report_update_trailhead_bathroom_status_from_none(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters=None)
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertIsNone(trailhead.bathroom_status)
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+      'bathroom_status': 'C',
+    })
+
+    self.assertRedirects(post_response, path)
+    get_response = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response.status_code, 200)
+    self.assertTemplateUsed(get_response, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response.context['reports_list']), 1)
+    self.assertEqual(get_response.context['trailhead'].bathroom_status, 'C')
+  
+  def test_create_report_update_trailhead_bathroom_status_toggle(self):
+    region = create_region('NC')
+    trailhead = create_trail_and_trailhead(region=region, filters={ 'bathroom_status': 'C' })
+    time = datetime.now()
+    trail = trailhead.trails.all()[0]
+
+    self.assertEqual(trailhead.bathroom_status, 'C')
+
+    path = reverse('reports_trail_trailhead', args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+    post_response = self.client.post(path, { 
+      'region': region.id,
+      'trail': trail.id, 
+      'trailhead': trailhead.id,
+      'date_hiked_day': 1,
+      'date_hiked_month': 1,
+      'date_hiked_year': 2020,
+      'day_hiked': 'M',
+      'trail_begin': time.time(),
+      'trail_end': time.time(),
+      'pkg_location': 'P',
+      'pkg_estimate_begin': 29,
+      'pkg_estimate_end': 34,
+      'cars_seen': 34,
+      'people_seen': 344,
+      'bathroom_status': 'O'
+    })
+
+    self.assertRedirects(post_response, path)
+    get_response = self.client.get(path, args=(region.region_slug, trail.trail_slug, trailhead.trailhead_slug,))
+
+    self.assertEqual(get_response.status_code, 200)
+    self.assertTemplateUsed(get_response, 'trails/reports_trail_trailhead.html')
+    self.assertEqual(len(get_response.context['reports_list']), 1)
+    self.assertEqual(get_response.context['trailhead'].bathroom_status, 'O')
 
   def test_create_report_update_bathroom_type(self):
     return True

@@ -19,8 +19,6 @@ def update_trail_length(clean_form):
         clean_form['trail'].length_json[clean_form['trailhead'].name] = str(Decimal((input_length + existing_length) / 2).quantize(Decimal('1.0')))
     
     clean_form['trail'].modified = timezone.now(), 
-    clean_form['trailhead'].modified = timezone.now()
-    clean_form['trailhead'].save(update_fields=['modified'])
     clean_form['trail'].save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
   
 # called on report submission
@@ -40,8 +38,11 @@ def update_trail_elevation(clean_form):
         clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] = int((input_elevation_gain + existing_elevation_gain) / 2)
     
     clean_form['trail'].modified = timezone.now(), 
-    clean_form['trailhead'].modified = timezone.now()
-    clean_form['trailhead'].save(update_fields=['modified'])
     clean_form['trail'].save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
     
 
+def update_trailhead_bathroom_status(clean_form):
+  clean_form['trailhead'].bathroom_status = clean_form['bathroom_status']
+  clean_form['trailhead'].modified = timezone.now()
+  clean_form['trailhead'].save(update_fields=['modified'])
+  clean_form['trailhead'].save(update_fields=['modified', 'bathroom_status'])

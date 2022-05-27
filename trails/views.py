@@ -153,8 +153,9 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
     form = ReportForm(request.POST)
     if form.is_valid():
       clean = form.cleaned_data
-      update_trail_length(clean)
-      update_trail_elevation(clean)
+      if clean['length']: update_trail_length(clean)
+      if clean['elevation_gain']: update_trail_elevation(clean)
+      if clean['bathroom_status']: update_trailhead_bathroom_status(clean)
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
