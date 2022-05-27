@@ -155,7 +155,11 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
       clean = form.cleaned_data
       if clean['length']: update_trail_length(clean)
       if clean['elevation_gain']: update_trail_elevation(clean)
-      if clean['bathroom_status']: update_trailhead_bathroom_status(clean)
+      update_trail_dogs_allowed(clean['dogs_seen'], trail)
+      update_trail_horses_allowed(clean['horses_seen'], trail)
+
+      if clean['bathroom_status']: update_trailhead_bathroom_status(clean['bathroom_status'], trailhead)
+      if clean['access_condition']: update_trailhead_access_condition(clean['access_condition'], trailhead)
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:

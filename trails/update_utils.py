@@ -39,10 +39,49 @@ def update_trail_elevation(clean_form):
     
     clean_form['trail'].modified = timezone.now(), 
     clean_form['trail'].save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
-    
 
-def update_trailhead_bathroom_status(clean_form):
-  clean_form['trailhead'].bathroom_status = clean_form['bathroom_status']
-  clean_form['trailhead'].modified = timezone.now()
-  clean_form['trailhead'].save(update_fields=['modified'])
-  clean_form['trailhead'].save(update_fields=['modified', 'bathroom_status'])
+def update_trail_dogs_allowed(dogs, trail):
+  if trail.dogs_allowed == []:
+    if dogs:
+      trail.dogs_allowed.append(1)
+      trail.dogs_allowed.append(0)
+    else: 
+      trail.dogs_allowed.append(0)
+      trail.dogs_allowed.append(1)
+  else:
+    if dogs:
+      trail.dogs_allowed[0] += 1
+    else: 
+      trail.dogs_allowed[1] += 1
+
+  trail.modified = timezone.now()
+  trail.save(update_fields=['modified', 'dogs_allowed'])
+
+def update_trail_horses_allowed(horses, trail):
+  if trail.horses_allowed == []:
+    if horses:
+      trail.horses_allowed.append(1)
+      trail.horses_allowed.append(0)
+    else: 
+      trail.horses_allowed.append(0)
+      trail.horses_allowed.append(1)
+  else:
+    if horses:
+      trail.horses_allowed[0] += 1
+    else: 
+      trail.horses_allowed[1] += 1
+
+  trail.modified = timezone.now()
+  trail.save(update_fields=['modified', 'horses_allowed'])
+    
+# called on report submission if user submits relevant data
+# always update bathroom status and access condition of trailhead to newest information available
+def update_trailhead_bathroom_status(bathroom_status, trailhead):
+  trailhead.bathroom_status = bathroom_status
+  trailhead.modified = timezone.now()
+  trailhead.save(update_fields=['modified', 'bathroom_status'])
+
+def update_trailhead_access_condition(access_condition, trailhead):
+  trailhead.access_condition = access_condition
+  trailhead.modified = timezone.now()
+  trailhead.save(update_fields=['modified', 'access_condition'])

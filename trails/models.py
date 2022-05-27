@@ -57,8 +57,8 @@ class Trail(models.Model):
   elevation_gain_json = models.JSONField('Elevation Gain', blank=True, null=True,
     help_text='From trailhead to highest point of trail',
   )
-  dogs_allowed = models.BooleanField(blank=True, null=True)
-  horses_allowed = models.BooleanField(blank=True, null=True)
+  dogs_allowed = models.JSONField('Dogs', blank=True, null=True, default=list)
+  horses_allowed = models.JSONField('Horses', blank=True, null=True, default=list)
 
   def save(self, *args, **kwargs):
     self.trail_slug = self.trail_slug or slugify(self.name)
@@ -283,7 +283,7 @@ class Report(models.Model):
     blank=True, null=True,
     max_length=2,
     choices=ACCESS_CONDITIONS,
-    help_text='If accessed via service road, the condition of the service road?'
+    help_text='What is the condition of the road access to trailhead?'
   )
   trail_begin = models.TimeField(help_text='What time did the hike begin?')
   trail_end = models.TimeField(help_text='What time did the hike end?')
@@ -322,5 +322,5 @@ class Report(models.Model):
     'People seen', help_text='Approximate number of people encountered on trail',
     validators=[MinValueValidator(0)]
   )
-  horses_seen = models.BooleanField()
-  dogs_seen = models.BooleanField()
+  horses_seen = models.BooleanField(blank=True, null=True)
+  dogs_seen = models.BooleanField(blank=True, null=True)
