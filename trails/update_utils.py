@@ -85,3 +85,10 @@ def update_trailhead_access_condition(access_condition, trailhead):
   trailhead.access_condition = access_condition
   trailhead.modified = timezone.now()
   trailhead.save(update_fields=['modified', 'access_condition'])
+
+def update_trailhead_parking_capacity(cars, max, trailhead):
+  capacity = cars * (100 / max)
+  if trailhead.pkg_capacity is None or abs(trailhead.pkg_capacity - capacity) <= 10:
+    trailhead.pkg_capacity = capacity
+    trailhead.modified = timezone.now()
+    trailhead.save(update_fields=['modified', 'pkg_capacity'])

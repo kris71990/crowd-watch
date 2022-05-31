@@ -160,6 +160,9 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
 
       if clean['bathroom_status']: update_trailhead_bathroom_status(clean['bathroom_status'], trailhead)
       if clean['access_condition']: update_trailhead_access_condition(clean['access_condition'], trailhead)
+
+      max_capacity = clean['pkg_estimate_begin'] if clean['pkg_estimate_begin'] > clean['pkg_estimate_end'] else clean['pkg_estimate_end']
+      update_trailhead_parking_capacity(clean['cars_seen'], max_capacity, trailhead)
       form.save()
       return HttpResponseRedirect(request.path_info)
   else:
