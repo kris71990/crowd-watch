@@ -116,7 +116,8 @@ class Trailhead(models.Model):
     choices=ACCESS_TYPES,
     help_text='How is the trailhead accessed?'
   )
-  access_distance = models.IntegerField(
+  access_distance = models.DecimalField(
+    max_digits=3, decimal_places=1,
     blank=True, null=True,
     help_text='If accessed via service road, length of service road from paved road to trailhead',
     validators=[MinValueValidator(0.1)]

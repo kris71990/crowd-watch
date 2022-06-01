@@ -46,11 +46,8 @@ def generate_random_choices():
 
 def create_report(report):
   random_choices = generate_random_choices()
-  if 'access_distance' in report:
-    access_distance = report['access_distance']
-  else:
-    access_distance = 0.1
 
+  access_distance = report['access_distance'] if 'access_distance' in report else 0.1
   day_hiked = report['day_hiked'] if 'day_hiked' in report else random_choices['day_hiked']
   trail_begin = report['trail_begin'] if 'trail_begin' in report else fake.time()
   trail_end = report['trail_end'] if 'trail_end' in report else fake.time()

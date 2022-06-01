@@ -1,45 +1,49 @@
 from decimal import Decimal
 from django.utils import timezone
 
+# Updates to Trail (elevation_gain, length, dogs_allowed, horses_allowed)
+# Updates to Trailhead (bathroom_status, access_condition, pkg_capacity)
+
 # called on report submission
-# if report has a length, clean_form['trail'] is updated with length if none exists
+# if report has a length, length is updated with length if none exists
 # or algorithmically adjusts length based on consensus of previous reported values
-def update_trail_length(clean_form):
-  if clean_form['length'] is not None:
-    if (clean_form['trail'].length_json is None or clean_form['trail'].length_json[clean_form['trailhead'].name] is None or 
-        clean_form['trail'].length_json[clean_form['trailhead'].name] == 'None'):
-      clean_form['trail'].length_json = { clean_form['trailhead'].name: str(clean_form['length']) }
+def update_trail_length(length, trail, trailhead_name):
+  if length is not None:
+    if (trail.length_json is None or trail.length_json[trailhead_name] is None or 
+        trail.length_json[trailhead_name] == 'None'):
+      trail.length_json = { trailhead_name: str(length) }
     # if difference between input and existing lengths is close, find average and reassign
-    elif abs(Decimal(clean_form['trail'].length_json[clean_form['trailhead'].name]) - clean_form['length']) <= 1:
-      existing_length = Decimal(clean_form['trail'].length_json[clean_form['trailhead'].name])
-      input_length = clean_form['length']
+    elif abs(Decimal(trail.length_json[trailhead_name]) - length) <= 1:
+      existing_length = Decimal(trail.length_json[trailhead_name])
+      input_length = length
       if existing_length > input_length:
-        clean_form['trail'].length_json[clean_form['trailhead'].name] = str(Decimal((existing_length + input_length) / 2).quantize(Decimal('1.0')))
+        trail.length_json[trailhead_name] = str(Decimal((existing_length + input_length) / 2).quantize(Decimal('1.0')))
       else:
-        clean_form['trail'].length_json[clean_form['trailhead'].name] = str(Decimal((input_length + existing_length) / 2).quantize(Decimal('1.0')))
+        trail.length_json[trailhead_name] = str(Decimal((input_length + existing_length) / 2).quantize(Decimal('1.0')))
     
-    clean_form['trail'].modified = timezone.now(), 
-    clean_form['trail'].save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
+    trail.modified = timezone.now(), 
+    trail.save(update_fields=['modified', 'length_json'])
   
 # called on report submission
-# if report has an elevation gain, clean_form['elevation_gain'] is updated with data if none exists
+# if report has an elevation gain, elevation gain is updated with data if none exists
 # or algorithmically adjusts elevation based on consensus of previous reported values
-def update_trail_elevation(clean_form):      
-  if (clean_form['elevation_gain'] is not None):  
-    if (clean_form['trail'].elevation_gain_json is None or clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] is None or 
-        clean_form['trail'].length_json[clean_form['trailhead'].name] == 'None'):
-      clean_form['trail'].elevation_gain_json = { clean_form['trailhead'].name: clean_form['elevation_gain'] }
-    elif abs(clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] - clean_form['elevation_gain']) <= 100:
-      existing_elevation_gain = clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name]
-      input_elevation_gain = clean_form['elevation_gain']
+def update_trail_elevation(elevation, trail, trailhead_name):      
+  if (elevation is not None):  
+    if (trail.elevation_gain_json is None or trail.elevation_gain_json[trailhead_name] is None or 
+        trail.length_json[trailhead_name] == 'None'):
+      trail.elevation_gain_json = { trailhead_name: elevation }
+    elif abs(trail.elevation_gain_json[trailhead_name] - elevation) <= 100:
+      existing_elevation_gain = trail.elevation_gain_json[trailhead_name]
+      input_elevation_gain = elevation
       if existing_elevation_gain > input_elevation_gain:
-        clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] = int((existing_elevation_gain + input_elevation_gain) / 2)
+        trail.elevation_gain_json[trailhead_name] = int((existing_elevation_gain + input_elevation_gain) / 2)
       else:
-        clean_form['trail'].elevation_gain_json[clean_form['trailhead'].name] = int((input_elevation_gain + existing_elevation_gain) / 2)
+        trail.elevation_gain_json[trailhead_name] = int((input_elevation_gain + existing_elevation_gain) / 2)
     
-    clean_form['trail'].modified = timezone.now(), 
-    clean_form['trail'].save(update_fields=['modified', 'length_json', 'elevation_gain_json'])
+    trail.modified = timezone.now(), 
+    trail.save(update_fields=['modified', 'elevation_gain_json'])
 
+# called on every report submission; updates trail with dog and horse sightings array
 def update_trail_dogs_allowed(dogs, trail):
   if trail.dogs_allowed == []:
     if dogs:
@@ -86,9 +90,37 @@ def update_trailhead_access_condition(access_condition, trailhead):
   trailhead.modified = timezone.now()
   trailhead.save(update_fields=['modified', 'access_condition'])
 
+# called on every report submission, maintains parking capacity attribute on trailhead model based on
+# reported car/parking data
 def update_trailhead_parking_capacity(cars, max, trailhead):
   capacity = cars * (100 / max)
-  if trailhead.pkg_capacity is None or abs(trailhead.pkg_capacity - capacity) <= 10:
+  if trailhead.pkg_capacity is None:
     trailhead.pkg_capacity = capacity
-    trailhead.modified = timezone.now()
-    trailhead.save(update_fields=['modified', 'pkg_capacity'])
+  elif abs(trailhead.pkg_capacity - capacity) <= 5:
+    trailhead.pkg_capacity = (trailhead.pkg_capacity + capacity) / 2
+
+  trailhead.modified = timezone.now()
+  trailhead.save(update_fields=['modified', 'pkg_capacity'])
+
+
+# called when new data is submitted on attributes that should not change often
+# structural elements of a trailhead
+def update_trailhead_bathroom_type(bathroom_type, trailhead):
+  trailhead.bathroom_type = bathroom_type
+  trailhead.modified = timezone.now()
+  trailhead.save(update_fields=['modified', 'bathroom_type'])
+
+def update_trailhead_access(access, trailhead):
+  trailhead.access = access
+  trailhead.modified = timezone.now()
+  trailhead.save(update_fields=['modified', 'access'])
+
+def update_trailhead_access_distance(access_distance, trailhead):
+  trailhead.access_distance = access_distance
+  trailhead.modified = timezone.now()
+  trailhead.save(update_fields=['modified', 'access_distance'])
+
+def update_trailhead_parking_type(parking_type, trailhead):
+  trailhead.pkg_type = parking_type
+  trailhead.modified = timezone.now()
+  trailhead.save(update_fields=['modified', 'pkg_type'])

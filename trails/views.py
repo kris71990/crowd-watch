@@ -153,17 +153,21 @@ def reports_trail_trailhead(request, region_slug, trail_slug, trailhead_slug):
     form = ReportForm(request.POST)
     if form.is_valid():
       clean = form.cleaned_data
-      if clean['length']: update_trail_length(clean)
-      if clean['elevation_gain']: update_trail_elevation(clean)
+      form.save()
+      if clean['length']: update_trail_length(clean['length'], trail, trailhead.name)
+      if clean['elevation_gain']: update_trail_elevation(clean['elevation_gain'], trail, trailhead.name)
       update_trail_dogs_allowed(clean['dogs_seen'], trail)
       update_trail_horses_allowed(clean['horses_seen'], trail)
 
       if clean['bathroom_status']: update_trailhead_bathroom_status(clean['bathroom_status'], trailhead)
+      if clean['bathroom_type']: update_trailhead_bathroom_type(clean['bathroom_type'], trailhead)
+      if clean['access']: update_trailhead_access(clean['access'], trailhead)
       if clean['access_condition']: update_trailhead_access_condition(clean['access_condition'], trailhead)
+      if clean['access_distance']: update_trailhead_access_distance(clean['access_distance'], trailhead)
+      if clean['pkg_location']: update_trailhead_parking_type(clean['pkg_location'], trailhead)
 
       max_capacity = clean['pkg_estimate_begin'] if clean['pkg_estimate_begin'] > clean['pkg_estimate_end'] else clean['pkg_estimate_end']
       update_trailhead_parking_capacity(clean['cars_seen'], max_capacity, trailhead)
-      form.save()
       return HttpResponseRedirect(request.path_info)
   else:
     form = ReportForm(initial={ 'region': region, 'trail': trail, 'trailhead': trailhead }, label_suffix='')
