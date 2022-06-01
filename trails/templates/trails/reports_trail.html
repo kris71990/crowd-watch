@@ -15,6 +15,7 @@
       <h2>
         <a href="{% url 'trails' region.region_slug %}">{{ region.get_name_display }}</a> | 
         {{ trail.name }}
+        {% if day %}| {{ reports_list.0.get_day_hiked_display }}{% endif %}
       </h2>
     </div>
 
@@ -57,7 +58,7 @@
               {% endif %}
 
               <td>
-                <a href="{% url 'report' region_slug=region.region_slug trail_slug=report.trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">More</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=report.trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">-> Report</a>
               </td>
             </div>
           {% endfor %}

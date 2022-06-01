@@ -2,7 +2,7 @@ from django.core import validators
 from django.db import models
 from django.urls import reverse
 import uuid
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
 
 class Region(models.Model):
@@ -31,7 +31,7 @@ class Region(models.Model):
   region_slug = models.SlugField(null=True, verbose_name="Slug")
 
   def save(self, *args, **kwargs):
-    self.region_slug or slugify(self.name)
+    self.region_slug = self.region_slug or slugify(self.name)
     super().save(*args, **kwargs)
 
 class Trail(models.Model):
@@ -57,9 +57,11 @@ class Trail(models.Model):
   elevation_gain_json = models.JSONField('Elevation Gain', blank=True, null=True,
     help_text='From trailhead to highest point of trail',
   )
+  dogs_allowed = models.JSONField('Dogs', blank=True, null=True, default=list)
+  horses_allowed = models.JSONField('Horses', blank=True, null=True, default=list)
 
   def save(self, *args, **kwargs):
-    self.trail_slug or slugify(self.name)
+    self.trail_slug = self.trail_slug or slugify(self.name)
     super().save(*args, **kwargs)
 
 class Trailhead(models.Model):
@@ -89,12 +91,19 @@ class Trailhead(models.Model):
     ('FR', 'Fixed Building with plumbing')
   ]
 
+  ACCESS_CONDITIONS = [
+    ('I', 'Impassable'),
+    ('P+', 'Many potholes'),
+    ('P', 'Potholes'),
+    ('P-', 'Occasional potholes'),
+    ('G', 'Good')
+  ]
+
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   region = models.ForeignKey(Region, on_delete=models.CASCADE)
   trails = models.ManyToManyField(Trail, related_name='trailheads')
   modified = models.DateTimeField('time modified', auto_now=True)
   trailhead_slug = models.SlugField(null=True, verbose_name="Slug")
-
 
   name = models.CharField(max_length=50, unique=True, help_text='Name of Trailhead')
   coordinates = models.CharField(
@@ -107,10 +116,16 @@ class Trailhead(models.Model):
     choices=ACCESS_TYPES,
     help_text='How is the trailhead accessed?'
   )
-  access_distance = models.IntegerField(
+  access_distance = models.DecimalField(
+    max_digits=3, decimal_places=1,
     blank=True, null=True,
     help_text='If accessed via service road, length of service road from paved road to trailhead',
     validators=[MinValueValidator(0.1)]
+  )
+  access_condition = models.CharField('Road access condition',
+    max_length=2, blank=True, null=True,
+    choices=ACCESS_CONDITIONS,
+    help_text='Condition of road to trailhead'
   )
   pkg_type = models.CharField('Parking type',
     max_length=2, blank=True, null=True,
@@ -136,7 +151,7 @@ class Trailhead(models.Model):
   )
 
   def save(self, *args, **kwargs):
-    self.trailhead_slug or slugify(self.name)
+    self.trailhead_slug = self.trailhead_slug or slugify(self.name)
     super().save(*args, **kwargs)
 
 class Report(models.Model):
@@ -269,7 +284,7 @@ class Report(models.Model):
     blank=True, null=True,
     max_length=2,
     choices=ACCESS_CONDITIONS,
-    help_text='If accessed via service road, the condition of the service road?'
+    help_text='What is the condition of the road access to trailhead?'
   )
   trail_begin = models.TimeField(help_text='What time did the hike begin?')
   trail_end = models.TimeField(help_text='What time did the hike end?')
@@ -293,12 +308,12 @@ class Report(models.Model):
   pkg_estimate_begin = models.IntegerField(
     'Percentage Capacity Start',
     help_text='Approximate parking capacity full at trailhead arrival',
-    validators=[MinValueValidator(0)]
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   pkg_estimate_end = models.IntegerField(
     'Percentage Capacity End',
     help_text='Approximate parking capacity full at trailhead departure',
-    validators=[MinValueValidator(0)]
+    validators=[MinValueValidator(0), MaxValueValidator(100)]
   )
   cars_seen = models.IntegerField(
     'Cars seen', help_text='Most cars seen at arrival/departure',
@@ -308,5 +323,5 @@ class Report(models.Model):
     'People seen', help_text='Approximate number of people encountered on trail',
     validators=[MinValueValidator(0)]
   )
-  horses_seen = models.BooleanField()
-  dogs_seen = models.BooleanField()
+  horses_seen = models.BooleanField(blank=True, null=True)
+  dogs_seen = models.BooleanField(blank=True, null=True)

@@ -22,6 +22,9 @@ def parse_time(period):
   return { 'min': min, 'max': max }
 
 def create_advice(type, filtered, total):
+  if total < 1:
+    return None
+
   ratio = (filtered / total) * 100
   if (ratio > 80):
     caution = 'red'

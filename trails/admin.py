@@ -42,10 +42,10 @@ class TrailAdmin(admin.ModelAdmin):
   get_trailheads.short_description = 'Trailheads'
   get_reports.short_description = 'Reports'
 
-  readonly_fields = ['id', 'modified', 'get_trailheads', 'length_json', 'elevation_gain_json']
+  readonly_fields = ['id', 'modified', 'get_trailheads']
   fieldsets = (
     (None, {
-      'fields': ('name', 'trail_slug', 'region', 'coordinates',)
+      'fields': ('name', 'trail_slug', 'region', 'coordinates', 'length_json', 'elevation_gain_json')
     }),
     ('Metadata', {
       'fields': readonly_fields

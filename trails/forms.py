@@ -5,12 +5,13 @@ from datetime import datetime
 class TrailForm(ModelForm):
   class Meta:
     model = Trail
-    fields = ['region', 'trail_slug', 'name', 'coordinates', 'length_json', 'elevation_gain_json']
+    fields = ['region', 'name', 'coordinates', 'length_json', 'elevation_gain_json']
 
 class TrailheadForm(ModelForm):
   class Meta:
     model = Trailhead
-    fields = ('region', 'trails', 'trailhead_slug', 'name', 'coordinates', 'access', 'access_distance', 'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
+    fields = ('region', 'trails', 'name', 'coordinates', 'access', 'access_distance', 
+              'pkg_type', 'pkg_capacity', 'bathroom_type', 'bathroom_status')
 
 class TrailheadAssociationForm(ModelForm):
   class Meta:
@@ -25,7 +26,9 @@ class ReportForm(ModelForm):
       year_choices.append(current_year - i)
 
     model = Report
-    fields = ('trail', 'trailhead', 'date_hiked', 'day_hiked', 'weather_type', 'temperature', 'car_type', 'access', 'access_distance', 'access_condition','trail_begin', 'trail_end', 'bathroom_type', 'bathroom_status', 'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'horses_seen', 'dogs_seen')
+    fields = ('region', 'trail', 'trailhead', 'date_hiked', 'day_hiked', 'length', 'elevation_gain', 'weather_type', 'temperature', 
+              'car_type', 'access', 'access_distance', 'access_condition', 'trail_begin', 'trail_end', 'bathroom_type', 'bathroom_status', 
+              'pkg_location', 'pkg_estimate_begin', 'pkg_estimate_end', 'cars_seen', 'people_seen', 'horses_seen', 'dogs_seen')
     widgets = {
       'date_hiked': SelectDateWidget(
         years=year_choices,

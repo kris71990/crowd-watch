@@ -1,36 +1,34 @@
 from django.test import TestCase
 from django.urls import reverse
-from faker import Faker
 
 from ...models import Trail
-from ..mocks import create_trail
-
-fake = Faker()
+from ..mocks import create_trail, create_region
 
 # /list
 class TrailListViewTests(TestCase):
   # returns empty list when no trails exist
   def test_trail_list_empty(self):
     response = self.client.get(reverse('trail_list'))
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trail_list.html')
 
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'trails/trail_list.html')
     self.assertContains(response, 'No trails found')
     self.assertQuerysetEqual(response.context['trails_list'], [])
+    self.assertTrue(response.context['date'])
 
   # returns all trails when some exist, regardless of region, ordered by most recent
   def test_trail_list(self):
     regions = ['CC', 'WW', 'NC']
     for i in range(3):
-      create_trail(name=fake.name(), region=regions[i], coordinates=fake.word())
+      region = create_region(i)
+      create_trail(region=region)
       
     response = self.client.get(reverse('trail_list'))
     trails = response.context['trails_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trail_list.html')
+    self.assertTemplateUsed(response, 'trails/trail_list.html')
     self.assertContains(response, 'Trail Feed')
-
     self.assertEqual(len(trails), 3)
     self.assertGreater(trails[0].modified, trails[1].modified)
     self.assertGreater(trails[1].modified, trails[2].modified)
@@ -39,82 +37,59 @@ class TrailListViewTests(TestCase):
 class TrailListByRegionViewTests(TestCase):
   # returns empty list when no trails exist in region
   def test_trail_list_by_region_empty(self):
-    region = 'CC'
-    response = self.client.get(reverse('trails', args=(region,)))
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
+    region = create_region('CC')
+    response = self.client.get(reverse('trails', args=(region.region_slug,)))
 
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'trails/trails.html')
     self.assertContains(response, 'No trails found')
     self.assertQuerysetEqual(response.context['trails_list'], [])
-    self.assertEqual(response.context['region'], region)
-    self.assertIsNotNone(response.context['form'])
+    self.assertEqual(response.context['region'].name, region.name)
+    self.assertTrue(response.context['form'])
+    self.assertTrue(response.context['date'])
 
   # returns all trails when some exist in region, ordered by most recent
   def test_trail_list_by_region(self):
-    region = 'CC'
+    region = create_region('CC')
     for i in range(3):
-      create_trail(name=fake.name(), region=region, coordinates=fake.word())
+      create_trail(region=region)
 
-    response = self.client.get(reverse('trails', args=(region,)))
+    response = self.client.get(reverse('trails', args=(region.region_slug,)))
     trails = response.context['trails_list']
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
+    self.assertTemplateUsed(response, 'trails/trails.html')
     self.assertContains(response, 'Central Cascades Trails')
-
     self.assertEqual(len(trails), 3)
     self.assertGreater(trails[0].modified, trails[1].modified)
     self.assertGreater(trails[1].modified, trails[2].modified)
-    self.assertEqual(response.context['region'], region)
-    self.assertIsNotNone(response.context['form'])
+    self.assertEqual(response.context['region'].name, region.name)
+    self.assertEqual(trails[0].report__count, 0)
+    self.assertTrue(response.context['form'])
+    self.assertTrue(response.context['date'])
 
   # create a trail, return new list of trails for region, in order
   def test_create_trail(self):
-    region = 'CC'
+    region = create_region('CC')
     for i in range(3):
-      create_trail(name=fake.name(), region=region, coordinates=fake.word())
+      create_trail(region=region)
 
-    path = reverse('trails', args=(region,))
-    post_response = self.client.post(path, { 'name': 'dssf', 'region': region, 'coordinates': 'sffsd' })
+    path = reverse('trails', args=(region.region_slug,))
+    post_response = self.client.post(path, { 'name': 'dssf xyz', 'region': region.id, 'coordinates': 'sffsd' })
     self.assertRedirects(post_response, path)
 
-    get_response = self.client.get(path, args=(region,))
+    get_response = self.client.get(path, args=(region.region_slug,))
     trails = get_response.context['trails_list']
 
     self.assertEqual(get_response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
+    self.assertTemplateUsed(get_response, 'trails/trails.html')
     self.assertContains(get_response, 'Central Cascades Trails')
     self.assertEqual(len(trails), 4)
     self.assertGreater(trails[0].modified, trails[1].modified)
-    self.assertEqual(trails[0].name, 'dssf')
-
-  # test negative trail length error
-  def test_create_trail_error_length(self):
-    region = 'CC'
-    path = reverse('trails', args=(region,))
-    response = self.client.post(path, {
-      'name': 'test',
-      'region': region,
-      'coordinates': '21313',
-      'length': -0.1,
-    })
-
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
-    self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')
-
-  # test negative elevation gain error
-  def test_create_trail_error_elevation(self):
-    region = 'CC'
-    path = reverse('trails', args=(region,))
-    response = self.client.post(path, {
-      'name': 'test',
-      'region': region,
-      'coordinates': '21313',
-      'elevation_gain': -3,
-    })
-
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed('trails.html')
-    self.assertContains(response, 'Ensure this value is greater than or equal to 1.')
-
+    self.assertEqual(trails[0].name, 'dssf xyz')
+    self.assertEqual(trails[0].trail_slug, 'dssf-xyz')
+    self.assertIsNone(trails[0].elevation_gain_json)
+    self.assertIsNone(trails[0].length_json)
+    self.assertTrue(get_response.context['form'])
+    self.assertEqual(get_response.context['region'].name, region.name)
+    self.assertEqual(trails[0].report__count, 0)
