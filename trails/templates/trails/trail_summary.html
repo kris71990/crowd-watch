@@ -25,10 +25,30 @@
       <ul>
       {% for trailhead in trailheads %}
         <li>{{ trailhead.name }} - <span>via {{ trailhead.get_access_display }}</span> |
-          <span>{{ trailhead.get_bathroom_type_display }} - <span id="bathroom_status">{{ trailhead.get_bathroom_status_display }}</span></span>
+          <span>{{ trailhead.get_bathroom_type_display }} - <span class="approved_status">{{ trailhead.get_bathroom_status_display }}</span></span>
         </li>
       {% endfor %}
       </ul>
+
+      <h4>Animals</h4>
+      <p>Dogs Allowed: 
+        {% if trail.dogs_allowed.length < 1 %} 
+          <span>Unknown</span>
+        {% elif trail.dogs_allowed.0 > trail.dogs_allowed.1 %} 
+          <span class="approved_status">Yes</span>
+        {% else %}
+          <span class="disapproved_status">No</p>
+        {% endif %}
+      </p>
+      <p>Horses Allowed: 
+        {% if trail.horses_allowed.length < 1 %} 
+          <span>Unknown</span>
+        {% elif trail.horses_allowed.0 > trail.horses_allowed.1 %}
+          <span class="approved_status">Yes</span>
+        {% else %}
+          <span class="disapproved_status">No</p>
+        {% endif %}
+      </p>
 
       <h4>Popularity</h4>
       <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ region.get_name_display }}</p>

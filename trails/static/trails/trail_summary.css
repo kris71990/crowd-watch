@@ -6,6 +6,10 @@ span {
   font-style: normal;
 }
 
-#bathroom_status {
+.approved_status {
   color: #0A8954;
+}
+
+.disapproved_status {
+  color: #EB350E;
 }
