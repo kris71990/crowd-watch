@@ -24,8 +24,14 @@
 
       <ul>
       {% for trailhead in trailheads %}
-        <li>{{ trailhead.name }} - <span>via {{ trailhead.get_access_display }}</span> |
-          <span>{{ trailhead.get_bathroom_type_display }} - <span class="approved_status">{{ trailhead.get_bathroom_status_display }}</span></span>
+        <li id="trailhead_name">{{ trailhead.name }}</li>
+        <li id="trailhead_stats">
+          <p>Access via {{ trailhead.get_access_display }} 
+            {% if trailhead.access_distance %} {{ trailhead.access_distance }} {% endif %}
+            {% if trailhead.access_condition %}(latest conditions: {{ trailhead.get_access_condition_display }}){% endif %}
+          </p>
+          <p>Parking: {{ trailhead.get_pkg_type_display }}, fits approximately {{ trailhead.pkg_capacity }} vehicles.</p>
+          <p>{{ trailhead.get_bathroom_type_display }} - <span class="approved_status">{{ trailhead.get_bathroom_status_display }}</span></p>
         </li>
       {% endfor %}
       </ul>

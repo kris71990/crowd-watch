@@ -1,5 +1,9 @@
-li {
+#trailhead_name {
   font-style: italic;
+}
+
+#trailhead_stats {
+  padding-left: 20px;
 }
 
 span {
