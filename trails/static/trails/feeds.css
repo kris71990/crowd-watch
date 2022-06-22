@@ -22,10 +22,6 @@ td:last-child a {
   color: #2C520F;
 }
 
-td:last-child a:hover {
-  font-weight: bold;
-}
-
 .filters a {
   color: #50836E;
   font-weight: bold;

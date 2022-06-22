@@ -65,15 +65,15 @@
 
               {% if trail %}
               <td>
-                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">-> Report {{ report.length }}/{{report.elevation_gain}}</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">-> Report</a>
               </td>
               {% elif trailhead %}
               <td>
-                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=trailhead.trailhead_slug report=report.id %}">-> Report {{ report.length }}/{{report.elevation_gain}}</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=trailhead.trailhead_slug report=report.id %}">-> Report</a>
               </td>
               {% else %}
               <td>
-                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">-> Report {{ report.length }}/{{report.elevation_gain}}</a>
+                <a href="{% url 'report' region_slug=region.region_slug trail_slug=trail.trail_slug trailhead_slug=report.trailhead.trailhead_slug report=report.id %}">-> Report</a>
               </td>
               {% endif %}
             </div>

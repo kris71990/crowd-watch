@@ -51,7 +51,11 @@
       </p>
 
       <h4>Popularity</h4>
-      <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ region.get_name_display }}</p>
+      {% if summary.reports_trail_count == 1 %}
+        <p>{{ summary.reports_trail_count }} report of {{ summary.reports_region_count }} total posted for {{ region.get_name_display }}</p>
+      {% else %}
+        <p>{{ summary.reports_trail_count }} reports of {{ summary.reports_region_count }} total posted for {{ region.get_name_display }}</p>
+      {% endif %}
       {% if summary.advice %}
         <div class="{{ summary.advice.caution }}">
           <p>{{ summary.advice.advice}}</p>
