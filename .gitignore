@@ -236,4 +236,9 @@ Thumbs.db
 !.vscode/extensions.json
 *.code-workspace
 
+### Docker ###
+.dockerignore
+docker-compose.yml
+Dockerfile
+
 # End of https://www.toptal.com/developers/gitignore/api/django,python,vscode
