@@ -1,22 +1,30 @@
 version: 2.1
 
-orbs:
-  python: circleci/python@2.1.1
-
 jobs:
-  test:
-    executor: python/default
+  build:
+    docker:
+      - image: circleci/python:3.10.3
     steps:
       - checkout 
-      - python/install-packages:
-          pkg-manager: pip
-          pip-dependency-file: requirements.txt
       - run:
-          name: Unit Tests
+          name: Setup env
           command: |
+            echo 'export IMG_TAG=${CIRCLE_BUILD_NUM}' >> $BASH_ENV
+            echo 'export IMG_NAME=python-circleci-docker' >> $BASH_ENV
+            virtualenv crowdproject
+            . crowdproject/bin/activate
+            pip install --no-cache-dir -r requirements.txt
+      - run:
+          name: Run Tests
+          command: |
+            . crowdproject/bin/activate
             python manage.py test
-            
-workflows:
-  main:
-    jobs:
-      - test
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build and push Docker image
+          command: |
+            . crowdproject/bin/activate
+            docker build -t kris719/$IMG_NAME:$IMG_TAG .
+            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+            docker push kris719/$IMG_NAME:$IMG_TAG

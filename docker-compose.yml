@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    volumes: 
+      - crowds:/var/lib/postgresql/data
+    environment:
+      - "POSTGRES_DB=${DB_NAME}"
+      - "POSTGRES_USER=${USER}"
+      - "POSTGRES_PASSWORD=${PASSWORD}"
+  web:
+    build: .
+    command: >
+      sh -c 'python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000'
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - "POSTGRES_DB=${DB_NAME}"
+      - "POSTGRES_USER=${USER}"
+      - "POSTGRES_PASSWORD=${PASSWORD}"
+    depends_on:
+      - db
+
+volumes:
+  crowds:
