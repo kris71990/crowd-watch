@@ -3,14 +3,22 @@ version: "3.8"
 services:
   db:
     image: postgres
+    networks:
+      - crowdproject
     volumes: 
       - crowds:/var/lib/postgresql/data
     environment:
       - "POSTGRES_DB=${DB_NAME}"
-      - "POSTGRES_USER=${USER}"
-      - "POSTGRES_PASSWORD=${PASSWORD}"
+      - "POSTGRES_USER=${POSTGRES_USER}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
   web:
     build: .
+    depends_on:
+      - db
+    networks:
+      - crowdproject
+    links:
+      - db:db
     command: >
       sh -c 'python manage.py makemigrations &&
              python manage.py migrate &&
@@ -21,10 +29,12 @@ services:
       - "8000:8000"
     environment:
       - "POSTGRES_DB=${DB_NAME}"
-      - "POSTGRES_USER=${USER}"
-      - "POSTGRES_PASSWORD=${PASSWORD}"
-    depends_on:
-      - db
+      - "POSTGRES_USER=${POSTGRES_USER}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
 
 volumes:
   crowds:
+
+networks:
+  crowdproject:
+    driver: bridge
