@@ -11,6 +11,7 @@ jobs:
           PASSWORD: $PASSWORD
           HOST: $HOST
           SECRET_KEY: $DJANGO_SECRET_KEY
+          DJAGO_SETTINGS_MODULE: crowdproject.settings.ci
     steps:
       - checkout 
       - restore_cache:
