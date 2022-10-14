@@ -41,5 +41,5 @@ jobs:
 workflows:
   main:
     jobs:
-      - build
+      - build:
           context: crowdproject
