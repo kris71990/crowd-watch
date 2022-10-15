@@ -4,6 +4,8 @@
 
 **Version:** 1.0
 
+[![kris71990](https://circleci.com/gh/kris71990/crowd-watch.svg?style=shield)](https://github.com/kris71990/crowd-watch)
+
 ## About
 
 This is a web application created to keep track of how people move and where they congregate.
