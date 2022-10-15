@@ -76,46 +76,6 @@ class TrailheadViewTests(TestCase):
     self.assertTrue(context['formDayFilter'])
     self.assertTrue(context['formTimeFilter'])
 
-  def test_create_trailhead_error_access_distance(self):
-    region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, filters=None)
-    trailhead_trails = trailhead.trails.all()
-
-    path = reverse('trailheads', args=(region.region_slug, trailhead_trails[0].trail_slug,))
-    response = self.client.post(path, { 
-      'region': region.id,
-      'trails': trailhead_trails[0].id, 
-      'name': 'abcd', 
-      'coordinates': 'sffsd',
-      'access_distance': 0,
-    })
-
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed(response, 'trails/trailheads.html')
-    self.assertContains(response, 'Ensure this value is greater than or equal to 0.1.')
-    self.assertTrue(response.context['formTh'])
-    self.assertTrue(response.context['formDayFilter'])
-    self.assertTrue(response.context['formTimeFilter'])
-
-  def test_create_trailhead_error_pkg_capacity(self):
-    region = create_region('CC')
-    trailhead = create_trail_and_trailhead(region=region, filters=None)
-    trailhead_trails = trailhead.trails.all()
-
-    path = reverse('trailheads', args=(region.region_slug, trailhead_trails[0].trail_slug,))
-    response = self.client.post(path, { 
-      'region': region.id,
-      'trails': trailhead_trails[0].id, 
-      'name': 'abcd', 
-      'coordinates': 'sffsd',
-      'pkg_capacity': -1
-    })
-
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed(response, 'trails/trailheads.html')
-    self.assertContains(response, 'Ensure this value is greater than or equal to 0.')
-    self.assertTrue(response.context['formTh'])
-
 # <region>/bathroom
 # <region>/access
 class TrailheadFilterTests(TestCase):
