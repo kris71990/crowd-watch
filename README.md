@@ -4,7 +4,7 @@
 
 **Version:** 1.0
 
-[![kris71990](https://circleci.com/gh/kris71990/crowd-watch.svg?style=shield)](https://github.com/kris71990/crowd-watch)
+[![kris71990](https://circleci.com/gh/kris71990/crowd-watch/tree/master.svg?style=shield)](https://github.com/kris71990/crowd-watch/?branch=master)
 
 ## About
 
