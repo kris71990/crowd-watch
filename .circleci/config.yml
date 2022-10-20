@@ -5,13 +5,6 @@ jobs:
     docker:
       - image: cimg/python:3.10.3
       - image: cimg/postgres:14.2
-        environment:
-          NAME: $NAME
-          USER: $USER
-          PASSWORD: $PASSWORD
-          HOST: $HOST
-          SECRET_KEY: $DJANGO_SECRET_KEY
-          DJAGO_SETTINGS_MODULE: crowdproject.settings.ci
     steps:
       - checkout 
       - restore_cache:
@@ -35,9 +28,11 @@ jobs:
           name: Build and push Docker image
           command: |
             . crowdproject/bin/activate
-            docker build -t kris719/$IMG_NAME:$IMG_TAG .
-            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker push kris719/$IMG_NAME:$IMG_TAG
+            if [ "$ {CIRCLE_BRANCH}" == "master" ]; then
+              docker build -t kris719/$IMG_NAME:$IMG_TAG .
+              echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+              docker push kris719/$IMG_NAME:$IMG_TAG
+            fi
 
 workflows:
   main:
